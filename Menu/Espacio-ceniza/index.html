@@ -1,0 +1,799 @@
+<!doctype html>
+<html lang="es-AR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Carta · Espacio Ceniza | Coctelería en Villa Luro, CABA</title>
+<meta name="description" content="La carta de Espacio Ceniza: cócteles de autor, tragos clásicos, aperitivos y algo para picar. Stand up, microteatro y barra en Villa Luro, CABA.">
+<meta name="theme-color" content="#F9F9F7">
+<script>
+/* Intro de la llamita: corre cada vez que se abre la carta, salvo que el celular pida "reducir movimiento" */
+try{ if(!matchMedia('(prefers-reduced-motion: reduce)').matches) document.documentElement.classList.add('intro'); }catch(e){}
+</script>
+
+<!-- CANONICAL: completar cuando esté el dominio propio -->
+<!-- <link rel="canonical" href="https://DOMINIO/"> -->
+
+<meta property="og:type" content="website">
+<meta property="og:locale" content="es_AR">
+<meta property="og:title" content="Carta · Espacio Ceniza">
+<meta property="og:description" content="Cócteles de autor, clásicos y aperitivos. Stand up, microteatro y barra en Villa Luro.">
+<meta property="og:image" content="https://res.cloudinary.com/eekglpse/image/upload/w_1200,h_630,c_fill,q_auto,f_jpg/v1792543359/PORTADA.jpg">
+<!-- og:url: completar con el dominio -->
+<meta name="twitter:card" content="summary_large_image">
+
+<link rel="icon" href="https://res.cloudinary.com/eekglpse/image/upload/v1792543357/favicon-fondo-negro.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="https://res.cloudinary.com/eekglpse/image/upload/w_180,h_180,c_pad,b_rgb:141414,f_png/v1792543357/favicon-fondo-negro.svg">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://docs.google.com">
+<link rel="preconnect" href="https://res.cloudinary.com">
+<link rel="preload" as="image" href="https://res.cloudinary.com/eekglpse/image/upload/w_220,q_auto,f_auto/v1792550089/favicon-transparente.png">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;1,400&family=Oswald:wght@500;600&display=swap" rel="stylesheet">
+
+<script type="application/ld+json">
+{
+  "@context":"https://schema.org",
+  "@type":"BarOrPub",
+  "name":"Espacio Ceniza",
+  "description":"Espacio multicultural de arte y stream: coctelería, microteatro, ciclos de stand up y juegos de mesa.",
+  "address":{"@type":"PostalAddress","addressLocality":"Villa Luro","addressRegion":"CABA","addressCountry":"AR"},
+  "telephone":"+54 11 5742-4161",
+  "servesCuisine":"Coctelería",
+  "image":"https://res.cloudinary.com/eekglpse/image/upload/v1792543359/PORTADA.jpg",
+  "sameAs":["https://instagram.com/espacio_ceniza","https://linktr.ee/espacioceniza"]
+}
+</script>
+
+<style>
+:root{
+  --bg:#F9F9F7;
+  --ink:#141414;
+  --muted:#6B6660;      /* gris cálido para descripciones */
+  --line:#D9D5CE;       /* puntos guía y divisores */
+  --orange:#F2611D;     /* precios y categoría activa */
+  --red:#C8281E;        /* sellos */
+  --yellow:#F5A623;     /* sello Recomendado */
+  --violet:#7A3FD6;     /* sello Nuevo */
+  --white:#FFFFFF;
+  --max:640px;
+  --nav-h:60px;
+  --ease:cubic-bezier(.4,0,.2,1);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+html,body{max-width:100vw;overflow-x:hidden}
+body{
+  font-family:'DM Sans',system-ui,sans-serif;
+  background:var(--bg);color:var(--ink);
+  font-size:16px;line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+  -webkit-tap-highlight-color:transparent;
+}
+::selection{background:var(--orange);color:var(--white)}
+a{color:inherit}
+.wrap{max-width:var(--max);margin:0 auto;padding:0 20px}
+
+/* ---------- PORTADA ---------- */
+.hero{
+  position:relative;height:34svh;min-height:220px;max-height:380px;
+  background:var(--ink);overflow:hidden;
+  /* curva orgánica del kit B, abajo a la izquierda */
+  border-bottom-left-radius:70% 22%;
+}
+.hero img.bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.hero::after{
+  content:"";position:absolute;inset:0;
+  background:linear-gradient(180deg,rgba(20,20,20,.25),rgba(20,20,20,.7));
+}
+.hero .logo{
+  position:absolute;z-index:2;left:50%;top:50%;transform:translate(-50%,-50%);
+  width:min(62%,300px);height:auto;
+}
+.hero h1{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+
+/* ---------- BARRA FIJA DE CATEGORÍAS ---------- */
+.nav{
+  position:sticky;top:0;z-index:50;
+  background:rgba(249,249,247,.94);
+  -webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--line);
+}
+.nav-track{
+  display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;
+  padding:8px 20px;max-width:var(--max);margin:0 auto;
+  scroll-snap-type:x proximity;
+}
+.nav-track::-webkit-scrollbar{display:none}
+/* los bordes se desvanecen solo del lado donde hay más categorías para deslizar */
+.nav-track.fade-r{-webkit-mask-image:linear-gradient(to right,#000 82%,transparent);mask-image:linear-gradient(to right,#000 82%,transparent)}
+.nav-track.fade-l{-webkit-mask-image:linear-gradient(to left,#000 82%,transparent);mask-image:linear-gradient(to left,#000 82%,transparent)}
+.nav-track.fade-l.fade-r{-webkit-mask-image:linear-gradient(to right,transparent,#000 18%,#000 82%,transparent);mask-image:linear-gradient(to right,transparent,#000 18%,#000 82%,transparent)}
+.chip{
+  flex:0 0 auto;scroll-snap-align:center;
+  display:inline-flex;align-items:center;gap:7px;
+  min-height:44px;padding:0 14px;border-radius:9999px;
+  border:1.5px solid var(--ink);background:transparent;color:var(--ink);
+  font-family:'Oswald',sans-serif;font-weight:500;font-size:15px;
+  letter-spacing:.04em;text-transform:uppercase;text-decoration:none;
+  white-space:nowrap;cursor:pointer;
+  transition:background .2s var(--ease),color .2s var(--ease),border-color .2s var(--ease);
+}
+.chip svg{width:22px;height:22px;flex:0 0 auto}
+.chip.active{background:var(--orange);border-color:var(--orange);color:var(--white)}
+
+/* ---------- CATEGORÍAS ---------- */
+main{padding:28px 0 12px}
+.cat{scroll-margin-top:calc(var(--nav-h) + 8px);padding:28px 0 20px}
+.cat + .cat{border-top:1px solid var(--line)}
+.cat-head{display:flex;align-items:center;gap:12px;margin-bottom:4px}
+.cat-head svg{width:33px;height:33px;color:var(--orange);flex:0 0 auto}
+.cat-title{
+  font-family:'Oswald',sans-serif;font-weight:600;
+  font-size:clamp(30px,8.5vw,40px);line-height:1;
+  letter-spacing:.01em;text-transform:uppercase;
+}
+.cat-sub{font-style:italic;color:var(--muted);font-size:15px;margin:6px 0 18px}
+
+/* ---------- PRODUCTO: NOMBRE ····· PRECIO ---------- */
+.item{display:flex;gap:12px;padding:12px 0}
+.thumb{
+  flex:0 0 auto;width:60px;height:60px;border-radius:12px;overflow:hidden;
+  background:#ECE9E3;
+}
+.thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.item-body{flex:1;min-width:0}
+.row{display:flex;align-items:flex-end;gap:8px}
+.name{
+  font-family:'Oswald',sans-serif;font-weight:500;font-size:18px;line-height:1.25;
+  letter-spacing:.03em;text-transform:uppercase;
+  flex:0 1 auto;min-width:0;overflow-wrap:anywhere;
+}
+.leader{flex:1 1 16px;min-width:16px;border-bottom:2px dotted var(--line);margin-bottom:7px}
+.price{
+  flex:0 0 auto;white-space:nowrap;line-height:1.25;
+  font-family:'Oswald',sans-serif;font-weight:600;font-size:19px;color:var(--orange);
+}
+.desc{font-style:italic;color:var(--muted);font-size:15px;line-height:1.5;margin-top:3px}
+
+/* sellos solo ícono, al tocar muestran su nombre */
+.badges{display:inline-flex;gap:2px;vertical-align:-3px;margin-left:4px}
+.badge{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:26px;height:26px;margin:-5px -2px;  /* área táctil grande sin mover la línea */
+  border:0;background:none;color:var(--red);cursor:pointer;padding:0;
+}
+.badge svg{width:19px;height:19px}
+.badge[data-k="new"]{width:38px}
+.badge[data-k="new"] svg{width:34px;height:17px}
+.badge[data-k="rec"]{color:var(--yellow)}
+.badge[data-k="new"]{color:var(--violet)}
+.badge[data-k="sg"] svg{width:21px;height:21px}
+.tip{
+  position:fixed;z-index:100;pointer-events:none;
+  background:var(--ink);color:var(--white);
+  font-size:13px;font-weight:500;line-height:1;white-space:nowrap;
+  padding:8px 11px;border-radius:8px;
+  opacity:0;transform:translateY(4px);transition:opacity .15s,transform .15s;
+}
+.tip.show{opacity:1;transform:translateY(0)}
+
+/* ---------- PIE ---------- */
+.foot{
+  background:var(--ink);color:rgba(255,255,255,.82);
+  margin-top:24px;padding:48px 0 calc(40px + env(safe-area-inset-bottom));
+  border-top-right-radius:70% 40px;
+}
+.foot .logo-neg{width:150px;height:auto;display:block;margin-bottom:28px}
+.note{
+  font-size:16px;line-height:1.55;color:var(--white);
+  border-left:3px solid var(--orange);padding-left:14px;margin-bottom:28px;
+}
+.story{font-size:15px;line-height:1.6;margin-bottom:14px}
+.rent{font-size:15px;line-height:1.6;margin-bottom:28px;color:rgba(255,255,255,.65)}
+.links{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:32px}
+.link{
+  display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 16px;
+  border:1.5px solid rgba(255,255,255,.35);border-radius:9999px;
+  color:var(--white);text-decoration:none;font-size:15px;font-weight:500;
+}
+.link svg{width:18px;height:18px}
+.link:active{background:var(--orange);border-color:var(--orange)}
+.legend-title{
+  font-family:'Oswald',sans-serif;font-weight:500;font-size:13px;
+  letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.55);margin-bottom:10px;
+}
+.legend{list-style:none;display:grid;grid-template-columns:1fr 1fr;gap:10px 16px;font-size:14px}
+.legend li{display:flex;align-items:center;gap:8px}
+.legend svg{width:20px;height:20px;color:#F26B5E;flex:0 0 auto}
+.legend li[data-k="rec"] svg{color:var(--yellow)}
+.legend li[data-k="new"] svg{width:34px;height:17px;color:var(--violet)}
+.legend li[data-k="sg"] svg{width:24px;height:24px}
+.credit{margin-top:40px;padding-top:20px;border-top:1px solid rgba(255,255,255,.12);
+  display:flex;align-items:center;gap:8px;font-size:12px;line-height:1;letter-spacing:.04em;color:rgba(255,255,255,.5)}
+.credit img{height:13px;width:auto;display:block;opacity:.9}
+
+/* ---------- APARICIÓN SUAVE ---------- */
+.reveal{opacity:0;transform:translateY(16px);transition:opacity .5s ease,transform .5s ease}
+.reveal.in{opacity:1;transform:none}
+
+@media (min-width:768px){
+  .hero{max-height:420px}
+  .nav-track{justify-content:center}
+}
+/* ---------- INTRO: la llamita se consume y del lugar sale el logo ----------
+   Curvas fuertes (ease-out para entrar, ease-in-out para el movimiento en pantalla).
+   Solo transform, opacity y clip-path: corre en la GPU aunque la página esté cargando.
+   Línea de tiempo (2,05 s): 0-450 ms se enciende · 300-1200 ms baila · 1150-1650 ms se consume de arriba
+   hacia la base · 1400-2050 ms el logo sube desde la base, como humo que toma forma. */
+:root{
+  --ease-out:cubic-bezier(0.23,1,0.32,1);
+  --ease-in-out:cubic-bezier(0.77,0,0.175,1);
+}
+.hero .flame{
+  position:absolute;z-index:3;left:50%;top:50%;width:64px;height:auto;
+  translate:-50% -50%;opacity:0;pointer-events:none;transform-origin:50% 100%;
+}
+.intro .hero .logo{opacity:0}
+.hero .flame-glow{
+  position:absolute;z-index:2;left:50%;top:50%;width:190px;height:190px;translate:-50% -45%;
+  border-radius:50%;opacity:0;pointer-events:none;
+  background:radial-gradient(circle,rgba(242,97,29,.42),rgba(200,40,30,.16) 45%,transparent 70%);
+}
+.intro.play .hero .flame{
+  animation:
+    flame-in 450ms var(--ease-out) forwards,
+    flame-dance 900ms ease-in-out 300ms both,
+    flame-burn 500ms var(--ease-in-out) 1150ms forwards;
+}
+.intro.play .hero .flame-glow{animation:glow-life 1700ms ease-in-out forwards}
+.intro.play .hero .logo{animation:logo-rise 650ms var(--ease-out) 1400ms both}
+@keyframes flame-in{
+  from{opacity:0;transform:translateY(6px) scale(.94)}
+  to  {opacity:1;transform:translateY(0) scale(1)}
+}
+/* la llama baila desde su base: se estira, se ensancha y se inclina en tiempos irregulares.
+   Usa las propiedades scale y rotate sueltas para no pisar la entrada ni el consumo */
+@keyframes flame-dance{
+  0%  {scale:1 1;      rotate:0deg}
+  14% {scale:.95 1.10; rotate:-3deg}
+  27% {scale:1.04 .94; rotate:2deg}
+  42% {scale:.94 1.13; rotate:3.5deg}
+  56% {scale:1.03 .96; rotate:-2deg}
+  71% {scale:.96 1.09; rotate:-3.5deg}
+  86% {scale:1.02 .97; rotate:1.5deg}
+  100%{scale:1 1;      rotate:0deg}
+}
+/* el resplandor titila con la llama y se apaga cuando se consume */
+@keyframes glow-life{
+  0%  {opacity:0}
+  20% {opacity:.85}
+  32% {opacity:.55}
+  45% {opacity:1}
+  58% {opacity:.6}
+  68% {opacity:.9}
+  88% {opacity:.25}
+  100%{opacity:0}
+}
+@keyframes flame-burn{             /* se consume: la llama se recorta de arriba hacia la base */
+  from{opacity:1;clip-path:inset(0 0 0 0);transform:scale(1)}
+  to  {opacity:0;clip-path:inset(100% 0 0 0);transform:scale(.96)}
+}
+@keyframes logo-rise{              /* el logo se revela de abajo hacia arriba */
+  from{opacity:0;clip-path:inset(100% 0 0 0);transform:translate(-50%,-50%) translateY(6px)}
+  to  {opacity:1;clip-path:inset(0 0 0 0);transform:translate(-50%,-50%)}
+}
+
+/* ---------- CENIZA QUE SUBE EN EL PIE ---------- */
+.foot{position:relative;overflow:hidden}
+.foot .wrap{position:relative;z-index:1}
+#ash{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:0;opacity:0;transition:opacity 900ms var(--ease-out)}
+#ash.on{opacity:1}
+.foot::after{
+  content:"";position:absolute;left:-10%;right:-10%;bottom:-8%;height:38%;z-index:0;pointer-events:none;
+  background:radial-gradient(ellipse at 50% 100%,rgba(242,97,29,.48),rgba(200,40,30,.2) 42%,transparent 72%);
+  animation:embers 4.5s ease-in-out infinite;
+}
+@keyframes embers{0%,100%{opacity:.75}50%{opacity:1}}
+
+@keyframes logo-fade{from{opacity:0}to{opacity:1}}
+@media (prefers-reduced-motion:reduce){
+  #ash{display:none}
+  .foot::after{animation:none}
+  .hero .logo{animation:logo-fade 300ms ease both}
+  html{scroll-behavior:auto}
+  .reveal{opacity:1;transform:none;transition:none}
+  .chip,.tip{transition:none}
+}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <img class="bg" id="heroImg" alt="Interior de Espacio Ceniza" fetchpriority="high"
+       src="https://res.cloudinary.com/eekglpse/image/upload/w_800,q_auto,f_auto/v1792547395/Portada_SIN_LOGO.jpg"
+       srcset="https://res.cloudinary.com/eekglpse/image/upload/w_800,q_auto,f_auto/v1792547395/Portada_SIN_LOGO.jpg 800w,
+               https://res.cloudinary.com/eekglpse/image/upload/w_1600,q_auto,f_auto/v1792547395/Portada_SIN_LOGO.jpg 1600w"
+       sizes="100vw">
+  <span class="flame-glow" aria-hidden="true"></span>
+  <img class="flame" id="heroFlame" alt="" aria-hidden="true" src="https://res.cloudinary.com/eekglpse/image/upload/w_220,q_auto,f_auto/v1792550089/favicon-transparente.png">
+  <img class="logo" id="heroLogo" alt="Espacio Ceniza"
+       src="https://res.cloudinary.com/eekglpse/image/upload/w_600,q_auto,f_auto/v1792543356/logo-negativo-margen.png">
+  <h1>Carta de Espacio Ceniza</h1>
+</header>
+
+<nav class="nav" aria-label="Categorías de la carta">
+  <div class="nav-track" id="nav"></div>
+</nav>
+
+<main class="wrap" id="menu" aria-live="polite"></main>
+
+<footer class="foot">
+  <canvas id="ash" aria-hidden="true"></canvas>
+  <div class="wrap">
+    <img class="logo-neg" id="footLogo" alt="Espacio Ceniza" loading="lazy"
+         src="https://res.cloudinary.com/eekglpse/image/upload/w_300,q_auto,f_auto/v1792543356/logo-negativo-margen.png">
+    <p class="note" id="note"></p>
+    <p class="story">Al Negro Almeida se le prendió fuego el departamento. Junto a Nany decidieron empezar de cero y armaron este lugar. De esas cenizas salió Ceniza.</p>
+    <div class="links">
+      <a class="link" href="https://instagram.com/espacio_ceniza" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r=".6" fill="currentColor"/></svg>
+        @espacio_ceniza
+      </a>
+      <a class="link" href="https://linktr.ee/espacioceniza" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>
+        Agenda y shows
+      </a>
+    </div>
+    <p class="rent">También alquilamos el espacio para cumpleaños y eventos privados.</p>
+    <p class="legend-title">Qué significa cada sello</p>
+    <ul class="legend" id="legend"></ul>
+    <p class="credit"><span>Carta realizada por</span><img id="faraLogo" alt="FÁRA" loading="lazy" height="13" src="https://res.cloudinary.com/eekglpse/image/upload/e_trim/h_66,f_png,q_auto/v1792547783/fara_marca_agua_logotipo_crema.svg"></p>
+  </div>
+</footer>
+
+<div class="tip" id="tip" role="tooltip"></div>
+
+<script>
+/* =========================================================
+   CONFIGURACIÓN
+   La carta lee la planilla "Menú Espacio Ceniza".
+   Para que funcione, la planilla tiene que estar compartida
+   como "Cualquier persona con el enlace: Lector".
+   ========================================================= */
+const SHEET_ID = '1rxyhL-DvDZdc8bgR_W3I3laMquBYutnD_pCpDOB1hfE';
+const CACHE_KEY = 'ceniza-carta-v2';
+
+/* Imágenes por defecto. La web las reemplaza por los links de la pestaña Marca. */
+const IMG_DEFAULT = {
+  portada:'https://res.cloudinary.com/eekglpse/image/upload/v1792547395/Portada_SIN_LOGO.jpg',
+  logoNeg:'https://res.cloudinary.com/eekglpse/image/upload/v1792543356/logo-negativo-margen.png',
+  faraNeg:'https://res.cloudinary.com/eekglpse/image/upload/v1792547783/fara_marca_agua_logotipo_crema.svg',
+  llamita:'https://res.cloudinary.com/eekglpse/image/upload/v1792550089/favicon-transparente.png'
+};
+/* Nombre exacto de la fila en Marca → clave interna */
+const MARCA_ROWS = {'portada':'portada','logo negativo':'logoNeg','fara logo negativo':'faraNeg','llamita':'llamita'};
+const rowKey = s => String(s).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim();
+
+/* Copia de respaldo: se muestra al instante y si no hay señal.
+   Apenas llega la planilla, se reemplaza por los datos vivos. */
+const SNAPSHOT = {
+  nota:'Si querés un trago que no figura en nuestra carta, consultá con alguno de nuestros bartenders.',
+  cats:[
+    {tab:'Cócteles de autor', sub:'Calificados para paladares selectos', items:[
+      {n:'Fuerzas del Cielo', d:'Ron de coco, vodka, limón, almíbar, aquafaba, blue curaçao y licor de chocolate blanco. Un cóctel celestial, cremoso y vibrante, con notas tropicales y un toque visual electrizante.', p:'$ 11.000', b:['rec']},
+      {n:'Caipicarpano', d:'Pomelo, naranja, limón, almíbar y vermut rosso. Cítrico y amargo, con un carácter combativo y refrescante. Ideal para quienes buscan algo diferente.', p:'$ 10.000'},
+      {n:'Luz', d:'Ramazzotti, dry gin y dry vermut. Elegante de perfil herbal, con equilibrio entre dulzor y un final seco. Ideal para los amantes de los aperitivos complejos.', p:'$ 11.000'},
+      {n:'Ushuaia', d:'Dry gin, licor de crema de cassis, elderflower y tónica. Frutal y floral, con equilibrio entre dulzor y frescura, perfecto para beber en cualquier ocasión.', p:'$ 11.500', b:['new']},
+      {n:'Golden Tonic', d:'Dry gin, golden age elderflower y tónica. Un clásico reinventado, la frescura del gin se realza con el toque floral y sutilmente dulce del elderflower, creando un equilibrio elegante entre lo herbal y lo aromático. Simple y sofisticado.', p:'$ 10.500'}]},
+    {tab:'Tragos clásicos', sub:'Cócteles icónicos, atemporales y con personalidad definida.', items:[
+      {n:'Old Fashioned', d:'Bourbon, almíbar y angostura. Intenso, seco y elegante.', p:'$ 13.000'},
+      {n:'Negroni', d:'Gin, vermut rosso y campari. Equilibrado, amargo y aromático.', p:'$ 10.000'},
+      {n:'Boulevardier', d:'Bourbon, vermut rosso y campari. Una versión más robusta del Negroni.', p:'$ 11.500'},
+      {n:'Gin Tonic', d:'Dry gin con agua tónica y fruta. Refrescante y versátil.', p:'$ 9.000'},
+      {n:'Gin Tonic Premium', d:'Dry gin con agua tónica y fruta. Refrescante y versátil.', p:'$ 11.000', b:['rec']},
+      {n:'Screwdriver', d:'Vodka y jugo de naranja o speed. Simple, fresco y frutal.', p:'$ 9.000'},
+      {n:'Cuba Libre', d:'Ron, coca cola y lima. El clásico cubano, dulce y refrescante.', p:'$ 9.500'},
+      {n:'Mojito', d:'Ron blanco, limón, menta, almíbar y soda. Refrescante y herbal.', p:'$ 9.500'},
+      {n:'Mojito Malibu', d:'Variante tropical del mojito, con ron de coco.', p:'$ 10.000'},
+      {n:'Caipirinha / Caipiroska', d:'Cachaça o vodka, lima y azúcar. Fresco, cítrico y de carácter tropical.', p:'$ 9.000'},
+      {n:'Jägermeister', d:'Medida de Jäger con lata de Red Bull o Speed', p:'$ 13.000'},
+      {n:'Chandon mini', d:'Extra brut 187 ml', p:'$ 11.000'},
+      {n:'Whisky J.W. Red Label', d:'Solo o con hielo. Un clásico puro para disfrutar lentamente.', p:'$ 13.000'},
+      {n:'Whisky J.W. Black Label', d:'Solo o con hielo. Un clásico puro para disfrutar lentamente.', p:'$ 15.000'}]},
+    {tab:'Aperitivos', sub:'Ideales para una noche relajada. Ligeros, amargos o burbujeantes', items:[
+      {n:'Americano', d:'Vermut rosso, campari y soda. Suave, amargo y espumoso.', p:'$ 9.000'},
+      {n:'Cynar Julep', d:'Cynar con menta, limón y almíbar. Refrescante y con amargor herbal.', p:'$ 9.500'},
+      {n:'Aperol / Ramazzotti Spritz', d:'Aperol o Ramazzotti, espumante y soda. Liviano, cítrico y burbujeante.', p:'$ 10.000', b:['rec']},
+      {n:'Garibaldi', d:'Campari y jugo de naranja. Simple, fresco y amargo-dulce.', p:'$ 9.000'},
+      {n:'Gancia', d:'Aperitivo italiano con limón y sprite. Clásico argentino.', p:'$ 9.000'},
+      {n:'Vermut rosso', d:'Servido con soda, pomelo o tónica. El aperitivo por excelencia.', p:'$ 9.000'},
+      {n:'Fernet', d:'Con coca cola. Amargo, especiado y refrescante. Un ícono nacional.', p:'$ 9.000'},
+      {n:'Cerveza Heineken', d:'Lata 473 ml. Siempre fría.', p:'$ 7.000'},
+      {n:'Cerveza Michelob', d:'Lata 473 ml. Siempre fría.', p:'$ 7.000', b:['sg']},
+      {n:'Vinito', d:'Callia Malbec 375 ml', p:'$ 7.000'}]},
+    {tab:'Sin alcohol', sub:'Aprobados para conductores designados', items:[
+      {n:'Agua saborizada / Gaseosa', d:'Botella 500 ml', p:'$ 6.000'},
+      {n:'Pomelada Rosa', d:'Limón, almíbar, pomelo, arándanos y soda', p:'$ 7.000'}]},
+    {tab:'Para comer', sub:'Para no tomar con la panza vacía', items:[
+      {n:'Empanada', d:'Carne, pollo, jamón y queso, verdura', p:'$ 3.000'},
+      {n:'Promo 3 empanadas', d:'Carne, pollo, jamón y queso, verdura', p:'$ 8.000'},
+      {n:'Supremita', d:'Sanguchito de suprema con lechuga y tomate', p:'$ 3.000'},
+      {n:'Promo 3 supremitas', d:'Sanguchito de suprema con lechuga y tomate', p:'$ 8.000', b:['rec']}]}
+  ]
+};
+
+/* ---------- ÍCONOS ---------- */
+const svg = (inner, extra='') =>
+  `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" ${extra}>${inner}</svg>`;
+
+const FLAME = svg('<path d="M12 3c.6 3 4.5 5 4.5 10a4.5 4.5 0 0 1-9 0c0-2.6 1.6-3.7 1.9-5.6 1 .9 1.7 2 1.8 3.2 1-2.2 1.3-4.8.8-7.6z"/>');
+const CAT_ICONS = [
+  [/sin alcohol/i, svg('<path d="M6.5 7h11l-1.6 13.2a1 1 0 0 1-1 .8H9.1a1 1 0 0 1-1-.8z"/><path d="M14.5 7 16 2.5"/><circle cx="9" cy="5" r="2"/>')],
+  [/autor/i,       svg('<path d="M4 5h16l-8 8.5z"/><path d="M12 13.5V20M8 20h8"/><path d="M17.5 2.2l.5 1.3 1.3.5-1.3.5-.5 1.3-.5-1.3-1.3-.5 1.3-.5z" fill="currentColor"/>')],
+  [/aperitiv/i,    svg('<path d="M7 3h10v5a5 5 0 0 1-10 0z"/><path d="M12 13v8M8.5 21h7"/><path d="M7.4 7h9.2"/>')],
+  [/comer/i,       svg('<path d="M3 16a9 9 0 0 1 18 0z"/><path d="M4 16c1-1.3 2 1.3 3 0s2 1.3 3 0 2 1.3 3 0 2 1.3 3 0 2 1.3 3 0"/>')],
+  [/cl[aá]sic/i,   svg('<path d="M5 7h14l-1.4 12.2a2 2 0 0 1-2 1.8H8.4a2 2 0 0 1-2-1.8z"/><rect x="8.5" y="11" width="4" height="4" rx=".6"/><path d="M12.5 9.5l3 1-1 3"/>')]
+];
+const catIcon = name => (CAT_ICONS.find(([re]) => re.test(name)) || [null, FLAME])[1];
+
+const BADGES = {
+  /* Sin TACC: inspirado en el símbolo argentino (espigas + círculo tachado). En la fila va sin letras; en la leyenda, con letras */
+  sg:  {label:'Sin TACC', col:'Sin gluten', icon:'<svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="19.5" r="11" fill="#fff" stroke="#E2312B" stroke-width="3.4"/><path d="M16 15.6L16 30" stroke="#2B2B2B" stroke-width="1.4" stroke-linecap="round"/><g fill="#F5B800" stroke="#A87A06" stroke-width=".5"><ellipse cx="14.20" cy="4.20" rx="1.7" ry="2.8" transform="rotate(-30 14.20 4.20)"/><ellipse cx="17.80" cy="4.20" rx="1.7" ry="2.8" transform="rotate(30 17.80 4.20)"/><ellipse cx="14.20" cy="7.30" rx="1.7" ry="2.8" transform="rotate(-30 14.20 7.30)"/><ellipse cx="17.80" cy="7.30" rx="1.7" ry="2.8" transform="rotate(30 17.80 7.30)"/><ellipse cx="14.20" cy="10.40" rx="1.7" ry="2.8" transform="rotate(-30 14.20 10.40)"/><ellipse cx="17.80" cy="10.40" rx="1.7" ry="2.8" transform="rotate(30 17.80 10.40)"/><ellipse cx="14.20" cy="13.50" rx="1.7" ry="2.8" transform="rotate(-30 14.20 13.50)"/><ellipse cx="17.80" cy="13.50" rx="1.7" ry="2.8" transform="rotate(30 17.80 13.50)"/><ellipse cx="16" cy="2.1" rx="1.4" ry="2.5"/></g><g transform="rotate(-32 16 19.5)"><rect x="1.5" y="16" width="29" height="7" rx="1" fill="#E2312B"/><rect x="6" y="18.9" width="20" height="1.2" rx=".6" fill="#fff"/></g></svg>', iconBig:'<svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="19.5" r="11" fill="#fff" stroke="#E2312B" stroke-width="3.4"/><path d="M16 15.6L16 30" stroke="#2B2B2B" stroke-width="1.4" stroke-linecap="round"/><g fill="#F5B800" stroke="#A87A06" stroke-width=".5"><ellipse cx="14.20" cy="4.20" rx="1.7" ry="2.8" transform="rotate(-30 14.20 4.20)"/><ellipse cx="17.80" cy="4.20" rx="1.7" ry="2.8" transform="rotate(30 17.80 4.20)"/><ellipse cx="14.20" cy="7.30" rx="1.7" ry="2.8" transform="rotate(-30 14.20 7.30)"/><ellipse cx="17.80" cy="7.30" rx="1.7" ry="2.8" transform="rotate(30 17.80 7.30)"/><ellipse cx="14.20" cy="10.40" rx="1.7" ry="2.8" transform="rotate(-30 14.20 10.40)"/><ellipse cx="17.80" cy="10.40" rx="1.7" ry="2.8" transform="rotate(30 17.80 10.40)"/><ellipse cx="14.20" cy="13.50" rx="1.7" ry="2.8" transform="rotate(-30 14.20 13.50)"/><ellipse cx="17.80" cy="13.50" rx="1.7" ry="2.8" transform="rotate(30 17.80 13.50)"/><ellipse cx="16" cy="2.1" rx="1.4" ry="2.5"/></g><g transform="rotate(-32 16 19.5)"><rect x="1.5" y="16" width="29" height="7" rx="1" fill="#E2312B"/><text x="16" y="21.4" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-weight="700" font-size="4.9" fill="#fff">Sin T.A.C.C.</text></g></svg>'},
+  veg: {label:'Vegetariano',             col:'Vegetariano', icon:svg('<path d="M5 19C5 11 11 5 19 5c0 8-6 14-14 14z"/><path d="M5 19l8-8"/>')},
+  vgn: {label:'Vegano',                  col:'Vegano',      icon:svg('<circle cx="12" cy="12" r="9"/><path d="M8 8.5l4 7.5 4-7.5"/>')},
+  rec: {label:'Recomendado de la casa',  col:'Recomendado', icon:svg('<path d="M12 3l2.7 5.6 6.1.8-4.5 4.2 1.1 6-5.4-3-5.4 3 1.1-6-4.5-4.2 6.1-.8z" fill="currentColor"/>')},
+  /* Nuevo: pastilla roja con la palabra NEW */
+  new: {label:'Nuevo',                   col:'Nuevo',       icon:'<svg viewBox="0 0 34 17" aria-hidden="true"><rect x=".5" y=".5" width="33" height="16" rx="5" fill="currentColor"/><text x="17" y="12.6" text-anchor="middle" font-family="Oswald,Arial Narrow,sans-serif" font-weight="600" font-size="11" letter-spacing=".6" fill="#fff">NEW</text></svg>'}
+};
+
+/* ---------- UTILIDADES ---------- */
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const slug = s => String(s).normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+const isTrue = v => v === true || /^(true|verdadero|s[ií]|x)$/i.test(String(v ?? '').trim());
+
+/* Acepta "9000", "9.000", "$ 9.000" o un número: siempre muestra "$ 9.000" */
+function fmtPrice(raw){
+  if (raw === null || raw === undefined) return '';
+  if (typeof raw === 'number') return '$ ' + Math.round(raw).toLocaleString('es-AR');
+  const s = String(raw).trim();
+  if (!s) return '';
+  const clean = s.replace(/[^\d,]/g,'').replace(',', '.');
+  const n = parseFloat(clean);
+  return isNaN(n) ? s : '$ ' + Math.round(n).toLocaleString('es-AR');
+}
+
+/* Fotos de Cloudinary: se achican al mostrarlas, el link guardado no se toca */
+function thumbUrl(url){
+  if (!url) return '';
+  return /res\.cloudinary\.com\/.+\/upload\//.test(url)
+    ? url.replace('/upload/', '/upload/w_160,h_160,c_fill,q_auto,f_auto/')
+    : url;
+}
+
+/* ---------- LECTURA DE LA PLANILLA ---------- */
+async function fetchTab(name, range){
+  const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&headers=1&sheet=${encodeURIComponent(name)}` + (range ? `&range=${range}` : '');
+  const res = await fetch(url, {cache:'no-store'});
+  if (!res.ok) throw new Error('HTTP ' + res.status);
+  const txt = await res.text();
+  const data = JSON.parse(txt.slice(txt.indexOf('{'), txt.lastIndexOf('}') + 1));
+  if (data.status === 'error') throw new Error('planilla: ' + name);
+  const cols = data.table.cols.map(c => (c.label || '').trim());
+  return data.table.rows.map(r => {
+    const o = {};
+    cols.forEach((c, i) => {
+      const cell = r.c && r.c[i];
+      o[c] = cell ? {v:cell.v, f:cell.f} : {v:null, f:null};
+    });
+    return o;
+  });
+}
+const txt = cell => cell ? (cell.f ?? cell.v ?? '') : '';
+
+async function loadLive(){
+  const [catRows, howRows, marcaRows] = await Promise.all([
+    fetchTab('Categorias'),
+    fetchTab('Cómo usar').catch(() => []),
+    fetchTab('Marca', 'A2:B30').catch(() => [])
+  ]);
+  const cats = catRows
+    .map(r => ({tab:String(txt(r['Pestaña'])).trim(), sub:String(txt(r['Bajada'])).trim(), hidden:isTrue(r['Ocultar']?.v ?? r['Ocultar']?.f)}))
+    .filter(c => c.tab && !c.hidden);
+
+  const tabs = await Promise.all(cats.map(c => fetchTab(c.tab).catch(() => null)));
+  const out = {cats:[]};
+  cats.forEach((c, i) => {
+    const rows = tabs[i];
+    if (!rows) return;
+    const items = rows
+      .filter(r => String(txt(r['Nombre'])).trim() && !isTrue(r['Ocultar']?.v ?? r['Ocultar']?.f))
+      .map(r => {
+        const pc = r['Precio'] || {};
+        return {
+          n: String(txt(r['Nombre'])).trim(),
+          d: String(txt(r['Descripción'])).trim(),
+          p: typeof pc.v === 'number' ? pc.v : txt(pc),
+          f: String(txt(r['Foto (link)'])).trim(),
+          b: Object.entries(BADGES).filter(([, def]) => isTrue(r[def.col]?.v ?? r[def.col]?.f)).map(([k]) => k)
+        };
+      });
+    if (items.length) out.cats.push({tab:c.tab, sub:c.sub, items});
+  });
+  const nota = howRows.find(r => /nota al pie/i.test(String(txt(r['Dato']))));
+  out.nota = nota ? String(txt(nota['Valor'])).trim() : SNAPSHOT.nota;
+  out.img = {...IMG_DEFAULT};
+  marcaRows.forEach(r => {
+    const key = MARCA_ROWS[rowKey(txt(r['Nombre']))];
+    const link = String(txt(r['Link'])).trim();
+    if (key && /^https?:\/\//.test(link)) out.img[key] = link;
+  });
+  if (!out.cats.length) throw new Error('sin categorías');
+  return out;
+}
+
+/* ---------- DIBUJO ---------- */
+const nav = document.getElementById('nav');
+const menu = document.getElementById('menu');
+
+function render(data, instant){
+  nav.innerHTML = data.cats.map(c =>
+    `<a class="chip" href="#${slug(c.tab)}" data-id="${slug(c.tab)}">${catIcon(c.tab)}<span>${esc(c.tab)}</span></a>`
+  ).join('');
+
+  menu.innerHTML = data.cats.map(c => `
+    <section class="cat" id="${slug(c.tab)}" aria-labelledby="t-${slug(c.tab)}">
+      <div class="cat-head">${catIcon(c.tab)}<h2 class="cat-title" id="t-${slug(c.tab)}">${esc(c.tab)}</h2></div>
+      ${c.sub ? `<p class="cat-sub">${esc(c.sub)}</p>` : ''}
+      ${c.items.map(it => `
+        <article class="item reveal">
+          ${it.f ? `<div class="thumb"><img src="${esc(thumbUrl(it.f))}" alt="${esc(it.n)}" loading="lazy" width="60" height="60"></div>` : ''}
+          <div class="item-body">
+            <div class="row">
+              <h3 class="name">${esc(it.n)}${(it.b && it.b.length) ? `<span class="badges">${it.b.map(k =>
+                `<button class="badge" type="button" data-k="${k}" aria-label="${esc(BADGES[k].label)}">${BADGES[k].icon}</button>`).join('')}</span>` : ''}</h3>
+              <span class="leader" aria-hidden="true"></span>
+              <span class="price">${esc(fmtPrice(it.p))}</span>
+            </div>
+            ${it.d ? `<p class="desc">${esc(it.d)}</p>` : ''}
+          </div>
+        </article>`).join('')}
+    </section>`).join('');
+
+  document.getElementById('note').textContent = data.nota || '';
+  applyImages(data.img);
+  if (instant) menu.querySelectorAll('.reveal').forEach(e => e.classList.add('in')); else observeReveal();
+  setupSpy();
+}
+
+/* ---------- IMÁGENES ---------- */
+const cld = (url, t) => (/res\.cloudinary\.com\/.+\/upload\//.test(url) && !/\.svg(\?|$)/i.test(url))
+  ? url.replace('/upload/', `/upload/${t}/`) : url;
+function swapImg(el, src, srcset){
+  if (!el || el.getAttribute('src') === src) return;
+  const pre = new Image();               /* se precarga para que no parpadee */
+  if (srcset) { pre.srcset = srcset; pre.sizes = el.sizes || '100vw'; }
+  pre.onload = () => { if (srcset) el.srcset = srcset; else el.removeAttribute('srcset'); el.src = src; };
+  pre.src = src;
+}
+function applyImages(img){
+  img = {...IMG_DEFAULT, ...(img || {})};
+  swapImg(document.getElementById('heroImg'), cld(img.portada, 'w_800,q_auto,f_auto'),
+          `${cld(img.portada, 'w_800,q_auto,f_auto')} 800w, ${cld(img.portada, 'w_1600,q_auto,f_auto')} 1600w`);
+  swapImg(document.getElementById('heroLogo'), cld(img.logoNeg, 'w_600,q_auto,f_auto'));
+  swapImg(document.getElementById('footLogo'), cld(img.logoNeg, 'w_300,q_auto,f_auto'));
+  /* el logo de FÁRA se recorta al borde del dibujo (e_trim) para que no quede corrido por el margen del archivo */
+  swapImg(document.getElementById('faraLogo'), /res\.cloudinary\.com\/.+\/upload\//.test(img.faraNeg)
+    ? img.faraNeg.replace('/upload/', '/upload/e_trim/h_66,f_png,q_auto/') : img.faraNeg);
+}
+
+/* Leyenda del pie */
+document.getElementById('legend').innerHTML = Object.entries(BADGES)
+  .map(([k, b]) => `<li data-k="${k}">${b.iconBig || b.icon}<span>${esc(b.label)}</span></li>`).join('');
+
+/* ---------- APARICIÓN AL SCROLL ---------- */
+let io;
+function observeReveal(){
+  const els = document.querySelectorAll('.reveal');
+  if (!('IntersectionObserver' in window)) { els.forEach(e => e.classList.add('in')); return; }
+  io && io.disconnect();
+  io = new IntersectionObserver(es => es.forEach(e => {
+    if (e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); }
+  }), {threshold:.1, rootMargin:'0px 0px -5% 0px'});
+  els.forEach(e => io.observe(e));
+}
+
+/* ---------- CATEGORÍA ACTIVA EN LA BARRA ---------- */
+let current = null, ticking = false, navClickUntil = 0;
+function setActive(id, center){
+  if (id === current) return;
+  current = id;
+  nav.querySelectorAll('.chip').forEach(ch => {
+    const on = ch.dataset.id === id;
+    ch.classList.toggle('active', on);
+    if (on) {
+      ch.setAttribute('aria-current', 'true');
+      if (center) nav.scrollTo({left: ch.offsetLeft - (nav.clientWidth - ch.offsetWidth) / 2, behavior:'smooth'});
+    } else ch.removeAttribute('aria-current');
+  });
+}
+function spy(){
+  ticking = false;
+  if (Date.now() < navClickUntil) return;
+  const navH = document.querySelector('.nav').offsetHeight;
+  const secs = menu.querySelectorAll('.cat');
+  let id = secs[0] && secs[0].id;
+  secs.forEach(s => { if (s.getBoundingClientRect().top <= navH + 40) id = s.id; });
+  /* al llegar al final de la página, se marca la última */
+  if (window.innerHeight + window.scrollY >= document.body.scrollHeight - 4 && secs.length) id = secs[secs.length - 1].id;
+  if (id) setActive(id, true);
+}
+function setupSpy(){ current = null; spy(); updateFade(); }
+function updateFade(){
+  const max = nav.scrollWidth - nav.clientWidth;
+  nav.classList.toggle('fade-l', nav.scrollLeft > 4);
+  nav.classList.toggle('fade-r', nav.scrollLeft < max - 4);
+}
+nav.addEventListener('scroll', updateFade, {passive:true});
+window.addEventListener('resize', updateFade);
+window.addEventListener('scroll', () => { if (!ticking){ ticking = true; requestAnimationFrame(spy); } }, {passive:true});
+nav.addEventListener('click', e => {
+  const ch = e.target.closest('.chip');
+  if (!ch) return;
+  setActive(ch.dataset.id, true);
+  navClickUntil = Date.now() + 700;   /* que el scroll suave no haga titilar la barra */
+});
+
+/* ---------- CARTELITO DE LOS SELLOS ---------- */
+const tip = document.getElementById('tip');
+let tipTimer;
+function hideTip(){ tip.classList.remove('show'); }
+document.addEventListener('click', e => {
+  const b = e.target.closest('.badge');
+  if (!b) { hideTip(); return; }
+  tip.textContent = BADGES[b.dataset.k].label;
+  const r = b.getBoundingClientRect();
+  tip.style.left = '0px'; tip.style.top = '0px';
+  tip.classList.add('show');
+  const w = tip.offsetWidth, h = tip.offsetHeight;
+  const left = Math.max(10, Math.min(window.innerWidth - w - 10, r.left + r.width / 2 - w / 2));
+  const top = r.top - h - 8 < 10 ? r.bottom + 8 : r.top - h - 8;
+  tip.style.left = left + 'px'; tip.style.top = top + 'px';
+  clearTimeout(tipTimer); tipTimer = setTimeout(hideTip, 2200);
+});
+window.addEventListener('scroll', hideTip, {passive:true});
+
+/* ---------- ARRANQUE ----------
+   1) Muestra lo último guardado en el celular (o la copia de respaldo): abre al instante.
+   2) Pide la planilla. Si cambió algo, vuelve a dibujar y lo guarda. */
+/* ---------- INTRO ----------
+   Se enciende la llamita del logo y aparece el logo. Usa la fila "Llamita" de Marca
+   (o la guardada por defecto). Si la imagen no llegó en 0,9 s, muestra el logo directo. */
+(function(){
+  const root = document.documentElement;
+  if (!root.classList.contains('intro')) return;
+  const el = document.getElementById('heroFlame');
+  let done = false;
+  const end = () => root.classList.remove('intro','play');
+  const play = () => { if (done) return; done = true; root.classList.add('play'); setTimeout(end, 2100); };
+  const skip = () => { if (done) return; done = true; end(); };
+  let img = {};
+  try { img = (JSON.parse(localStorage.getItem(CACHE_KEY)) || {}).img || {}; } catch(e){}
+  const url = img.llamita || IMG_DEFAULT.llamita;
+  const want = cld(url, 'w_220,q_auto,f_auto');
+  if (el.getAttribute('src') !== want) el.src = want;
+  if (el.complete && el.naturalWidth) play();
+  else { el.onload = play; el.onerror = skip; setTimeout(skip, 900); }
+})();
+
+/* ---------- FOGÓN EN EL PIE ----------
+   Para que se lea como fuego y no como cielo estrellado:
+   - la ceniza nace abajo incandescente (naranja) y se enfría a gris mientras sube
+   - se apaga antes de llegar arriba: la mitad superior queda limpia
+   - humo suave que sube y se abre
+   - chispas de leña: rápidas, en ráfagas, zigzagueantes y de vida corta
+   Liviano: un canvas, corre solo con el pie en pantalla, se frena en segundo plano. */
+(function(){
+  const c = document.getElementById('ash');
+  if (!c || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const x = c.getContext('2d');
+  const HOT = [[242,97,29],[245,166,35],[200,40,30]];   /* naranja, amarillo y rojo de la marca */
+  const COOL = [178,170,161];                           /* gris ceniza cálido */
+  let W = 0, H = 0, F = [], S = [], M = [], raf = null, visible = false, nextBurst = 0;
+
+  /* humo: un círculo difuso pre-dibujado que se reutiliza (barato) */
+  const puff = document.createElement('canvas'); puff.width = puff.height = 128;
+  (function(){ const g = puff.getContext('2d'), gr = g.createRadialGradient(64,64,0,64,64,64);
+    gr.addColorStop(0,'rgba(190,178,165,1)'); gr.addColorStop(1,'rgba(190,178,165,0)'); g.fillStyle = gr; g.fillRect(0,0,128,128); })();
+
+  function size(){
+    const r = c.getBoundingClientRect(), d = Math.min(window.devicePixelRatio || 1, 2);
+    W = r.width; H = r.height; c.width = W * d; c.height = H * d; x.setTransform(d,0,0,d,0,0);
+  }
+  const rnd = (a, b) => a + Math.random() * (b - a);
+  function flake(start){
+    const r = rnd(1.4, 3.6), pts = [];
+    for (let i = 0; i < 5; i++){ const ang = i / 5 * 6.283 + rnd(0, .6); pts.push([Math.cos(ang) * r * rnd(.55, 1.15), Math.sin(ang) * r * rnd(.55, 1.15)]); }
+    const max = rnd(.35, .62) * H;              /* cuánto sube antes de apagarse */
+    return {x:rnd(0, W), y0:H + 6, y:H + 6, d:start ? rnd(0, max) : 0, max, pts,
+      rot:rnd(0, 6.28), spin:rnd(-.035, .035), v:rnd(.25, .55), ph:rnd(0, 6.28), sw:rnd(.4, 1),
+      hot:HOT[Math.floor(Math.random() * 3)], a:rnd(.55, .95)};
+  }
+  const smoke = start => ({x:rnd(.1, .9) * W, d:start ? rnd(0, H*.5) : 0, max:H * rnd(.4, .6), r:rnd(40, 70), v:rnd(.18, .32), a:rnd(.05, .085)});
+  /* chispa suelta, una por vez, que llega más alto */
+  function burst(){
+    S.push({x:rnd(.1, .9) * W, y:H - rnd(0, 10), px:0, py:0,
+      vx:rnd(-1.2, 1.2), vy:-rnd(6.5, 9.5), life:0, max:rnd(48, 75), r:rnd(1, 1.8), col:HOT[Math.floor(Math.random() * 3)]});
+  }
+  const mix = (h, k) => `${Math.round(h[0] + (COOL[0]-h[0])*k)},${Math.round(h[1] + (COOL[1]-h[1])*k)},${Math.round(h[2] + (COOL[2]-h[2])*k)}`;
+
+  let last = 0;
+  function tick(t){
+    /* k = cuántos cuadros de 60 Hz pasaron: en un iPhone de 120 Hz vale 0,5 y todo va a la misma velocidad */
+    const k = Math.min(3, last ? (t - last) / 16.667 : 1); last = t;
+    x.clearRect(0,0,W,H);
+    /* humo */
+    for (const m of M){
+      m.d += m.v * k; const q = m.d / m.max; if (q >= 1){ Object.assign(m, smoke(false)); continue; }
+      const r = m.r * (1 + q * 1.6), y = H - m.d, al = m.a * Math.sin(q * Math.PI);
+      x.globalAlpha = al; x.drawImage(puff, m.x + Math.sin(t/2200 + m.r) * 12 - r, y - r, r*2, r*2);
+    }
+    x.globalAlpha = 1;
+    /* ceniza: incandescente abajo, gris arriba, se apaga antes de la mitad */
+    for (const p of F){
+      p.v *= Math.pow(1.0015, k); p.d += p.v * k; const q = p.d / p.max;
+      if (q >= 1){ Object.assign(p, flake(false)); continue; }
+      p.y = p.y0 - p.d; p.x += Math.sin(t/1100 + p.ph) * p.sw * .35 * k; p.rot += p.spin * k;
+      const cool = Math.min(1, q / .35), al = p.a * (q < .1 ? q / .1 : 1 - Math.pow((q - .1) / .9, 1.4));
+      const cs = Math.cos(p.rot), sn = Math.sin(p.rot);
+      x.beginPath();
+      p.pts.forEach(([px, py], j) => { const X = p.x + px*cs - py*sn, Y = p.y + px*sn + py*cs; j ? x.lineTo(X, Y) : x.moveTo(X, Y); });
+      x.closePath(); x.fillStyle = `rgba(${mix(p.hot, cool)},${al})`; x.fill();
+    }
+    /* chispas de leña */
+    if (t > nextBurst){ burst(); nextBurst = t + rnd(260, 750); }
+    x.lineCap = 'round';
+    for (let i = S.length - 1; i >= 0; i--){
+      const p = S[i];
+      p.px = p.x; p.py = p.y; p.life += k;
+      p.vy += .05 * k; p.vx += rnd(-.4, .4) * k; p.vx *= Math.pow(.97, k); p.vy *= Math.pow(.99, k);   /* gravedad + zigzag */
+      p.x += p.vx * k; p.y += p.vy * k;
+      const al = 1 - p.life / p.max;
+      if (al <= 0 || p.y < 0){ S.splice(i, 1); continue; }
+      const [r, g, b] = p.col;
+      x.strokeStyle = `rgba(${r},${g},${b},${al * .85})`; x.lineWidth = p.r * 1.2;
+      x.beginPath(); x.moveTo(p.px - p.vx * 1.6, p.py - p.vy * 1.6); x.lineTo(p.x, p.y); x.stroke();   /* estela según velocidad */
+      x.beginPath(); x.arc(p.x, p.y, p.r * 3, 0, 6.283); x.fillStyle = `rgba(${r},${g},${b},${al * .2})`; x.fill();
+      x.beginPath(); x.arc(p.x, p.y, p.r * .8, 0, 6.283); x.fillStyle = `rgba(255,240,205,${al})`; x.fill();
+    }
+    raf = requestAnimationFrame(tick);
+  }
+  function fill(){
+    const n = Math.max(50, Math.min(110, Math.round(W * H / 4200)));
+    F = []; for (let i = 0; i < n; i++) F.push(flake(true));
+    M = []; for (let i = 0; i < 7; i++) M.push(smoke(true));
+  }
+  const start = () => { if (!raf && visible && !document.hidden){ if (!F.length){ size(); fill(); } raf = requestAnimationFrame(tick); c.classList.add('on'); } };
+  const stop = () => { if (raf){ cancelAnimationFrame(raf); raf = null; } last = 0; };
+  new IntersectionObserver(es => { visible = es[0].isIntersecting; visible ? start() : stop(); }).observe(c);
+  document.addEventListener('visibilitychange', () => document.hidden ? stop() : start());
+  window.addEventListener('resize', () => { size(); fill(); });
+})();
+
+let shown = SNAPSHOT;
+try { const c = JSON.parse(localStorage.getItem(CACHE_KEY)); if (c && c.cats && c.cats.length) shown = c; } catch(e){}
+render(shown);
+
+loadLive().then(live => {
+  const s = JSON.stringify(live);
+  if (s !== JSON.stringify(shown)) {
+    const y = window.scrollY;
+    render(live, true);
+    window.scrollTo(0, y);
+  }
+  try { localStorage.setItem(CACHE_KEY, s); } catch(e){}
+}).catch(err => console.warn('Carta: usando datos guardados.', err.message));
+</script>
+</body>
+</html>
