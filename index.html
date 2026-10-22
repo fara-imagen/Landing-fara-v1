@@ -782,7 +782,7 @@ h3{font-size:clamp(20px,2.1vw,24px);letter-spacing:-.015em;}
    PLANILLA_PUB: el código que aparece en el link de "Publicar en la web"
    (https://docs.google.com/spreadsheets/d/e/ESTE-CODIGO/pub...). Vacío = usa lo del HTML.
    ============================================================ */
-const PLANILLA_PUB='';
+const PLANILLA_PUB='2PACX-1vTOoGMOLUwT19wo225WphIC1s1NA_poh_Omz3HXBqjt9hmCECvr7ZWpr1e0dacM-X9upJm1U8TOaTzO';
 const PESTANAS={landing:201, links:202};
 (function(){
   if(!PLANILLA_PUB) return;
@@ -912,6 +912,10 @@ const PESTANAS={landing:201, links:202};
   /* se piden las dos pestañas a la vez; los colores de Landing se usan para pintar los logos de Links */
   Promise.allSettled([get(PESTANAS.landing),get(PESTANAS.links)]).then(([t,f])=>{
     let col;
+    /* si una pestaña no está publicada, Google devuelve otra: se revisan los encabezados antes de usarla */
+    const es=(r,col,txt)=>r&&r[1]&&String(r[1][col]||'').trim().startsWith(txt);
+    if(t.status==='fulfilled'&&!es(t.value,0,'Clave')) t={status:'rejected',reason:'la pestaña Landing no está publicada'};
+    if(f.status==='fulfilled'&&!es(f.value,1,'Link')) f={status:'rejected',reason:'la pestaña Links no está publicada'};
     if(t.status==='fulfilled') col=aplicarTextos(t.value); else console.warn('Planilla (Landing) no disponible, uso los textos del HTML.',t.reason);
     if(f.status==='fulfilled') aplicarFotos(f.value,col); else console.warn('Planilla (Links) no disponible, uso las fotos del HTML.',f.reason);
   });
