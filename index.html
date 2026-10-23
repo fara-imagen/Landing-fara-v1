@@ -4,26 +4,35 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<title>FÁRA · Fotografía de producto y marca para PyMEs en CABA</title>
+<title>FÁRA - Fotografía de producto y marcas para PyMEs</title>
 <meta name="description" content="Fotografía de producto y marca para PyMEs de CABA. Tu catálogo, tu tienda y tus redes se ven al precio que cobrás. Escribime y agendamos una reunión gratis de 15 minutos.">
 
-<!-- REEMPLAZAR: tu dominio real en canonical, og:url y JSON-LD (buscar "TU-DOMINIO") -->
+<!-- Espera a la planilla (máximo 2 s) antes de mostrar la página: así, si está tildada
+     "Web en mantenimiento", no se ve la landing un instante antes del aviso. -->
+<style>html.fara-espera body{visibility:hidden;} html.fara-espera *,html.fara-espera *::before,html.fara-espera *::after{animation-play-state:paused !important;}</style>
+<script>
+  document.documentElement.classList.add('fara-espera');
+  window.FARA_listo=function(){ document.documentElement.classList.remove('fara-espera'); };
+  setTimeout(window.FARA_listo,2000);
+</script>
+
+<!-- Dirección oficial de la web (dominio principal en Netlify) -->
 <link rel="canonical" href="https://faraimagen.com.ar/">
 
-<!-- Open Graph -->
+<!-- Open Graph: imagen al compartir el link (mismo link que la planilla, Links → LOGOS → Open Graph). Cambiarla necesita deploy -->
 <meta property="og:type" content="website">
 <meta property="og:locale" content="es_AR">
 <meta property="og:site_name" content="FÁRA">
 <meta property="og:title" content="FÁRA · Fotografía de producto y marca para PyMEs de CABA">
 <meta property="og:description" content="Si te piden descuento todo el tiempo, tu marca se ve más barata que tu producto. Escribime y agendamos una reunión gratis de 15 minutos.">
-<meta property="og:image" content="https://res.cloudinary.com/oiee5aqt/image/upload/v1792262042/FARA_opengraph.png">
+<meta property="og:image" content="https://res.cloudinary.com/eekglpse/image/upload/v1792776843/FARA_open_graph.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:url" content="https://faraimagen.com.ar/">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="FÁRA · Fotografía de producto y marca para PyMEs de CABA">
 <meta name="twitter:description" content="Si te piden descuento todo el tiempo, tu marca se ve más barata que tu producto.">
-<meta name="twitter:image" content="https://res.cloudinary.com/oiee5aqt/image/upload/v1792262042/FARA_opengraph.png">
+<meta name="twitter:image" content="https://res.cloudinary.com/eekglpse/image/upload/v1792776843/FARA_open_graph.jpg">
 
 <link rel="icon" type="image/png" href="https://res.cloudinary.com/oiee5aqt/image/upload/v1792262040/fara_favicon_48_positivo.png">
 <meta name="theme-color" content="#1A1410">
@@ -54,7 +63,7 @@
   "name": "FÁRA",
   "description": "Fotografía de producto y marca para PyMEs de la Ciudad de Buenos Aires.",
   "url": "https://faraimagen.com.ar/",
-  "image": "https://res.cloudinary.com/oiee5aqt/image/upload/v1792262042/FARA_opengraph.png",
+  "image": "https://res.cloudinary.com/eekglpse/image/upload/v1792776843/FARA_open_graph.jpg",
   "logo": "https://res.cloudinary.com/oiee5aqt/image/upload/f_png,h_160/c_crop,g_center,w_0.96,h_0.9/e_make_transparent:35/e_trim:10/e_colorize:100,co_rgb:1A1410/v1792365193/fara_horizontal_sin_descriptor_b_negativo.svg",
   "areaServed": { "@type": "City", "name": "Ciudad Autónoma de Buenos Aires" },
   "address": { "@type": "PostalAddress", "addressLocality": "Buenos Aires", "addressRegion": "CABA", "addressCountry": "AR" },
@@ -97,8 +106,8 @@
   --glass-blur:blur(22px) saturate(140%);
 
   /* trama de fondo: estrella de fara_trama_solo_estrellas_modulo, en línea, 4% sobre crema y 3% sobre oscuro */
-  --trama-osc:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 86.9175 50.1818'%3E%3Cdefs%3E%3Cpath id='s' d='M185.765,110.813c-40.562-24.01-62.383-39.111-62.383-49.702,0-8.523,14.691-18.372,38.069-32.089-2.269-2.378-4.665-4.632-7.171-6.761-21.767,12.39-36.705,20.101-44.911,20.101-2.874,0-7.217,0-9.513-14.125-1.13-6.952-1.607-16.329-1.81-28.132-1.451-.067-2.91-.105-4.378-.105-1.776,0-3.539.054-5.29.152-.203,11.787-.679,21.151-1.808,28.092-2.296,14.117-6.64,14.117-9.515,14.117-8.138,0-22.897-7.583-44.366-19.791-2.493,2.14-4.872,4.409-7.128,6.797,23.031,13.533,37.477,23.288,37.477,31.743,0,10.521-21.529,25.491-61.561,49.217.605,3.368,1.395,6.671,2.349,9.904,29.871-16.638,49.936-26.121,62.54-26.121,8.78,0,15.347,4.434,18.864,26.071,2.504,15.403,3.106,37.678,3.25,67.01,1.717.094,3.445.145,5.185.145,1.433,0,2.857-.038,4.274-.101.144-29.366.744-51.661,3.249-67.066,3.516-21.627,10.085-26.058,18.866-26.058,12.716,0,33.015,9.645,63.323,26.556.966-3.215,1.766-6.503,2.386-9.853Z'/%3E%3C/defs%3E%3Cg fill='%231A1410' fill-opacity='.04'%3E%3Cuse href='%23s' transform='translate(-24 -24) scale(0.2562)'/%3E%3Cuse href='%23s' transform='translate(-24 26.1818) scale(0.2562)'/%3E%3Cuse href='%23s' transform='translate(62.9175 -24) scale(0.2562)'/%3E%3Cuse href='%23s' transform='translate(62.9175 26.1818) scale(0.2562)'/%3E%3Cuse href='%23s' transform='translate(19.4587 1.0909) scale(0.2562)'/%3E%3C/g%3E%3C/svg%3E");
-  --trama-clara:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 86.9175 50.1818'%3E%3Cdefs%3E%3Cpath id='s' d='M185.765,110.813c-40.562-24.01-62.383-39.111-62.383-49.702,0-8.523,14.691-18.372,38.069-32.089-2.269-2.378-4.665-4.632-7.171-6.761-21.767,12.39-36.705,20.101-44.911,20.101-2.874,0-7.217,0-9.513-14.125-1.13-6.952-1.607-16.329-1.81-28.132-1.451-.067-2.91-.105-4.378-.105-1.776,0-3.539.054-5.29.152-.203,11.787-.679,21.151-1.808,28.092-2.296,14.117-6.64,14.117-9.515,14.117-8.138,0-22.897-7.583-44.366-19.791-2.493,2.14-4.872,4.409-7.128,6.797,23.031,13.533,37.477,23.288,37.477,31.743,0,10.521-21.529,25.491-61.561,49.217.605,3.368,1.395,6.671,2.349,9.904,29.871-16.638,49.936-26.121,62.54-26.121,8.78,0,15.347,4.434,18.864,26.071,2.504,15.403,3.106,37.678,3.25,67.01,1.717.094,3.445.145,5.185.145,1.433,0,2.857-.038,4.274-.101.144-29.366.744-51.661,3.249-67.066,3.516-21.627,10.085-26.058,18.866-26.058,12.716,0,33.015,9.645,63.323,26.556.966-3.215,1.766-6.503,2.386-9.853Z'/%3E%3C/defs%3E%3Cg fill='%23F2EBDD' fill-opacity='.03'%3E%3Cuse href='%23s' transform='translate(-24 -24) scale(0.2562)'/%3E%3Cuse href='%23s' transform='translate(-24 26.1818) scale(0.2562)'/%3E%3Cuse href='%23s' transform='translate(62.9175 -24) scale(0.2562)'/%3E%3Cuse href='%23s' transform='translate(62.9175 26.1818) scale(0.2562)'/%3E%3Cuse href='%23s' transform='translate(19.4587 1.0909) scale(0.2562)'/%3E%3C/g%3E%3C/svg%3E");
+  --trama-osc:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 86.9175 50.1818'%3E%3Cdefs%3E%3Cpath id='s' d='M185.765,110.813c-40.562-24.01-62.383-39.111-62.383-49.702,0-8.523,14.691-18.372,38.069-32.089-2.269-2.378-4.665-4.632-7.171-6.761-21.767,12.39-36.705,20.101-44.911,20.101-2.874,0-7.217,0-9.513-14.125-1.13-6.952-1.607-16.329-1.81-28.132-1.451-.067-2.910-.105-4.378-.105-1.776,0-3.539.054-5.29.152-.203,11.787-.679,21.151-1.808,28.092-2.296,14.117-6.640,14.117-9.515,14.117-8.138,0-22.897-7.583-44.366-19.791-2.493,2.140-4.872,4.409-7.128,6.797,23.031,13.533,37.477,23.288,37.477,31.743,0,10.521-21.529,25.491-61.561,49.217.605,3.368,1.395,6.671,2.349,9.904,29.871-16.638,49.936-26.121,62.540-26.121,8.780,0,15.347,4.434,18.864,26.071,2.504,15.403,3.106,37.678,3.250,67.010,1.717.094,3.445.145,5.185.145,1.433,0,2.857-.038,4.274-.101.144-29.366.744-51.661,3.249-67.066,3.516-21.627,10.085-26.058,18.866-26.058,12.716,0,33.015,9.645,63.323,26.556.966-3.215,1.766-6.503,2.386-9.853Z'/%3E%3C/defs%3E%3Cg fill='%231A1410' fill-opacity='.04'%3E%3Cuse href='%23s' transform='translate(-24 -24) scale(0.2562)'/%3E%3Cuse href='%23s' transform='translate(-24 26.1818) scale(0.2562)'/%3E%3Cuse href='%23s' transform='translate(62.9175 -24) scale(0.2562)'/%3E%3Cuse href='%23s' transform='translate(62.9175 26.1818) scale(0.2562)'/%3E%3Cuse href='%23s' transform='translate(19.4587 1.0909) scale(0.2562)'/%3E%3C/g%3E%3C/svg%3E");
+  --trama-clara:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 86.9175 50.1818'%3E%3Cdefs%3E%3Cpath id='s' d='M185.765,110.813c-40.562-24.01-62.383-39.111-62.383-49.702,0-8.523,14.691-18.372,38.069-32.089-2.269-2.378-4.665-4.632-7.171-6.761-21.767,12.39-36.705,20.101-44.911,20.101-2.874,0-7.217,0-9.513-14.125-1.13-6.952-1.607-16.329-1.81-28.132-1.451-.067-2.910-.105-4.378-.105-1.776,0-3.539.054-5.29.152-.203,11.787-.679,21.151-1.808,28.092-2.296,14.117-6.640,14.117-9.515,14.117-8.138,0-22.897-7.583-44.366-19.791-2.493,2.140-4.872,4.409-7.128,6.797,23.031,13.533,37.477,23.288,37.477,31.743,0,10.521-21.529,25.491-61.561,49.217.605,3.368,1.395,6.671,2.349,9.904,29.871-16.638,49.936-26.121,62.540-26.121,8.780,0,15.347,4.434,18.864,26.071,2.504,15.403,3.106,37.678,3.250,67.010,1.717.094,3.445.145,5.185.145,1.433,0,2.857-.038,4.274-.101.144-29.366.744-51.661,3.249-67.066,3.516-21.627,10.085-26.058,18.866-26.058,12.716,0,33.015,9.645,63.323,26.556.966-3.215,1.766-6.503,2.386-9.853Z'/%3E%3C/defs%3E%3Cg fill='%23F2EBDD' fill-opacity='.03'%3E%3Cuse href='%23s' transform='translate(-24 -24) scale(0.2562)'/%3E%3Cuse href='%23s' transform='translate(-24 26.1818) scale(0.2562)'/%3E%3Cuse href='%23s' transform='translate(62.9175 -24) scale(0.2562)'/%3E%3Cuse href='%23s' transform='translate(62.9175 26.1818) scale(0.2562)'/%3E%3Cuse href='%23s' transform='translate(19.4587 1.0909) scale(0.2562)'/%3E%3C/g%3E%3C/svg%3E");
 }
 
 /* ============ BASE ============ */
@@ -197,8 +206,7 @@ h3{font-size:clamp(20px,2.1vw,24px);letter-spacing:-.015em;}
 .hero-grid{position:relative;display:grid;}
 .hero-photo{position:relative;border-radius:var(--radius);overflow:hidden;aspect-ratio:16/9;background:var(--espresso-2);}
 .hero-photo picture{display:contents;}
-.hero-photo img{width:100%;height:100%;object-fit:cover;}
-@media (min-width:900px){ .hero-photo img{transform:scaleX(-1);} } /* la horizontal va espejada: la moto mira hacia la tarjeta */
+.hero-photo img{width:100%;height:100%;object-fit:cover;} /* ninguna foto se espeja: se muestra tal cual se subió */
 /* sección de mensajes */
 .talk{position:relative;overflow:hidden;}
 .talk::before{content:"";position:absolute;width:560px;height:560px;border-radius:50%;left:-160px;top:50%;transform:translateY(-50%);
@@ -463,6 +471,19 @@ h3{font-size:clamp(20px,2.1vw,24px);letter-spacing:-.015em;}
 .footer a{text-decoration:none;}
 .footer a:hover{color:var(--espresso);}
 
+/* ============ WEB EN MANTENIMIENTO (casilla de la planilla, Landing → general.mantenimiento) ============ */
+.mant{position:fixed;inset:0;z-index:100;display:grid;place-items:center;padding:24px 20px;overflow:auto;
+  background:var(--espresso) var(--trama-clara) 0 0/160px auto;color:var(--on-dark);text-align:center;
+  animation:mant-in .3s var(--ease) both;}
+.mant::before{content:"";position:absolute;width:520px;height:520px;border-radius:50%;left:50%;top:50%;transform:translate(-50%,-60%);
+  background:radial-gradient(circle,rgba(200,135,58,.22),transparent 65%);pointer-events:none;}
+.mant-box{position:relative;max-width:520px;display:grid;gap:18px;justify-items:center;}
+.mant-logo{height:30px;width:auto;margin-bottom:10px;}
+.mant-tit{font-weight:600;font-stretch:112%;font-size:clamp(28px,4.4vw,44px);line-height:1.1;letter-spacing:-.025em;}
+.mant-txt{color:var(--on-dark-muted);font-size:clamp(16px,1.6vw,18px);max-width:40ch;}
+.mant .btn-cta{margin-top:8px;width:auto;}
+@keyframes mant-in{from{opacity:0;}to{opacity:1;}}
+
 /* ============ REVEAL ============ */
 .reveal{opacity:0;transform:translateY(12px);transition:opacity .5s var(--ease), transform .5s var(--ease);}
 .reveal.in-view{opacity:1;transform:none;}
@@ -475,7 +496,7 @@ h3{font-size:clamp(20px,2.1vw,24px);letter-spacing:-.015em;}
 @media (prefers-reduced-motion: reduce){
   html{scroll-behavior:auto;}
   .reveal,.stagger-item{transform:none;transition:opacity .3s ease;}
-  .hero-photo,.hero-card .eyebrow,.hero-card h1,.hero-card .hero-cta,.hero-card .creds,.asks-box{animation:none;}
+  .hero-photo,.hero-card .eyebrow,.hero-card h1,.hero-card .hero-cta,.hero-card .creds,.asks-box,.mant{animation:none;}
   .asks-track{animation:none;flex-wrap:wrap;width:auto;} .asks-dup{display:none;} .asks{-webkit-mask-image:none;mask-image:none;margin-left:0;margin-right:0;} .asks-track > .ask:first-child{margin-left:0;}
   .hero-card mark{animation:none;background-size:100% 100%;}
   .promise-card .price-mark{transition:none;background-size:100% 100%;color:var(--crema);}
@@ -785,7 +806,7 @@ h3{font-size:clamp(20px,2.1vw,24px);letter-spacing:-.015em;}
 const PLANILLA_PUB='2PACX-1vTOoGMOLUwT19wo225WphIC1s1NA_poh_Omz3HXBqjt9hmCECvr7ZWpr1e0dacM-X9upJm1U8TOaTzO';
 const PESTANAS={landing:201, links:202};
 (function(){
-  if(!PLANILLA_PUB) return;
+  if(!PLANILLA_PUB){ window.FARA_listo(); return; }
   const url=gid=>`https://docs.google.com/spreadsheets/d/e/${PLANILLA_PUB}/pub?gid=${gid}&single=true&output=csv`;
   /* lector de CSV (respeta comillas, comas y saltos de línea dentro de una celda) */
   function csv(t){
@@ -807,6 +828,7 @@ const PESTANAS={landing:201, links:202};
   /* Cloudinary: la transformación se agrega al mostrar, nunca se guarda en la planilla */
   const cl=(u,t)=>u.includes('/upload/')?u.replace('/upload/','/upload/'+t+'/'):u;
   const LOGO='f_png,h_160/c_crop,g_center,w_0.96,h_0.9/e_make_transparent:35/e_trim:10/e_colorize:100,co_rgb:';
+  let mant=null; /* datos de "Web en mantenimiento" si la casilla está tildada */
 
   function aplicarTextos(rows){
     const D={};
@@ -849,6 +871,10 @@ const PESTANAS={landing:201, links:202};
     if(ig&&a){ a.href=ig; a.hidden=false; }
     /* pestaña del navegador (Google y WhatsApp siguen leyendo el título fijo del código) */
     const tp=get('general.titulo_pestana'); if(tp) document.title=tp;
+    /* web en mantenimiento: casilla tildada = pantalla completa con logo, mensaje y WhatsApp */
+    if(get('general.mantenimiento').toUpperCase()==='TRUE'){
+      mant={titulo:get('general.mantenimiento_mensaje'),texto:get('general.mantenimiento_mensaje',2)};
+    }
     /* colores de marca: los tonos secundarios se calculan solos a partir de los tres principales */
     const hex=v=>/^#?[0-9a-f]{6}$/i.test(v)?'#'+v.replace('#','').toUpperCase():null;
     const C={crema:hex(get('marca.color_crema')),espresso:hex(get('marca.color_espresso')),ambar:hex(get('marca.color_ambar'))};
@@ -908,6 +934,28 @@ const PESTANAS={landing:201, links:202};
     }
   }
 
+  /* pantalla de mantenimiento: tapa toda la web y deja solo el logo, el mensaje y el botón de WhatsApp.
+     Google y la vista previa de WhatsApp no ejecutan esto: siguen viendo la web normal. */
+  function mostrarMantenimiento(m){
+    if(document.getElementById('mant')) return;
+    const wa=(document.querySelector('a[href^="https://wa.me/"]')||{}).href||'https://wa.me/5493885735415';
+    const logo=(document.querySelector('.photo-credit img')||{}).src||'';
+    const box=document.createElement('div');
+    box.className='mant'; box.id='mant'; box.setAttribute('role','alertdialog'); box.setAttribute('aria-labelledby','mantTit');
+    box.innerHTML=`<div class="mant-box">
+      ${logo?`<img class="mant-logo" src="${esc(logo)}" alt="FÁRA">`:''}
+      <p class="mant-tit" id="mantTit">${esc(m.titulo||'Estoy renovando la web')}</p>
+      <p class="mant-txt">${esc(m.texto||'Estoy haciendo unos ajustes. Mientras tanto, escribime por WhatsApp y te respondo yo.')}</p>
+      <a class="btn btn-accent btn-cta" href="${esc(wa)}" target="_blank" rel="noopener">
+        <span class="btn-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#ico-wa"/></svg></span>
+        <span class="btn-txt"><strong>Escribime por WhatsApp</strong><small>Te respondo yo</small></span>
+      </a>
+    </div>`;
+    document.querySelectorAll('body > header, body > main, body > footer').forEach(el=>{ el.inert=true; el.setAttribute('aria-hidden','true'); });
+    document.documentElement.style.overflow='hidden';
+    document.body.appendChild(box);
+  }
+
   const get=gid=>fetch(url(gid)).then(r=>{ if(!r.ok) throw r.status; return r.text(); }).then(csv);
   /* se piden las dos pestañas a la vez; los colores de Landing se usan para pintar los logos de Links */
   Promise.allSettled([get(PESTANAS.landing),get(PESTANAS.links)]).then(([t,f])=>{
@@ -916,9 +964,10 @@ const PESTANAS={landing:201, links:202};
     const es=(r,col,txt)=>r&&r[1]&&String(r[1][col]||'').trim().startsWith(txt);
     if(t.status==='fulfilled'&&!es(t.value,0,'Clave')) t={status:'rejected',reason:'la pestaña Landing no está publicada'};
     if(f.status==='fulfilled'&&!es(f.value,1,'Link')) f={status:'rejected',reason:'la pestaña Links no está publicada'};
-    if(t.status==='fulfilled') col=aplicarTextos(t.value); else console.warn('Planilla (Landing) no disponible, uso los textos del HTML.',t.reason);
-    if(f.status==='fulfilled') aplicarFotos(f.value,col); else console.warn('Planilla (Links) no disponible, uso las fotos del HTML.',f.reason);
-  });
+    try{ if(t.status==='fulfilled') col=aplicarTextos(t.value); else console.warn('Planilla (Landing) no disponible, uso los textos del HTML.',t.reason); }catch(e){ console.warn(e); }
+    try{ if(f.status==='fulfilled') aplicarFotos(f.value,col); else console.warn('Planilla (Links) no disponible, uso las fotos del HTML.',f.reason); }catch(e){ console.warn(e); }
+    if(mant) mostrarMantenimiento(mant);
+  }).finally(()=>window.FARA_listo());
 })();
 
 /* Chat de la sección de mensajes: los primeros llegan rápido y después cada 2 s.
