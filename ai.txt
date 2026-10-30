@@ -21,6 +21,7 @@ Enlaces clave:
   Cómo trabajo: https://faraimagen.com.ar/#proceso
   Sobre mí: https://faraimagen.com.ar/#sobre-mi
   Instagram: https://www.instagram.com/fara.imagen/
+  Blog: https://faraimagen.com.ar/blog/
   Privacidad: https://faraimagen.com.ar/privacidad/
   Sitemap: https://faraimagen.com.ar/sitemap.xml
   Más información para IA: https://faraimagen.com.ar/llms.txt

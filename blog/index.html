@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>Blog · FÁRA</title>
+<meta name="description" content="Ideas prácticas para que tu catálogo, tu tienda y tus redes muestren lo que vale tu producto. Por FÁRA, fotografía de producto y marca en CABA.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://faraimagen.com.ar/blog/">
+<meta name="theme-color" content="#1A1410">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="es_AR">
+<meta property="og:site_name" content="FÁRA">
+<meta property="og:title" content="Blog · FÁRA">
+<meta property="og:description" content="Ideas prácticas para que tu catálogo, tu tienda y tus redes muestren lo que vale tu producto.">
+<meta property="og:url" content="https://faraimagen.com.ar/blog/">
+<meta property="og:image" content="https://res.cloudinary.com/eekglpse/image/upload/v1792776843/FARA_open_graph.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" type="image/png" href="https://res.cloudinary.com/eekglpse/image/upload/v1792547726/fara_favicon_48_positivo.png">
+
+<!-- Meta Pixel: reemplazá TU_PIXEL_ID por el ID de tu Pixel (ver README). Mientras diga TU_PIXEL_ID no se envía nada. -->
+<script>
+window.MK_PIXEL_ID='TU_PIXEL_ID';
+window.MK_PV_ID=(window.crypto&&crypto.randomUUID)?crypto.randomUUID():String(Date.now())+Math.random().toString(16).slice(2);
+if(window.MK_PIXEL_ID.indexOf('TU_')!==0){
+  !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
+  fbq('init',window.MK_PIXEL_ID);
+  fbq('track','PageView',{},{eventID:window.MK_PV_ID});
+}
+</script>
+<noscript><img height="1" width="1" style="display:none" alt="" src="https://www.facebook.com/tr?id=TU_PIXEL_ID&amp;ev=PageView&amp;noscript=1"></noscript>
+<script src="/assets/js/tracking.js" defer></script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://res.cloudinary.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@100..125,400..700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/style.css">
+</head>
+<body>
+
+<main>
+  <div class="wrap">
+    <p class="crumbs"><a href="/">← Volver al inicio</a></p>
+    <div class="page-head">
+      <span class="eyebrow">Blog</span>
+      <h1>Ideas para que tu marca se vea como vale tu producto</h1>
+      <p class="lead">Notas cortas y prácticas sobre fotografía de producto, catálogo y redes para PyMEs.</p>
+    </div>
+
+    <div class="blog-list" id="lista-posts">
+      <noscript><p>Activá JavaScript para ver los artículos, o entrá directo a <a href="/blog/por-que-te-piden-descuento/">Por qué te piden descuento aunque tu producto sea excelente</a>.</p></noscript>
+    </div>
+  </div>
+</main>
+
+<footer class="footer">
+  <div class="wrap">
+    <a class="footer-logo" href="/" aria-label="FÁRA, volver al inicio">
+      <img src="https://res.cloudinary.com/eekglpse/image/upload/f_png,h_160/c_crop,g_center,w_0.96,h_0.9/e_make_transparent:35/e_trim:10/e_colorize:100,co_rgb:1A1410/v1792547783/fara_marca_agua_logotipo_crema.svg" alt="FÁRA" height="22" loading="lazy">
+    </a>
+    <p>Fotografía de producto y marca · Ciudad Autónoma de Buenos Aires</p>
+    <div class="footer-links">
+      <a href="/blog/">Blog</a>
+      <a href="/privacidad/">Privacidad</a>
+    </div>
+  </div>
+</footer>
+
+<script src="/blog/assets/posts.js"></script>
+<script>
+(function () {
+  var posts = (window.MK_POSTS || []).slice().sort(function (a, b) { return a.date < b.date ? 1 : -1; });
+  var lista = document.getElementById('lista-posts');
+  if (!lista || !posts.length) return;
+  lista.textContent = '';
+  function el(tag, clase, texto) {
+    var n = document.createElement(tag);
+    if (clase) n.className = clase;
+    if (texto) n.textContent = texto;
+    return n;
+  }
+  function fecha(iso) {
+    try { return new Date(iso + 'T00:00:00Z').toLocaleDateString('es-AR', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' }); }
+    catch (e) { return iso; }
+  }
+  posts.forEach(function (p) {
+    var a = el('a', 'post-card');
+    a.href = '/blog/' + p.slug + '/';
+    a.appendChild(el('span', 'eyebrow', p.category || 'Blog'));
+    a.appendChild(el('h2', '', p.title));
+    a.appendChild(el('p', '', p.description));
+    a.appendChild(el('span', 'meta', fecha(p.date)));
+    lista.appendChild(a);
+  });
+})();
+</script>
+</body>
+</html>

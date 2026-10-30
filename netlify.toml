@@ -19,8 +19,8 @@
     # Apaga permisos del navegador que la web no usa
     Permissions-Policy = "camera=(), microphone=(), geolocation=(), payment=()"
 
-# Los archivos de assets cambian poco: se guardan en el navegador una semana
+# Los archivos de assets se guardan en el navegador una hora (así los cambios se ven rápido)
 [[headers]]
   for = "/assets/*"
   [headers.values]
-    Cache-Control = "public, max-age=604800"
+    Cache-Control = "public, max-age=3600"
