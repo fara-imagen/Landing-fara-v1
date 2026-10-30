@@ -1259,12 +1259,12 @@ const PESTANAS={landing:201, links:202};
     host.appendChild(h);
     var c='translate(-50%,-50%)';
     if(!h.animate){ setTimeout(function(){h.remove();},900); return; }
-    var ms=reduce.matches?900:1300;
+    var ms=reduce.matches?900:1200;
     var fuera=h.animate(reduce.matches
       ? [{opacity:0,transform:c},{opacity:1,transform:c,offset:.25},{opacity:1,transform:c,offset:.75},{opacity:0,transform:c}]
       : [{opacity:0,transform:c,easing:'linear'},
          {opacity:1,transform:c,offset:.06},
-         {opacity:1,transform:c,offset:.6,easing:EASE},
+         {opacity:1,transform:c,offset:.52,easing:EASE},
          {opacity:0,transform:'translate(-50%,-110%)'}],{duration:ms,fill:'both'});
     if(!reduce.matches){
       var tilt=(Math.random()*2-1)*14, i=h.firstChild;
