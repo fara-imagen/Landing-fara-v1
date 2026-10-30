@@ -1,6 +1,10 @@
 # FÁRA · netlify.toml
 # Encabezados de seguridad para todas las páginas del sitio.
 
+# Funciones del servidor (API de Conversiones de Meta)
+[functions]
+  directory = "netlify/functions"
+
 [[headers]]
   for = "/*"
   [headers.values]

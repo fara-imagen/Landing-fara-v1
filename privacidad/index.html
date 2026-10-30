@@ -12,6 +12,18 @@
 
 <link rel="icon" type="image/png" href="https://res.cloudinary.com/eekglpse/image/upload/v1792547726/fara_favicon_48_positivo.png">
 
+<!-- Meta Pixel: reemplazá TU_PIXEL_ID por el ID de tu Pixel (ver README). Mientras diga TU_PIXEL_ID no se envía nada. -->
+<script>
+window.MK_PIXEL_ID='TU_PIXEL_ID';
+window.MK_PV_ID=(window.crypto&&crypto.randomUUID)?crypto.randomUUID():String(Date.now())+Math.random().toString(16).slice(2);
+if(window.MK_PIXEL_ID.indexOf('TU_')!==0){
+  !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
+  fbq('init',window.MK_PIXEL_ID);
+  fbq('track','PageView',{},{eventID:window.MK_PV_ID});
+}
+</script>
+<noscript><img height="1" width="1" style="display:none" alt="" src="https://www.facebook.com/tr?id=TU_PIXEL_ID&amp;ev=PageView&amp;noscript=1"></noscript>
+<script src="/assets/js/tracking.js" defer></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://res.cloudinary.com">
@@ -56,7 +68,7 @@
 
       <h2>Pixel de Meta y publicidad</h2>
       <p>Cuando hago publicidad en Instagram o Facebook, esta web puede cargar el <strong>Pixel de Meta</strong>. Sirve para medir qué pasa después de un anuncio: si alguien llegó a la web, vio una sección o tocó el botón de WhatsApp. Con esa información Meta puede mostrar mis anuncios a personas parecidas y yo puedo saber qué anuncio sirvió.</p>
-      <p>Para que la medición sea más precisa, los eventos también se envían de forma directa desde el servidor de la web a Meta (API de Conversiones). En ningún caso mando tu nombre, tu teléfono ni tu mail a Meta desde la web. Los eventos llevan datos técnicos: qué botón se tocó, la página, la hora, tu navegador y un identificador de cookie.</p>
+      <p>Para que la medición sea más precisa, los eventos también se envían de forma directa desde el servidor de la web a Meta (API de Conversiones). En ningún caso mando tu nombre, tu teléfono ni tu mail a Meta desde la web. Los eventos llevan datos técnicos: qué botón se tocó, la página, la hora, tu navegador, tu dirección IP y un identificador de cookie.</p>
       <p>Meta trata esos datos bajo sus propias políticas. Podés revisarlas y ajustar las preferencias de anuncios de tu cuenta en <a href="https://www.facebook.com/privacy/policy/" target="_blank" rel="noopener">facebook.com/privacy/policy</a>.</p>
 
       <h2>Cookies</h2>

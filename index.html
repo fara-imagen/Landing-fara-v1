@@ -29,7 +29,18 @@
 <meta name="theme-color" content="#1A1410">
 
 <!-- VERIFICACIONES: acá van facebook-domain-verification y google-site-verification cuando las tengas -->
-<!-- META PIXEL: acá va el código del pixel si más adelante hacés publicidad -->
+<!-- Meta Pixel: reemplazá TU_PIXEL_ID por el ID de tu Pixel (ver README). Mientras diga TU_PIXEL_ID no se envía nada. -->
+<script>
+window.MK_PIXEL_ID='TU_PIXEL_ID';
+window.MK_PV_ID=(window.crypto&&crypto.randomUUID)?crypto.randomUUID():String(Date.now())+Math.random().toString(16).slice(2);
+if(window.MK_PIXEL_ID.indexOf('TU_')!==0){
+  !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
+  fbq('init',window.MK_PIXEL_ID);
+  fbq('track','PageView',{},{eventID:window.MK_PV_ID});
+}
+</script>
+<noscript><img height="1" width="1" style="display:none" alt="" src="https://www.facebook.com/tr?id=TU_PIXEL_ID&amp;ev=PageView&amp;noscript=1"></noscript>
+<script src="/assets/js/tracking.js" defer></script>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -644,7 +655,7 @@ h3{font-size:clamp(20px,2.1vw,24px);letter-spacing:-.015em;}
   </section>
 
   <!-- 5 · PROCESO (a definir por Matías) -->
-  <section id="proceso">
+  <section id="proceso" data-track-view="Cómo trabajo">
     <div class="wrap">
       <div class="section-head reveal">
         <span class="eyebrow" data-k="proceso.etiqueta">Cómo trabajo</span>
