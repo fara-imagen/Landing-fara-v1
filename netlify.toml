@@ -1,0 +1,22 @@
+# FÁRA · netlify.toml
+# Encabezados de seguridad para todas las páginas del sitio.
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    # Fuerza HTTPS durante 1 año
+    Strict-Transport-Security = "max-age=31536000"
+    # El navegador respeta el tipo de archivo declarado
+    X-Content-Type-Options = "nosniff"
+    # Al salir a otro sitio, solo se comparte el dominio de origen
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    # Nadie puede mostrar la web dentro de un iframe ajeno
+    X-Frame-Options = "SAMEORIGIN"
+    # Apaga permisos del navegador que la web no usa
+    Permissions-Policy = "camera=(), microphone=(), geolocation=(), payment=()"
+
+# Los archivos de assets cambian poco: se guardan en el navegador una semana
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=604800"
