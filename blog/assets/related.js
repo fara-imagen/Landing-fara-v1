@@ -49,6 +49,12 @@
     a.appendChild(el('span', 'eyebrow', o.p.category || 'Blog'));
     a.appendChild(el('h3', '', o.p.title));
     a.appendChild(el('p', '', o.p.description));
+    var pie = el('span', 'foot');
+    pie.appendChild(el('span', 'meta', o.p.category || 'Blog'));
+    var mas = el('span', 'more', 'Leer ');
+    mas.insertAdjacentHTML('beforeend', '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>');
+    pie.appendChild(mas);
+    a.appendChild(pie);
     lista.appendChild(a);
   });
   bloque.appendChild(lista);

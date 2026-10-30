@@ -30,19 +30,19 @@ if(window.MK_PIXEL_ID.indexOf('TU_')!==0){
 }
 </script>
 <noscript><img height="1" width="1" style="display:none" alt="" src="https://www.facebook.com/tr?id=TU_PIXEL_ID&amp;ev=PageView&amp;noscript=1"></noscript>
-<script src="/assets/js/tracking.js" defer></script>
+<script src="/assets/js/tracking.js?v=3" defer></script>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://res.cloudinary.com">
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@100..125,400..700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/assets/style.css">
+<link rel="stylesheet" href="/assets/style.css?v=3">
 </head>
 <body>
 
 <main>
   <div class="wrap">
-    <p class="crumbs"><a href="/">← Volver al inicio</a></p>
+    <p class="crumbs"><a href="/"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg> Volver al inicio</a></p>
     <div class="page-head">
       <span class="eyebrow">Blog</span>
       <h1>Ideas para que tu marca se vea como vale tu producto</h1>
@@ -91,7 +91,12 @@ if(window.MK_PIXEL_ID.indexOf('TU_')!==0){
     a.appendChild(el('span', 'eyebrow', p.category || 'Blog'));
     a.appendChild(el('h2', '', p.title));
     a.appendChild(el('p', '', p.description));
-    a.appendChild(el('span', 'meta', fecha(p.date)));
+    var pie = el('span', 'foot');
+    pie.appendChild(el('span', 'meta', fecha(p.date)));
+    var mas = el('span', 'more', 'Leer ');
+    mas.insertAdjacentHTML('beforeend', '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>');
+    pie.appendChild(mas);
+    a.appendChild(pie);
     lista.appendChild(a);
   });
 })();
