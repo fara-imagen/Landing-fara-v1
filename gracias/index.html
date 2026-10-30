@@ -59,10 +59,16 @@ if(window.MK_PIXEL_ID.indexOf('TU_')!==0){
 </footer>
 
 <script>
-/* Conversión: Lead una sola vez por sesión. Si el formulario ya lo disparó al enviarse,
-   MK.trackOnce encuentra la marca "mk_lead_sent" y no lo repite. */
+/* Conversión: Lead una sola vez por sesión.
+   Solo cuenta si la persona llegó desde una página del propio sitio (por ejemplo, al enviar un formulario).
+   Quien entra directo por el link no suma una conversión falsa.
+   Si el formulario ya disparó el Lead al enviarse, MK.trackOnce encuentra la marca "mk_lead_sent" y no lo repite. */
 window.addEventListener('DOMContentLoaded',function(){
-  if(window.MK) MK.trackOnce('Lead',{content_name:'Consulta enviada'},'mk_lead_sent');
+  var vinoDelSitio=false;
+  try{ vinoDelSitio=!!document.referrer && new URL(document.referrer).host===location.host; }catch(e){}
+  var marca=null;
+  try{ marca=sessionStorage.getItem('mk_lead_sent'); }catch(e){}
+  if(window.MK && (vinoDelSitio||marca)) MK.trackOnce('Lead',{content_name:'Consulta enviada'},'mk_lead_sent');
 });
 </script>
 </body>

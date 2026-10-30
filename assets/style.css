@@ -137,7 +137,7 @@ mark{
 .tabla{width:100%;border-collapse:collapse;margin-top:18px;font-size:15px;}
 .tabla th,.tabla td{text-align:left;vertical-align:top;padding:12px 14px;border-bottom:1px solid var(--line);}
 .tabla th{font-weight:600;font-stretch:112%;font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);}
-@media (max-width:640px){ .tabla thead{display:none;} .tabla tr{display:block;padding:10px 0;border-bottom:1px solid var(--line);} .tabla td{display:block;border:0;padding:4px 0;} }
+@media (max-width:640px){ .tabla thead{display:none;} .tabla tr{display:block;padding:12px 0;border-bottom:1px solid var(--line);} .tabla td{display:block;border:0;padding:4px 0;} .tabla td::before{content:attr(data-label);display:block;font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);} }
 
 /* ============ 404 / GRACIAS (pantalla completa, pie siempre abajo) ============ */
 .main-center{display:flex;flex-direction:column;}

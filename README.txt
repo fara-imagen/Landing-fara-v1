@@ -62,6 +62,8 @@ Eventos del sitio:
   Contact ....... en cualquier botón de WhatsApp (menú, portada, cierre)
   Schedule ...... listo para un botón de agenda (agregale data-track="agenda")
   Lead .......... listo para un formulario (agregale data-track-form) y en /gracias/
+                  (en /gracias/ solo cuenta si la persona llegó desde una página del sitio;
+                   quien entra directo por el link no suma un Lead falso)
 
 ==========================================================
 4) CÓMO SUMAR UN POST AL BLOG

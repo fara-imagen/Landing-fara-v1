@@ -165,6 +165,8 @@
   /* dónde de la página estaba el botón (para saber cuál convierte más) */
   function ubicacion(el) {
     if (el.closest('#mant')) return 'mantenimiento';
+    if (el.closest('.post-cta')) return 'articulo';
+    if (el.closest('.nf')) return 'gracias';
     if (el.closest('header')) return 'menu';
     if (el.closest('.hero')) return 'portada';
     if (el.closest('#contacto')) return 'cierre';
