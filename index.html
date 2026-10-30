@@ -486,6 +486,12 @@ h3{font-size:clamp(20px,2.1vw,24px);letter-spacing:-.015em;}
 .mant .btn-cta{margin-top:8px;width:auto;}
 @keyframes mant-in{from{opacity:0;}to{opacity:1;}}
 
+/* ============ ME GUSTA CON DOBLE TOQUE (detalle escondido en las fotos) ============ */
+.hero-photo,.about-photo,.promise,#lightbox img{touch-action:manipulation;} /* el doble toque no hace zoom */
+.fara-like{position:absolute;z-index:6;width:clamp(72px,12vw,108px);aspect-ratio:1;pointer-events:none;
+  color:var(--ambar);filter:drop-shadow(0 6px 18px rgba(26,20,16,.4));will-change:transform,opacity;}
+.fara-like svg{width:100%;height:100%;display:block;}
+
 /* ============ REVEAL ============ */
 .reveal{opacity:0;transform:translateY(12px);transition:opacity .5s var(--ease), transform .5s var(--ease);}
 .reveal.in-view{opacity:1;transform:none;}
@@ -1131,6 +1137,58 @@ const PESTANAS={landing:201, links:202};
   document.getElementById('lbClose').addEventListener('click',close);
   dlg.addEventListener('click',e=>{ if(e.target===dlg) close(); });
   dlg.addEventListener('cancel',e=>{ e.preventDefault(); close(); }); /* tecla Esc */
+})();
+</script>
+
+<script>
+/* Doble toque (o doble clic) sobre las fotos: aparece un corazón, como en Instagram.
+   Es solo un detalle visual: no cuenta ni guarda nada. Va en la portada, "Sobre mí",
+   la foto de fondo de la promesa y el visor del portafolio. No va en el comparador. */
+(function(){
+  var SVG='<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 21.2l-1.4-1.3C5.4 15.1 2 12 2 8.2 2 5.1 4.4 2.8 7.4 2.8c1.7 0 3.4.8 4.6 2.1 1.2-1.3 2.9-2.1 4.6-2.1 3 0 5.4 2.3 5.4 5.4 0 3.8-3.4 6.9-8.6 11.7L12 21.2z"/></svg>';
+  var EASE='cubic-bezier(.23,1,.32,1)';
+  var reduce=matchMedia('(prefers-reduced-motion: reduce)');
+  var last={t:0,x:0,y:0};
+
+  /* en qué foto se puede dar el me gusta (null = en ninguna) */
+  function anfitrion(el){
+    if(!el||!el.closest) return null;
+    if(el.closest('#lbImg')) return document.getElementById('lightbox');
+    if(el.closest('.cmp')) return null;
+    var h=el.closest('.hero-photo,.about-photo'); if(h) return h;
+    var p=el.closest('.promise'); if(p&&!el.closest('.promise-card')) return p;
+    return null;
+  }
+
+  function corazon(host,x,y){
+    var r=host.getBoundingClientRect(), h=document.createElement('span');
+    h.className='fara-like'; h.setAttribute('aria-hidden','true'); h.innerHTML=SVG;
+    h.style.left=(x-r.left)+'px'; h.style.top=(y-r.top)+'px';
+    var viejos=host.querySelectorAll('.fara-like'); if(viejos.length>5) viejos[0].remove();
+    host.appendChild(h);
+    var c='translate(-50%,-50%)';
+    if(!h.animate){ setTimeout(function(){h.remove();},600); return; }
+    var kf=reduce.matches
+      ? [{opacity:0,transform:c},{opacity:1,transform:c,offset:.3},{opacity:1,transform:c,offset:.7},{opacity:0,transform:c}]
+      : [{opacity:0,transform:c+' scale(.7)'},
+         {opacity:1,transform:c+' scale(1.08)',offset:.25},
+         {opacity:1,transform:c+' scale(1)',offset:.55},
+         {opacity:0,transform:'translate(-50%,-90%) scale(.96)'}];
+    var a=h.animate(kf,{duration:reduce.matches?500:650,easing:EASE,fill:'both'});
+    a.onfinish=function(){h.remove();};
+  }
+
+  /* dos toques seguidos, cerca uno del otro (aunque el primero haya abierto el visor) */
+  document.addEventListener('pointerup',function(e){
+    if(e.pointerType==='mouse'&&e.button!==0) return;
+    var dx=e.clientX-last.x, dy=e.clientY-last.y;
+    var doble=e.timeStamp-last.t<350&&dx*dx+dy*dy<2304;
+    last={t:e.timeStamp,x:e.clientX,y:e.clientY};
+    if(!doble) return;
+    var host=anfitrion(e.target); if(!host) return;
+    last.t=0; /* un tercer toque no cuenta como otro doble */
+    corazon(host,e.clientX,e.clientY);
+  },{passive:true});
 })();
 </script>
 </body>
