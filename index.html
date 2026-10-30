@@ -1167,14 +1167,15 @@ const PESTANAS={landing:201, links:202};
     var viejos=host.querySelectorAll('.fara-like'); if(viejos.length>5) viejos[0].remove();
     host.appendChild(h);
     var c='translate(-50%,-50%)';
-    if(!h.animate){ setTimeout(function(){h.remove();},600); return; }
+    if(!h.animate){ setTimeout(function(){h.remove();},900); return; }
     var kf=reduce.matches
-      ? [{opacity:0,transform:c},{opacity:1,transform:c,offset:.3},{opacity:1,transform:c,offset:.7},{opacity:0,transform:c}]
+      ? [{opacity:0,transform:c},{opacity:1,transform:c,offset:.25},{opacity:1,transform:c,offset:.75},{opacity:0,transform:c}]
       : [{opacity:0,transform:c+' scale(.7)'},
-         {opacity:1,transform:c+' scale(1.08)',offset:.25},
-         {opacity:1,transform:c+' scale(1)',offset:.55},
-         {opacity:0,transform:'translate(-50%,-90%) scale(.96)'}];
-    var a=h.animate(kf,{duration:reduce.matches?500:650,easing:EASE,fill:'both'});
+         {opacity:1,transform:c+' scale(1.1)',offset:.2},
+         {opacity:1,transform:c+' scale(1)',offset:.35},
+         {opacity:1,transform:c+' scale(1)',offset:.65},
+         {opacity:0,transform:'translate(-50%,-95%) scale(.96)'}];
+    var a=h.animate(kf,{duration:reduce.matches?900:1300,easing:EASE,fill:'both'});
     a.onfinish=function(){h.remove();};
   }
 
