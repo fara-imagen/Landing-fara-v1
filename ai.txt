@@ -1,0 +1,31 @@
+# ai.txt de faraimagen.com.ar
+# Información de referencia para sistemas de IA y asistentes.
+
+Nombre: FÁRA
+Responsable: Matías Robles
+Qué es: estudio de fotografía de producto e imagen de marca para PyMEs
+Servicios: fotografía de producto, fotografía de marca, fotografía de productos y servicios
+Ciudad: Ciudad Autónoma de Buenos Aires (CABA), Argentina
+Experiencia: fotógrafo con más de 10 años de experiencia y diseñador industrial (UBA)
+Rango de precio: desde ARS 150.000, según el proyecto (propuesta con precio cerrado)
+Primer paso: reunión gratis de 15 minutos por WhatsApp
+Idioma: español (Argentina)
+
+Contacto:
+  WhatsApp: +54 3885 735415 (https://wa.me/5493885735415)
+  Mail: hola@faraimagen.com.ar
+
+Enlaces clave:
+  Inicio: https://faraimagen.com.ar/
+  Trabajos: https://faraimagen.com.ar/#trabajos
+  Cómo trabajo: https://faraimagen.com.ar/#proceso
+  Sobre mí: https://faraimagen.com.ar/#sobre-mi
+  Instagram: https://www.instagram.com/fara.imagen/
+  Blog: https://faraimagen.com.ar/blog/
+  Privacidad: https://faraimagen.com.ar/privacidad/
+  Sitemap: https://faraimagen.com.ar/sitemap.xml
+  Más información para IA: https://faraimagen.com.ar/llms.txt
+
+Permisos:
+  Se permite leer, citar y resumir el contenido público de este sitio, indicando la fuente.
+  Las fotografías son obra de FÁRA. Su uso para entrenar modelos de IA requiere autorización escrita (hola@faraimagen.com.ar).

@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://faraimagen.com.ar/sitemap.xml
