@@ -23,6 +23,8 @@ const RE_CODIGO = /^[A-Z]{3}-[a-z2-9]{6,8}$/;
 const PLAZO_ENTREGA = 30; // días, si Config no dice otra cosa
 const AVISO_ENTREGA = 5;
 const MAIL_FARA = 'hola@faraimagen.com.ar';
+const LOGO_MAIL = 'https://res.cloudinary.com/eekglpse/image/upload/f_png,h_160/c_crop,g_center,w_0.96,h_0.9/e_make_transparent:35/e_trim:10/e_colorize:100,co_rgb:1A1410/v1792547783/fara_marca_agua_logotipo_crema.svg';
+const MESES = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
 
 const H_USO = 'Cómo usar';
 const H_COT = 'Cotizaciones';
@@ -341,7 +343,7 @@ function avisosEntregas() {
     if (!mail || dias > anticipo || f[col] !== '') return;
     try {
       const aviso = textoAviso(f, dias, limite);
-      GmailApp.sendEmail(mail, aviso.asunto, aviso.cuerpo, remitente);
+      GmailApp.sendEmail(mail, aviso.asunto, aviso.cuerpo, Object.assign({ htmlBody: aviso.html }, remitente));
       hoja.getRange(i + 2, col + 1).setValue(new Date());
     } catch (err) {
       // un mail mal escrito no frena a los demás; mañana se vuelve a intentar
@@ -361,19 +363,52 @@ function opcionesMail(cfg) {
 function textoAviso(f, dias, limite) {
   const saludo = texto(f[COL_ENT.saludo]);
   const titulo = texto(f[COL_ENT.titulo]);
-  const fecha = limite.split('-').reverse().join('/');
+  const fecha = fechaEnLetras(limite);
+  const link = SITIO_ENTREGA + f[COL_ENT.codigo];
   const asunto = dias === 0 ? 'Hoy es el último día para descargar tu entrega de FÁRA'
     : dias === 1 ? 'Mañana vence tu entrega de FÁRA'
     : 'Tu entrega de FÁRA vence en ' + dias + ' días';
+  const encabezado = dias === 0 ? 'Hoy es el último día para descargar'
+    : dias === 1 ? 'Tu entrega vence mañana'
+    : 'Tu entrega vence en ' + dias + ' días';
+  const hola = saludo ? 'Hola ' + saludo + ',' : 'Hola,';
+  const disponible = 'Tu entrega' + (titulo ? ' "' + titulo + '"' : '') + ' está disponible hasta el ' + fecha + '.';
+  const borrado = 'Descargá todo a tiempo: después de esa fecha los archivos se borran.';
+  const costo = 'Si necesitás recuperarlos después de esa fecha, tiene un costo extra.';
   return {
     asunto: asunto,
-    cuerpo: (saludo ? 'Hola ' + saludo + ',' : 'Hola,') + '\n\n' +
-      'Tu entrega' + (titulo ? ' "' + titulo + '"' : '') + ' está disponible hasta el ' + fecha + '.\n' +
-      'Descargá todo antes de esa fecha: después los archivos se borran y recuperarlos tiene un costo extra.\n\n' +
-      SITIO_ENTREGA + f[COL_ENT.codigo] + '\n\n' +
-      'Cualquier duda, respondé este mail.\n\nFÁRA'
+    cuerpo: hola + '\n\n' + disponible + '\n' + borrado + ' ' + costo + '\n\n' + link + '\n\nCualquier duda, respondé este mail.\n\nFÁRA',
+    html: mailHtml(encabezado, hola, disponible, borrado, costo, link)
   };
 }
+
+// los mails solo aceptan estilos escritos en cada elemento y tablas para ordenar
+function mailHtml(encabezado, hola, disponible, borrado, costo, link) {
+  const letra = 'font-family:Arial,Helvetica,sans-serif;';
+  const parrafo = 'margin:0 0 14px;' + letra + 'font-size:16px;line-height:1.5;color:' + C_ESPRESSO + ';';
+  return '<body style="margin:0;padding:0;background:' + C_CREMA + ';">' +
+    '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:' + C_CREMA + ';"><tr><td align="center" style="padding:24px 12px;">' +
+    '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:480px;background:#FFFFFF;border-radius:16px;"><tr><td style="padding:28px 28px 24px;">' +
+    '<img src="' + LOGO_MAIL + '" alt="FÁRA" height="24" style="display:block;height:24px;width:auto;border:0;margin:0 0 24px;">' +
+    '<h1 style="margin:0 0 16px;' + letra + 'font-size:24px;line-height:1.2;font-weight:bold;color:' + C_ESPRESSO + ';">' + escapar(encabezado) + '</h1>' +
+    '<p style="' + parrafo + '">' + escapar(hola) + '</p>' +
+    '<p style="' + parrafo + '">' + escapar(disponible) + ' ' + escapar(borrado) + '</p>' +
+    '<table role="presentation" cellpadding="0" cellspacing="0" style="margin:22px 0;"><tr><td style="background:' + C_AMBAR + ';border-radius:10px;">' +
+    '<a href="' + link + '" style="display:inline-block;padding:14px 28px;' + letra + 'font-size:16px;font-weight:bold;color:#FFFFFF;text-decoration:none;">Ver mi entrega</a>' +
+    '</td></tr></table>' +
+    '<p style="margin:0;' + letra + 'font-size:13px;line-height:1.5;font-style:italic;color:' + C_MARRON + ';">' + escapar(costo) + '</p>' +
+    '</td></tr><tr><td style="padding:16px 28px 22px;border-top:1px solid ' + C_CREMA2 + ';' + letra + 'font-size:13px;line-height:1.5;color:' + C_MARRON + ';">' +
+    'Cualquier duda, respondé este mail.' +
+    '</td></tr></table></td></tr></table></body>';
+}
+
+const escapar = function (v) {
+  return String(v).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+};
+const fechaEnLetras = function (txt) {
+  const p = txt.split('-');
+  return Number(p[2]) + ' de ' + MESES[Number(p[1]) - 1] + ' de ' + p[0];
+};
 
 function activarAvisos() {
   const existe = ScriptApp.getProjectTriggers().some(function (t) { return t.getHandlerFunction() === 'avisosEntregas'; });
@@ -744,6 +779,7 @@ function completarDesdeCatalogo(hoja, fila, servicio) {
 const C_CREMA = '#F2EBDD';
 const C_CREMA2 = '#E9DFCB';
 const C_ESPRESSO = '#1A1410';
+const C_MARRON = '#5C5047';
 const C_VERDE = '#7A8B6F';
 const C_ROJO = '#A8473A';
 const C_AMBAR = '#C8873A'; // pestañas y encabezados de cotizaciones
