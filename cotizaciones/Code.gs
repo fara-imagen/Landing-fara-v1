@@ -8,7 +8,7 @@
  * Menús FÁRA ...... "Nueva cotización" y "Nueva entrega" generan el código y dejan la fila lista.
  * onEdit() ........ completa datos del Catálogo, la última modificación y la fecha límite,
  *                   y crea la entrega de una cotización al aceptarla o marcar un pago.
- * avisosEntregas() manda los mails de vencimiento. Corre solo una vez por día.
+ * avisosEntregas() manda los mails de vencimiento y marca las vencidas. Corre solo una vez por día.
  *
  * Instrucciones en cotizaciones/README.md y entregas/README.md.
  */
@@ -50,7 +50,7 @@ const COL_ENT = {
 const COL_ARC = { codigo: 0, orden: 1, nombre: 2, tipo: 3, link: 4, detalle: 5, fecha: 6, visible: 7 };
 const ESTADOS_ENT = {
   'Pendiente de pago': 'pendiente', 'En proceso': 'proceso', 'Disponible': 'disponible',
-  'Archivos borrados': 'borrada', 'Pausada': 'pausada', 'Anulada': 'anulada'
+  'Vencida': 'borrada', 'Archivos borrados': 'borrada', 'Pausada': 'pausada', 'Anulada': 'anulada'
 };
 const TIPOS_ARC = { 'Descarga': 'descarga', 'Web': 'web', 'Entregado': 'entregado', 'En proceso': 'proceso' };
 const VISIBLES_ARC = { 'Al pagar': 'pago', 'Entrega parcial': 'parcial', 'Oculto': 'oculto' };
@@ -328,11 +328,17 @@ function avisosEntregas() {
 
   hoja.getRange(2, 1, FILAS, COL_ENT.link + 1).getValues().forEach(function (f, i) {
     const limite = dia(f[COL_ENT.limite], zona);
-    const mail = texto(f[COL_ENT.mail]);
-    if (f[COL_ENT.estado] !== 'Disponible' || !limite || !mail) return;
+    if (f[COL_ENT.estado] !== 'Disponible' || !limite) return;
     const dias = diasEntre(hoy, limite);
+    if (dias < 0) {
+      // queda en rojo hasta que borres la carpeta y la pases a Archivos borrados
+      hoja.getRange(i + 2, COL_ENT.estado + 1).setValue('Vencida');
+      guardarEntrega(texto(f[COL_ENT.codigo]));
+      return;
+    }
+    const mail = texto(f[COL_ENT.mail]);
     const col = dias === 0 ? COL_ENT.avisoUltimo : COL_ENT.avisoPrevio;
-    if (dias < 0 || dias > anticipo || f[col] !== '') return;
+    if (!mail || dias > anticipo || f[col] !== '') return;
     try {
       const aviso = textoAviso(f, dias, limite);
       GmailApp.sendEmail(mail, aviso.asunto, aviso.cuerpo, remitente);
@@ -936,7 +942,7 @@ function armarEntregas(ss) {
   automaticas.forEach(function (c) { automatica(h, c); });
   // en rojo: venció y falta borrar o cerrar la carpeta. Al pasar a Archivos borrados se apaga
   const vencida = SpreadsheetApp.newConditionalFormatRule()
-    .whenFormulaSatisfied('=AND($A2<>"";$J2="Disponible";$I2<>"";$I2<TODAY())')
+    .whenFormulaSatisfied('=AND($A2<>"";OR($J2="Vencida";AND($J2="Disponible";$I2<>"";$I2<TODAY())))')
     .setBackground(C_ROJO).setFontColor(C_CREMA)
     .setRanges([h.getRange(2, 1, FILAS, COL_ENT.link + 1)]).build();
   bandas(h, COL_ENT.link + 1, '=AND($A2<>"";ISEVEN(ROW()))', [vencida]);
@@ -995,7 +1001,7 @@ function sumarUsoEntregas(ss) {
     ['Pendiente de pago: avisa que falta el pago y muestra solo las entregas parciales. El plazo no corre.'],
     ['En proceso: el cliente ve la lista mientras la vas terminando. Lo marcado Al pagar sale sin link hasta que lo pague. El plazo no corre y no salen mails.'],
     ['Disponible: se ve todo. Si la Fecha límite está vacía, se completa sola con los días de Config.'],
-    ['Fila en rojo: venció. Borrá o cerrá la carpeta y pasala a Archivos borrados.'],
+    ['Vencida: pasa sola el día después de la Fecha límite y la fila se pone en rojo. Borrá o cerrá la carpeta y pasala a Archivos borrados.'],
     ['Pausada y Anulada: un mensaje, sin datos ni links.']
   ];
   const desde = h.getLastRow() + 1;

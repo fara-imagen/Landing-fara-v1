@@ -64,10 +64,11 @@ Mientras la entrega esté en `En proceso` no vence nada y no sale ningún mail.
 | Pendiente de pago | "Tu trabajo está listo", el aviso de pago y solo las entregas parciales. El plazo no corre |
 | En proceso | "Tu trabajo está en marcha" y la lista, salvo lo Oculto. Lo que espera el pago sale sin link. El plazo no corre |
 | Disponible | Todo, con la fecha límite y el aviso para descargar |
-| Archivos borrados | El mensaje de plazo terminado, con botón de WhatsApp |
+| Vencida | Se pone sola el día después de la Fecha límite. El mensaje de plazo terminado, con botón de WhatsApp |
+| Archivos borrados | Lo mismo que Vencida. Lo ponés vos cuando ya borraste la carpeta |
 | Pausada / Anulada | Solo un mensaje |
 
-Al pasar el límite, una entrega `Disponible` vence sola: se ocultan los links de tipo Descarga y aparece el botón de WhatsApp para pedir los archivos. Lo de tipo Web y Entregado sigue a la vista.
+Al pasar el límite, una entrega `Disponible` vence sola en la web, y a la mañana siguiente su Estado cambia a `Vencida` en la planilla: se ocultan los links de tipo Descarga y aparece el botón de WhatsApp para pedir los archivos. Lo de tipo Web y Entregado sigue a la vista.
 
 La página avisa antes y después de la fecha que recuperar los archivos tiene un costo extra. Ese costo no sale en la página: lo acordás con el cliente.
 
@@ -75,7 +76,7 @@ La página avisa antes y después de la fecha que recuperar los archivos tiene u
 Al pasar a `Disponible`, si **Fecha límite** está vacía se completa sola con 30 días.
 - Para cambiar los 30 días de todas las entregas nuevas: **Config → Entregas: días para descargar**.
 - Para cambiar una sola: escribí otra fecha en su fila.
-- Para reabrir una vencida: poné una fecha nueva. Los avisos se vuelven a activar.
+- Para reabrir una vencida: poné una fecha nueva y pasala a `Disponible`. Los avisos se vuelven a activar.
 
 El cliente puede descargar hasta el final del día de la fecha límite, hora de Argentina.
 
@@ -94,7 +95,7 @@ Si está, el script la usa sola. Si no está, el mail sale desde fara.imagen@gma
 ## Cuando vence: borrar de verdad
 **Ocultar un link en la página no quita el permiso en Drive ni en Pixieset.** Quien lo haya guardado puede seguir entrando.
 
-Por eso la fila vencida se pone en **rojo** en la planilla. Cuando la veas:
+Por eso la fila `Vencida` queda en **rojo** en la planilla. Cuando la veas:
 1. Borrá la carpeta o cerrale el permiso en Drive o Pixieset.
 2. Pasá el Estado a `Archivos borrados`. El rojo se apaga.
 
