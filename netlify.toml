@@ -5,6 +5,12 @@
 [functions]
   directory = "netlify/functions"
 
+# Cotizaciones: todas las direcciones /cotizacion/<codigo> muestran la misma plantilla
+[[redirects]]
+  from = "/cotizacion/*"
+  to = "/cotizacion/index.html"
+  status = 200
+
 [[headers]]
   for = "/*"
   [headers.values]
@@ -24,3 +30,9 @@
   for = "/assets/*"
   [headers.values]
     Cache-Control = "public, max-age=3600"
+
+# Las cotizaciones no aparecen en buscadores
+[[headers]]
+  for = "/cotizacion/*"
+  [headers.values]
+    X-Robots-Tag = "noindex, nofollow"

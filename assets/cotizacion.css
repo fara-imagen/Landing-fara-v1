@@ -1,0 +1,124 @@
+/* ==========================================================
+   FÁRA · assets/cotizacion.css
+   Solo lo que la página de cotización necesita y style.css no tiene.
+   Variables, botones, tarjetas de vidrio y pantallas de aviso salen de style.css.
+   ========================================================== */
+
+.cot{display:flex;flex-direction:column;}
+.cot-wrap{width:100%;max-width:760px;padding-top:12px;padding-bottom:48px;animation:cot-entra .5s var(--ease) both;}
+@keyframes cot-entra{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:none;}}
+
+.cot-nav{max-width:696px;min-height:52px;padding-right:20px;}
+.cot-logo-cliente{height:30px;width:auto;max-width:120px;object-fit:contain;}
+.cot + .footer .wrap{max-width:760px;}
+
+/* bloques sin trama visible: precios siempre sobre fondo parejo */
+.cot .post-hero{background:var(--espresso);}
+.cot .post-body{background:rgba(255,255,255,.72);}
+
+/* cabecera */
+.post-hero .cot-codigo{text-transform:none;letter-spacing:.04em;}
+.cot-datos{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:14px 24px;margin-top:22px;padding-top:18px;border-top:1px solid var(--line-dark);}
+.cot-datos dt{font-size:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--on-dark-muted);}
+.cot-datos dd{margin-top:2px;font-size:16px;font-weight:600;}
+.cot-para{margin-top:12px;color:var(--on-dark-muted);}
+.cot-plazo{margin-top:18px;}
+
+/* textos que vienen de la planilla: respetan los saltos de línea */
+.cot-texto{white-space:pre-line;}
+
+/* ítems */
+.cot-seccion{margin-top:32px;padding:0;}
+.cot-seccion h2{margin-bottom:4px;}
+.cot-item.post-body{padding:24px 22px;}
+.cot-item h3{font-size:clamp(20px,2.2vw,23px);}
+.cot-item .cot-texto{margin-top:8px;color:var(--muted);font-size:16px;}
+.cot-item ul{margin-top:12px;padding-left:20px;font-size:16px;}
+.cot-item li{margin-top:4px;}
+.cot-item li::marker{color:var(--ambar);}
+.cot-item-pie{margin-top:16px;padding-top:14px;border-top:1px solid var(--line);display:grid;gap:6px;}
+.cot-item-cuenta{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:4px 16px;}
+.cot-precio{margin-left:auto;font-size:21px;font-weight:700;font-stretch:112%;letter-spacing:-.01em;}
+.cot-precio s{margin-right:8px;font-weight:500;color:var(--muted);}
+.cot-ahorro{justify-self:end;}
+@media (min-width:768px){ .cot-item.post-body{padding:28px 32px;} }
+
+/* resumen: bloque sólido, sin vidrio ni trama */
+.cot-resumen{justify-items:stretch;margin-top:24px;}
+.cot-resumen h2{margin-bottom:2px;}
+.cot-filas{display:grid;gap:8px;}
+.cot-fila{display:flex;justify-content:space-between;align-items:baseline;gap:16px;}
+.cot-fila dt{color:var(--on-dark-muted);}
+.cot-fila dd{font-weight:600;text-align:right;}
+.cot-fila-total{margin-top:8px;padding-top:14px;border-top:1px solid var(--line-dark);}
+.cot-fila-total dt{color:var(--on-dark);font-weight:600;}
+.cot-fila-total dd{font-size:clamp(28px,6vw,36px);font-weight:700;font-stretch:112%;letter-spacing:-.02em;line-height:1.1;}
+.cot-motivo{font-size:15px;}
+.post-cta p.cot-motivo{color:var(--on-dark-muted);}
+
+/* botones */
+.cot-acciones{display:grid;gap:10px;margin-top:8px;}
+.cot-acciones .btn{width:100%;}
+.cot-acciones .btn-accent{font-size:18px;}
+.btn-sec{background:var(--crema-2);color:var(--espresso);}
+@media (hover:hover) and (pointer:fine){ .btn-sec:hover{background:var(--crema);} }
+
+/* avisos: vencida y aceptada */
+.cot-aviso{display:grid;gap:10px;justify-items:start;margin-top:20px;padding:22px;border-radius:var(--radius);background:var(--crema-2);}
+.cot-aviso h2{font-size:clamp(21px,2.6vw,25px);}
+.cot-aviso .btn{width:100%;}
+.cot-aviso p{color:var(--muted);}
+
+/* acordeón */
+.cot-acc{margin-top:10px;border-radius:18px;
+  background:rgba(255,255,255,.72);
+  backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);
+  border:1px solid rgba(255,255,255,.65);
+  box-shadow:0 12px 28px rgba(26,20,16,.06), inset 0 1px 0 rgba(255,255,255,.8);}
+.cot-acc summary{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  min-height:58px;padding:14px 20px;cursor:pointer;list-style:none;
+  font-weight:600;font-stretch:112%;border-radius:18px;
+}
+.cot-acc summary::-webkit-details-marker{display:none;}
+.cot-acc summary:focus-visible{outline:3px solid var(--ambar);outline-offset:3px;}
+.cot-acc summary svg{width:18px;height:18px;flex:none;fill:none;stroke:var(--ambar);stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;transition:transform .25s var(--ease);}
+.cot-acc[open] summary svg{transform:rotate(180deg);}
+.cot-acc-cuerpo{padding:0 20px 20px;font-size:16px;color:var(--muted);}
+.cot-acc-cuerpo strong{color:var(--espresso);font-weight:600;}
+.cot-acc-cuerpo p + p{margin-top:10px;}
+
+/* pie */
+.cot-legal{flex-basis:100%;font-size:13px;line-height:1.5;}
+
+/* carga */
+.cot-sk{margin-top:16px;border-radius:var(--radius);background:var(--crema-2);animation:cot-pulso 1.4s ease-in-out infinite;}
+.cot-sk-hero{height:365px;margin-top:20px;background:var(--espresso-2);}
+@media (min-width:768px){ .cot-sk-hero{height:399px;} }
+.cot-sk-texto{height:120px;}
+.cot-sk-item{height:190px;}
+.cot-sk-resumen{height:300px;background:var(--espresso-2);}
+@keyframes cot-pulso{0%,100%{opacity:1;}50%{opacity:.62;}}
+.cot-noscript{margin:48px auto;text-align:center;}
+
+/* pantallas de aviso (.nf de style.css) */
+.cot .nf{flex:1;width:100%;}
+.cot .nf-box .btn{margin-top:4px;}
+
+/* sin versión impresa: la propuesta se ve solo en la web */
+.cot-sin-impresion{display:none;}
+@media print{
+  .header,.cot,.footer{display:none !important;}
+  body{background:#fff;}
+  .cot-sin-impresion{display:block;padding:40px;font-size:16px;}
+}
+
+/* ============ ACCESIBILIDAD ============ */
+@media (prefers-reduced-motion: reduce){
+  .cot-wrap{animation:none;}
+  .cot-sk{animation:none;}
+  .cot-acc summary svg{transition:none;}
+}
+@media (prefers-reduced-transparency: reduce){
+  .cot .post-body,.cot-acc{background:var(--crema-2);backdrop-filter:none;-webkit-backdrop-filter:none;}
+}

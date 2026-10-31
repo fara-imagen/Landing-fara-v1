@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- Plantilla única de cotizaciones: netlify.toml manda acá /cotizacion/<codigo>.
+     Sin Pixel ni medición: el link de cada cliente no sale a ningún tercero. -->
+<title>Propuesta · FÁRA</title>
+<meta name="description" content="Propuesta de FÁRA, fotografía de producto y marca.">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#1A1410">
+
+<!-- Open Graph genérico: nunca lleva datos del cliente -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="FÁRA">
+<meta property="og:title" content="Tu propuesta de FÁRA">
+<meta property="og:description" content="Fotografía de producto y marca.">
+<meta property="og:image" content="https://res.cloudinary.com/eekglpse/image/upload/v1793324415/FARA_open_graph.jpg">
+
+<link rel="icon" type="image/png" href="https://res.cloudinary.com/eekglpse/image/upload/v1792547726/fara_favicon_48_positivo.png">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://res.cloudinary.com">
+<link rel="preconnect" href="https://script.google.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@100..125,400..700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/style.css?v=3">
+<link rel="stylesheet" href="/assets/cotizacion.css?v=1">
+<script src="/assets/js/cotizacion.js?v=1" defer></script>
+</head>
+<body>
+
+<header class="header">
+  <div class="nav cot-nav">
+    <a class="nav-logo" href="/" aria-label="FÁRA, ir al inicio">
+      <img src="https://res.cloudinary.com/eekglpse/image/upload/f_png,h_160/c_crop,g_center,w_0.96,h_0.9/e_make_transparent:35/e_trim:10/e_colorize:100,co_rgb:1A1410/v1792547783/fara_marca_agua_logotipo_crema.svg" alt="FÁRA" height="21">
+    </a>
+    <img class="cot-logo-cliente" id="cotLogoCliente" alt="" hidden>
+  </div>
+</header>
+
+<main class="cot" id="cot" aria-busy="true">
+  <!-- Estado de carga: misma forma que la página final, para que nada salte -->
+  <div class="wrap cot-wrap" aria-label="Cargando la propuesta" role="status">
+    <div class="cot-sk cot-sk-hero"></div>
+    <div class="cot-sk cot-sk-texto"></div>
+    <div class="cot-sk cot-sk-item"></div>
+    <div class="cot-sk cot-sk-item"></div>
+    <div class="cot-sk cot-sk-resumen"></div>
+  </div>
+  <noscript>
+    <div class="wrap nf-box cot-noscript">
+      <h1>Esta propuesta necesita JavaScript</h1>
+      <p>Activalo en tu navegador o escribime por WhatsApp.</p>
+      <a class="btn btn-accent" href="https://wa.me/5493885735415">Escribime por WhatsApp</a>
+    </div>
+  </noscript>
+</main>
+
+<footer class="footer" id="cotPie" hidden>
+  <div class="wrap">
+    <span class="footer-logo">
+      <img src="https://res.cloudinary.com/eekglpse/image/upload/f_png,h_160/c_crop,g_center,w_0.96,h_0.9/e_make_transparent:35/e_trim:10/e_colorize:100,co_rgb:1A1410/v1792547783/fara_marca_agua_logotipo_crema.svg" alt="FÁRA" height="22" loading="lazy">
+    </span>
+    <div class="footer-links" id="cotContacto"></div>
+    <p class="cot-legal" id="cotActualizada" hidden></p>
+    <p class="cot-legal" id="cotDisclaimer" hidden></p>
+  </div>
+</footer>
+
+<p class="cot-sin-impresion">Esta propuesta se consulta online, siempre actualizada, en el link que te envié.</p>
+
+</body>
+</html>
