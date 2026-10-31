@@ -69,6 +69,8 @@ Mientras la entrega esté en `En proceso` no vence nada y no sale ningún mail.
 
 Al pasar el límite, una entrega `Disponible` vence sola: se ocultan los links de tipo Descarga y aparece el botón de WhatsApp para pedir los archivos. Lo de tipo Web y Entregado sigue a la vista.
 
+La página avisa antes y después de la fecha que recuperar los archivos tiene un costo extra. Ese costo no sale en la página: lo acordás con el cliente.
+
 ## Plazo
 Al pasar a `Disponible`, si **Fecha límite** está vacía se completa sola con 30 días.
 - Para cambiar los 30 días de todas las entregas nuevas: **Config → Entregas: días para descargar**.

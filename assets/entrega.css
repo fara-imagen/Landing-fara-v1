@@ -25,6 +25,7 @@
 /* aviso de plazo: urgente cuando quedan pocos días */
 .ent-aviso-urgente{background:var(--espresso);color:var(--on-dark);}
 .ent-aviso-urgente p{color:var(--on-dark-muted);}
+.cot-aviso p.ent-letra-chica{font-size:13px;line-height:1.5;}
 
 /* falta el pago: apenas teñido, con candado fino */
 .ent-aviso-bloqueado{background:rgba(168,71,58,.07);border:1px solid rgba(168,71,58,.2);}

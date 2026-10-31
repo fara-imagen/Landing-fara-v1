@@ -118,15 +118,16 @@
     }
     if (e.estado === 'vencida') {
       return aviso('El plazo de descarga terminó',
-        'Los archivos ya no están disponibles. Escribime y vemos cómo te los reenvío.',
+        'Los archivos ya no están disponibles. Recuperarlos tiene un costo extra: escribime y lo vemos.',
         boton('btn-accent', 'Pedir los archivos',
           linkWhatsApp(wa, 'Hola Matías, venció la entrega ' + e.codigo + '. ¿Me reenviás los archivos?')));
     }
-    if (e.dias === null || !e.archivos.some(function (a) { return a.tipo === 'descarga' && lleno(a.link); })) return null;
+    if (e.dias === null || !e.archivos.some(function (a) { return a.tipo === 'proceso' || (a.tipo === 'descarga' && lleno(a.link)); })) return null;
     const urgente = e.dias <= DIAS_URGENTE;
     return aviso(e.dias === 0 ? 'Hoy es el último día para descargar' : 'Descargá antes del ' + fechaLarga(e.limite),
-      'Guardá todo en tu compu o en tu nube. ' + (e.dias === 0 ? 'Mañana' : 'Después de esa fecha') + ' los archivos dejan de estar disponibles.',
-      null, urgente ? 'ent-aviso-urgente' : '');
+      'Guardá todo en tu compu o en tu nube. ' + (e.dias === 0 ? 'Mañana' : 'Después de esa fecha') + ' los archivos se borran.',
+      h('p', { class: 'ent-letra-chica' }, 'Si necesitás recuperarlos después de esa fecha, tiene un costo extra.'),
+      urgente ? 'ent-aviso-urgente' : '');
   }
 
   function renglon(a) {

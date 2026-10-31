@@ -363,7 +363,7 @@ function textoAviso(f, dias, limite) {
     asunto: asunto,
     cuerpo: (saludo ? 'Hola ' + saludo + ',' : 'Hola,') + '\n\n' +
       'Tu entrega' + (titulo ? ' "' + titulo + '"' : '') + ' está disponible hasta el ' + fecha + '.\n' +
-      'Descargá todo antes de esa fecha: después los archivos dejan de estar disponibles.\n\n' +
+      'Descargá todo antes de esa fecha: después los archivos se borran y recuperarlos tiene un costo extra.\n\n' +
       SITIO_ENTREGA + f[COL_ENT.codigo] + '\n\n' +
       'Cualquier duda, respondé este mail.\n\nFÁRA'
   };
