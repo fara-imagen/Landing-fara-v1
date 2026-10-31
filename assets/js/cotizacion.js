@@ -96,7 +96,9 @@
     const anticipo = total * Math.min(num(c.anticipoPct), 100) / 100;
     return {
       items: items, subtotal: subtotal, descuentos: descItems + general, general: general,
-      total: total, anticipo: anticipo, saldo: total - anticipo
+      total: total, anticipo: anticipo, saldo: total - anticipo,
+      /* sin anticipo no hay nada que marcar como "anticipo pagado" */
+      pago: c.pago === 'total' || (c.pago === 'anticipo' && anticipo > 0) ? c.pago : 'pendiente'
     };
   }
 
@@ -112,7 +114,7 @@
     return 'Quedan ' + dias + ' días';
   }
 
-  function cabecera(c, vencida) {
+  function cabecera(c, vencida, aceptada) {
     const dias = diasHasta(c.vencimiento);
     const datos = h('dl', { class: 'cot-datos' },
       lleno(c.emision) && h('div', {}, h('dt', {}, 'Fecha'), h('dd', {}, fechaLarga(c.emision))),
@@ -123,7 +125,7 @@
       h('h1', {}, lleno(c.titulo) ? c.titulo : 'Tu propuesta'),
       lleno(c.cliente) && h('p', { class: 'cot-para' }, 'Para ' + c.cliente + (lleno(c.contacto) ? ' · ' + c.contacto : '')),
       datos.childElementCount ? datos : null,
-      !vencida && c.estado !== 'aceptada' && dias !== null && h('p', { class: 'cot-plazo' }, h('mark', {}, textoPlazo(dias)))
+      !vencida && !aceptada && dias !== null && h('p', { class: 'cot-plazo' }, h('mark', {}, textoPlazo(dias)))
     );
   }
 
@@ -149,19 +151,36 @@
     );
   }
 
+  function filaPagado() {
+    return h('div', { class: 'cot-fila cot-fila-pagado' },
+      h('dt', {}, icono('M5 12.5l4.5 4.5L19 7.5'), 'Pagado'),
+      h('dd', {}));
+  }
+
   function resumen(c, t, acciones) {
     const m = c.moneda;
+    const hayAnticipo = t.anticipo > 0;
+    const anticipoPagado = hayAnticipo && t.pago !== 'pendiente';
+    const saldoPagado = hayAnticipo && t.pago === 'total';
+    const totalPagado = !hayAnticipo && t.pago === 'total';
     const filas = h('dl', { class: 'cot-filas' },
       t.descuentos > 0 && fila('Subtotal', plata(t.subtotal, m)),
       t.descuentos > 0 && fila('Descuentos', '− ' + plata(t.descuentos, m)),
-      fila('Total', plata(t.total, m), 'cot-fila-total'),
-      t.anticipo > 0 && fila('Anticipo (' + num(c.anticipoPct) + '%)', plata(t.anticipo, m)),
-      t.anticipo > 0 && fila('Saldo', plata(t.saldo, m))
+      fila('Total', plata(t.total, m), 'cot-fila-total' + (totalPagado ? ' cot-fila-tachada' : '')),
+      t.descuentos > 0 && h('div', { class: 'cot-fila cot-fila-ahorro' },
+        h('dt', { class: 'cot-oculto' }, 'Ahorro'),
+        h('dd', {}, h('mark', {}, 'Ahorrás ' + plata(t.descuentos, m)))),
+      totalPagado && filaPagado(),
+      hayAnticipo && fila('Anticipo (' + num(c.anticipoPct) + '%)', plata(t.anticipo, m), anticipoPagado ? 'cot-fila-tachada' : ''),
+      anticipoPagado && filaPagado(),
+      hayAnticipo && (saldoPagado
+        ? fila('Saldo', plata(t.saldo, m), 'cot-fila-tachada')
+        : fila(anticipoPagado ? 'Saldo pendiente' : 'Saldo', plata(t.saldo, m), anticipoPagado ? 'cot-fila-saldo' : '')),
+      saldoPagado && filaPagado()
     );
     return h('section', { class: 'post-cta cot-resumen', 'aria-label': 'Resumen de la propuesta' },
       h('h2', {}, 'Resumen'),
       filas,
-      t.descuentos > 0 && h('p', {}, h('mark', {}, 'Ahorrás ' + plata(t.descuentos, m))),
       t.general > 0 && lleno(c.descuentoMotivo) && h('p', { class: 'cot-motivo' }, c.descuentoMotivo),
       acciones
     );
@@ -253,8 +272,10 @@
   function propuesta(c) {
     const t = calcular(c);
     const dias = diasHasta(c.vencimiento);
-    const vencida = c.estado === 'vencida' || (c.estado !== 'aceptada' && dias !== null && dias < 0);
-    const aceptada = c.estado === 'aceptada';
+    /* con un pago registrado la propuesta ya está en marcha: no vence ni se vuelve a aceptar */
+    const conPago = t.pago !== 'pendiente';
+    const vencida = !conPago && (c.estado === 'vencida' || (c.estado !== 'aceptada' && dias !== null && dias < 0));
+    const aceptada = c.estado === 'aceptada' || conPago;
     const wa = (c.config || {}).whatsapp;
 
     if (lleno(c.logoCliente)) {
@@ -280,11 +301,12 @@
       : null;
 
     mostrar(h('div', { class: 'wrap cot-wrap' },
-      cabecera(c, vencida),
+      cabecera(c, vencida, aceptada),
       vencida && aviso('Esta propuesta venció', 'Los valores pueden haber cambiado. Escribime y te la actualizo.',
         boton('btn-accent', 'Pedir actualización',
           linkWhatsApp(wa, 'Hola Matías, la propuesta ' + c.codigo + ' venció. ¿Me la actualizás?'))),
-      aceptada && aviso('Propuesta aceptada', 'Gracias. Ya estamos trabajando con estos valores. Cualquier duda, escribime.'),
+      t.pago === 'total' && aviso('Propuesta pagada', 'Gracias. Este link queda disponible para que lo consultes cuando quieras.'),
+      t.pago !== 'total' && c.estado === 'aceptada' && aviso('Propuesta aceptada', 'Gracias. Ya estamos trabajando con estos valores. Cualquier duda, escribime.'),
       h('div', { class: 'cot-cuerpo' },
         h('div', { class: 'cot-detalle' },
           lleno(c.intro) && h('div', { class: 'post-body cot-texto' }, c.intro),

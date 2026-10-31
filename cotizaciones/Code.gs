@@ -24,9 +24,10 @@ const H_CONFIG = 'Config';
 const COL = {
   codigo: 0, clienteCodigo: 1, cliente: 2, contacto: 3, titulo: 4, intro: 5, emision: 6, vencimiento: 7,
   estado: 8, moneda: 9, descuentoTipo: 10, descuentoValor: 11, descuentoMotivo: 12, formaPago: 13,
-  anticipoPct: 14, plazoEntrega: 15, condiciones: 16, notas: 17, disclaimer: 18, logoCliente: 19,
-  total: 20, actualizada: 21, link: 22
+  anticipoPct: 14, pago: 15, plazoEntrega: 16, condiciones: 17, notas: 18, disclaimer: 19,
+  logoCliente: 20, total: 21, actualizada: 22, link: 23
 };
+const PAGOS = { 'Pendiente': 'pendiente', 'Anticipo pagado': 'anticipo', 'Pagado total': 'total' };
 const COL_ITEM = {
   codigo: 0, orden: 1, servicio: 2, descripcion: 3, entregables: 4, cantidad: 5, unidad: 6,
   precio: 7, descuentoPct: 8, mostrar: 9, importe: 10
@@ -111,6 +112,7 @@ function buscarCotizacion(codigo) {
     descuentoMotivo: texto(f[COL.descuentoMotivo]),
     formaPago: texto(f[COL.formaPago]),
     anticipoPct: porcentaje(f[COL.anticipoPct]),
+    pago: PAGOS[f[COL.pago]] || 'pendiente',
     plazoEntrega: texto(f[COL.plazoEntrega]),
     condiciones: texto(f[COL.condiciones]) || texto(cfg.condiciones),
     notas: texto(f[COL.notas]),
@@ -276,6 +278,7 @@ function crearCotizacion(ss, prefijo) {
   const fila = primeraLibre(hoja);
   hoja.getRange(fila, COL.codigo + 1, 1, 2).setValues([[codigo, prefijo]]);
   hoja.getRange(fila, COL.emision + 1, 1, 4).setValues([[hoy, vence, 'Borrador', 'ARS']]);
+  hoja.getRange(fila, COL.pago + 1).setValue('Pendiente');
   hoja.getRange(fila, COL.actualizada + 1).setValue(hoy);
 
   // tres renglones de ítems ya unidos a la cotización: los vacíos no se muestran
@@ -413,12 +416,13 @@ function armarCotizaciones(ss) {
   const h = ss.insertSheet(H_COT);
   encabezado(h, ['Código', 'Código de cliente', 'Cliente', 'Contacto', 'Título de la propuesta', 'Mensaje de introducción',
     'Fecha de emisión', 'Vencimiento', 'Estado', 'Moneda', 'Tipo de descuento', 'Descuento', 'Motivo del descuento',
-    'Forma de pago', 'Anticipo %', 'Plazo de entrega', 'Condiciones', 'Notas', 'Disclaimer', 'Logo del cliente (link)',
+    'Forma de pago', 'Anticipo %', 'Pago', 'Plazo de entrega', 'Condiciones', 'Notas', 'Disclaimer', 'Logo del cliente (link)',
     'Total', 'Última modificación', 'Link'], [COL.codigo, COL.total, COL.actualizada, COL.link]);
 
   lista(h, 2, COL.estado, FILAS, ['Borrador', 'Enviada', 'Aceptada', 'Vencida', 'Anulada', 'Pausada']);
   lista(h, 2, COL.moneda, FILAS, ['ARS', 'USD']);
   lista(h, 2, COL.descuentoTipo, FILAS, ['%', 'Monto']);
+  lista(h, 2, COL.pago, FILAS, Object.keys(PAGOS));
   h.getRange(2, COL.emision + 1, FILAS, 2).setNumberFormat('dd/mm/yyyy');
   h.getRange(2, COL.actualizada + 1, FILAS, 1).setNumberFormat('dd/mm/yyyy hh:mm');
   h.getRange(2, COL.descuentoValor + 1, FILAS, 1).setNumberFormat('#,##0.##');
@@ -434,7 +438,7 @@ function armarCotizaciones(ss) {
 
   [COL.codigo, COL.total, COL.actualizada, COL.link].forEach(function (c) { automatica(h, c); });
   bandas(h, COL.link + 1, '=AND($A2<>"";ISEVEN(ROW()))');
-  h.setColumnWidths(1, 23, 130);
+  h.setColumnWidths(1, COL.link + 1, 130);
   h.setColumnWidth(COL.intro + 1, 280);
   h.setColumnWidth(COL.titulo + 1, 240);
   h.setColumnWidth(COL.link + 1, 360);
@@ -519,6 +523,7 @@ function armarUso(ss) {
     ['Borrador: el link dice que no está disponible.'],
     ['Enviada: se ve completa. Si pasa la fecha de vencimiento, se muestra vencida sola.'],
     ['Aceptada: se ve completa con el aviso de aceptada.'],
+    ['Pago: elegí Anticipo pagado o Pagado total a medida que cobrás. Si te paga otro anticipo, cambiá primero Anticipo %. El link sigue activo como registro.'],
     ['Pausada y Anulada: un mensaje, sin datos ni precios.'],
     ['Vencida: se ve completa con el botón para pedir actualización.'],
     [''],
@@ -530,9 +535,9 @@ function armarUso(ss) {
   h.getRange(1, 1, lineas.length, 1).setValues(lineas).setFontFamily('Archivo').setBackground(C_CREMA).setFontColor(C_ESPRESSO).setWrap(true);
   h.setColumnWidth(1, 720);
   h.getRange(1, 1).setFontSize(20).setFontWeight('bold');
-  [4, 10, 13, 20].forEach(function (f) { h.getRange(f, 1).setFontWeight('bold').setFontSize(13); });
-  h.getRange(21, 1).setBackground(C_VERDE).setFontColor(C_CREMA);
-  h.getRange(22, 1).setBackground(C_ROJO).setFontColor(C_CREMA);
+  [4, 10, 13, 21].forEach(function (f) { h.getRange(f, 1).setFontWeight('bold').setFontSize(13); });
+  h.getRange(22, 1).setBackground(C_VERDE).setFontColor(C_CREMA);
+  h.getRange(23, 1).setBackground(C_ROJO).setFontColor(C_CREMA);
   h.setHiddenGridlines(true);
 }
 
@@ -545,8 +550,9 @@ function cargarEjemplo(ss) {
     'Fotos de producto y landing para tu marca',
     'Hola Laura, gracias por la charla de ayer.\nAcá está la propuesta con lo que hablamos para la carta nueva y la web.']]);
   hoja.getRange(f, COL.estado + 1).setValue('Enviada');
-  hoja.getRange(f, COL.descuentoTipo + 1, 1, 6).setValues([['%', 10, 'Descuento por contratar los tres servicios juntos.',
-    'Transferencia bancaria.', 50, '15 días hábiles desde la sesión de fotos.']]);
+  hoja.getRange(f, COL.descuentoTipo + 1, 1, 5).setValues([['%', 10, 'Descuento por contratar los tres servicios juntos.',
+    'Transferencia bancaria.', 50]]);
+  hoja.getRange(f, COL.plazoEntrega + 1).setValue('15 días hábiles desde la sesión de fotos.');
 
   const items = ss.getSheetByName(H_ITEMS);
   items.getRange(2, COL_ITEM.servicio + 1, 3, 7).setValues([

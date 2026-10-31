@@ -64,6 +64,18 @@
 .cot-fila-total{margin-top:8px;padding-top:14px;border-top:1px solid var(--line-dark);}
 .cot-fila-total dt{color:var(--on-dark);font-weight:600;}
 .cot-fila-total dd{font-size:clamp(28px,6vw,36px);font-weight:700;font-stretch:112%;letter-spacing:-.02em;line-height:1.1;}
+.cot-fila-ahorro{justify-content:flex-end;}
+.cot-fila-ahorro dd{font-weight:500;}
+.cot-oculto{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);}
+/* anticipo pagado: renglón tachado de punta a punta y confirmación en verde */
+.cot-fila-tachada{position:relative;}
+.cot-fila-tachada::after{content:"";position:absolute;left:0;right:0;top:50%;height:1px;background:var(--on-dark-muted);}
+.cot-fila-tachada dd{font-weight:500;color:var(--on-dark-muted);}
+.cot-fila-total.cot-fila-tachada::after{top:calc(50% + 5px);}
+.cot-fila-pagado{margin-top:-4px;}
+.cot-fila-pagado dt{display:flex;align-items:center;gap:6px;font-size:15px;font-weight:700;color:var(--salvia);}
+.cot-fila-pagado svg{width:18px;height:18px;flex:none;fill:none;stroke:currentColor;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;}
+.cot-fila-saldo dt{color:var(--on-dark);font-weight:600;}
 .cot-motivo{font-size:15px;}
 .post-cta p.cot-motivo{color:var(--on-dark-muted);}
 

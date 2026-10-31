@@ -14,6 +14,16 @@ Para el mismo cliente podés crear todas las cotizaciones que quieras: cada una 
 
 En **Precio** va el total de ese renglón. La cantidad es informativa: no multiplica.
 
+## Anticipo y pagos
+Dejá **Anticipo %** vacío si no cobrás anticipo. Si te paga otro porcentaje, cambiá **Anticipo %** antes de marcar el pago.
+
+En la columna **Pago** elegí:
+- `Pendiente`: se ve normal.
+- `Anticipo pagado`: el anticipo sale tachado con el tick de pagado y queda el saldo pendiente.
+- `Pagado total`: todo sale pagado y aparece el aviso de propuesta pagada.
+
+Con cualquier pago marcado, la página saca el botón de aceptar y deja de vencer. El link sigue activo como registro hasta que la pases a `Anulada`.
+
 ## Cambiar una cotización
 Editá la celda en la planilla. Listo. Para volver a ver todos los ítems: **FÁRA → Ver todos los ítems**.
 
