@@ -66,4 +66,6 @@ Si más adelante cambia `Code.gs`: **Implementar → Gestionar implementaciones 
 - `cotizaciones/Code.gs`: el script de la planilla.
 - `netlify.toml`: la regla que manda `/cotizacion/*` a la plantilla.
 
+Las entregas de archivos usan la misma planilla y el mismo script: ver `entregas/README.md`.
+
 Este repo es público: acá nunca van datos reales de clientes.

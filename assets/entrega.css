@@ -1,0 +1,36 @@
+/* ==========================================================
+   FÁRA · assets/entrega.css
+   Solo lo que la página de entrega necesita y cotizacion.css no tiene.
+   Se carga después de style.css y cotizacion.css.
+   ========================================================== */
+
+/* una sola columna, también en compu: no hay resumen al costado */
+@media (min-width:1000px){
+  .ent .cot-wrap{max-width:760px;}
+  .ent ~ .footer .wrap{max-width:760px;}
+  .header:has(+ .ent) .cot-nav{max-width:696px;}
+}
+
+/* aviso de plazo: urgente cuando quedan pocos días */
+.ent-aviso-urgente{background:var(--espresso);color:var(--on-dark);}
+.ent-aviso-urgente p{color:var(--on-dark-muted);}
+
+/* renglones */
+.ent-lista{display:grid;gap:12px;margin-top:12px;}
+.ent-item.post-body{margin-top:0;padding:20px 22px;display:grid;gap:14px;}
+.ent-item-texto{display:grid;gap:6px;min-width:0;overflow-wrap:anywhere;}
+.ent-item h3{font-size:clamp(19px,2.2vw,22px);}
+.ent-item .cot-texto{color:var(--muted);font-size:16px;}
+.ent-item .meta{display:flex;flex-wrap:wrap;align-items:center;gap:6px;}
+.ent-item .meta svg{width:16px;height:16px;flex:none;fill:none;stroke:var(--salvia);stroke-width:3;stroke-linecap:round;stroke-linejoin:round;}
+.ent-item .btn{width:100%;}
+.ent-item-vencido h3{color:var(--muted);}
+@media (min-width:768px){
+  .ent-item.post-body{grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:24px;padding:24px 32px;}
+  .ent-item .btn{width:auto;min-width:150px;}
+}
+
+/* carga */
+.ent-sk-hero{height:300px;margin-top:20px;background:var(--espresso-2);}
+.ent-sk-aviso{height:150px;}
+@media (min-width:768px){ .ent-sk-hero{height:350px;} }

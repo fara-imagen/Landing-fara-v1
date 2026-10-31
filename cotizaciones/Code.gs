@@ -1,25 +1,35 @@
 /**
- * FÁRA · Cotizaciones: puente entre la planilla y faraimagen.com.ar/cotizacion/<codigo>.
+ * FÁRA · Cotizaciones y entregas: puente entre la planilla y
+ * faraimagen.com.ar/cotizacion/<codigo> y faraimagen.com.ar/entrega/<codigo>.
  *
- * doGet() ......... recibe un código y devuelve solo esa cotización.
+ * doGet() ......... recibe un código y devuelve solo esa cotización o entrega.
  * setup() ......... arma la planilla entera. Se ejecuta una sola vez.
- * Menú FÁRA ....... "Nueva cotización" genera el código y deja la fila lista.
- * onEdit() ........ completa datos del Catálogo y la última modificación.
+ * agregarEntregas() suma las pestañas de entregas a una planilla ya armada.
+ * Menú FÁRA ....... "Nueva cotización" y "Nueva entrega" generan el código y dejan la fila lista.
+ * onEdit() ........ completa datos del Catálogo, la última modificación y la fecha límite.
+ * avisosEntregas() manda los mails de vencimiento. Corre solo una vez por día.
  *
- * Instrucciones en cotizaciones/README.md.
+ * Instrucciones en cotizaciones/README.md y entregas/README.md.
  */
 
 const SITIO = 'https://faraimagen.com.ar/cotizacion/';
+const SITIO_ENTREGA = 'https://faraimagen.com.ar/entrega/';
 const LETRAS = 'abcdefghjkmnpqrstuvwxyz23456789'; // sin 0, o, 1, l, i
 const LARGO_CODIGO = 8;
 const FILAS = 500;
 const CACHE_SEGUNDOS = 21600; // 6 horas, el máximo de Google
+const RE_CODIGO = /^[A-Z]{3}-[a-z2-9]{6,8}$/;
+const PLAZO_ENTREGA = 30; // días, si Config no dice otra cosa
+const AVISO_ENTREGA = 5;
+const MAIL_FARA = 'hola@faraimagen.com.ar';
 
 const H_USO = 'Cómo usar';
 const H_COT = 'Cotizaciones';
 const H_ITEMS = 'Ítems';
 const H_CAT = 'Catálogo';
 const H_CONFIG = 'Config';
+const H_ENT = 'Entregas';
+const H_ARC = 'Archivos';
 
 const COL = {
   codigo: 0, clienteCodigo: 1, cliente: 2, contacto: 3, titulo: 4, intro: 5, emision: 6, vencimiento: 7,
@@ -32,12 +42,24 @@ const COL_ITEM = {
   codigo: 0, orden: 1, servicio: 2, descripcion: 3, entregables: 4, cantidad: 5, unidad: 6,
   precio: 7, descuentoPct: 8, mostrar: 9, importe: 10
 };
+const COL_ENT = {
+  codigo: 0, clienteCodigo: 1, cliente: 2, mail: 3, titulo: 4, mensaje: 5, logoCliente: 6, limite: 7,
+  estado: 8, avisoPrevio: 9, avisoUltimo: 10, link: 11
+};
+const COL_ARC = { codigo: 0, orden: 1, nombre: 2, tipo: 3, link: 4, detalle: 5, fecha: 6, visible: 7 };
+const ESTADOS_ENT = {
+  'Pendiente de pago': 'pendiente', 'Disponible': 'disponible', 'Archivos borrados': 'borrada',
+  'Pausada': 'pausada', 'Anulada': 'anulada'
+};
+const TIPOS_ARC = { 'Descarga': 'descarga', 'Web': 'web', 'Entregado': 'entregado' };
+const VISIBLES_ARC = { 'Al pagar': 'pago', 'Entrega parcial': 'parcial', 'Oculto': 'oculto' };
 
 /* ---------- web ---------- */
 
 function doGet(e) {
+  if (e && e.parameter && e.parameter.entrega) return responder(pedirEntrega(String(e.parameter.entrega)));
   const pedido = String((e && e.parameter && e.parameter.codigo) || '');
-  if (!/^[A-Z]{3}-[a-z2-9]{6,8}$/.test(pedido)) return responder('{"ok":false}');
+  if (!RE_CODIGO.test(pedido)) return responder('{"ok":false}');
   try {
     const guardada = CacheService.getScriptCache().get(claveCache(pedido));
     if (guardada) return responder(guardada);
@@ -69,9 +91,15 @@ function guardarEnCache(codigo) {
 
 // mantiene listas las cotizaciones enviadas: lo ejecuta el activador de "Activar carga rápida"
 function refrescarCache() {
-  SpreadsheetApp.getActiveSpreadsheet().getSheetByName(H_COT).getRange(2, 1, FILAS, COL.estado + 1).getValues()
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  ss.getSheetByName(H_COT).getRange(2, 1, FILAS, COL.estado + 1).getValues()
     .filter(function (r) { return texto(r[COL.codigo]) !== '' && r[COL.estado] === 'Enviada'; })
     .forEach(function (r) { guardarEnCache(texto(r[COL.codigo])); });
+  const entregas = ss.getSheetByName(H_ENT);
+  if (!entregas) return;
+  entregas.getRange(2, 1, FILAS, COL_ENT.estado + 1).getValues()
+    .filter(function (r) { return texto(r[COL_ENT.codigo]) !== '' && ['pendiente', 'disponible'].indexOf(ESTADOS_ENT[r[COL_ENT.estado]]) >= 0; })
+    .forEach(function (r) { guardarEntrega(texto(r[COL_ENT.codigo])); });
 }
 
 function activarCargaRapida() {
@@ -135,14 +163,17 @@ function buscarCodigo(hoja, codigo) {
   return hoja.getRange(2, 1, FILAS, 1).createTextFinder(codigo).matchCase(true).matchEntireCell(true);
 }
 
-function leerItems(ss, codigo) {
-  const hoja = ss.getSheetByName(H_ITEMS);
+// solo el tramo donde están sus renglones, no la pestaña entera
+function renglonesDe(hoja, codigo, columnas) {
   const filas = buscarCodigo(hoja, codigo).findAll().map(function (c) { return c.getRow(); });
   if (!filas.length) return [];
-  // solo el tramo donde están sus renglones, no la pestaña entera
   const desde = Math.min.apply(null, filas);
   const hasta = Math.max.apply(null, filas);
-  return hoja.getRange(desde, 1, hasta - desde + 1, COL_ITEM.mostrar + 1).getValues()
+  return hoja.getRange(desde, 1, hasta - desde + 1, columnas).getValues();
+}
+
+function leerItems(ss, codigo) {
+  return renglonesDe(ss.getSheetByName(H_ITEMS), codigo, COL_ITEM.mostrar + 1)
     .filter(function (r) {
       return String(r[COL_ITEM.codigo]) === codigo && r[COL_ITEM.mostrar] === true && texto(r[COL_ITEM.servicio]) !== '';
     })
@@ -158,6 +189,184 @@ function leerItems(ss, codigo) {
         descuentoPct: porcentaje(r[COL_ITEM.descuentoPct])
       };
     });
+}
+
+/* ---------- entregas ----------
+   La ficha guardada tiene todos los renglones, links incluidos, y nunca sale a la web.
+   En cada pedido vistaEntrega() arma lo que corresponde mostrar ese día: así un link
+   vence a tiempo aunque la ficha siga en la caché, y los que el cliente todavía no
+   puede ver nunca llegan a su navegador. */
+
+function claveEntrega(codigo) {
+  return 'ent:' + codigo;
+}
+
+function pedirEntrega(codigo) {
+  if (!RE_CODIGO.test(codigo)) return '{"ok":false}';
+  try {
+    const guardada = CacheService.getScriptCache().get(claveEntrega(codigo));
+    return JSON.stringify(vistaEntrega(JSON.parse(guardada || guardarEntrega(codigo))));
+  } catch (err) {
+    return '{"ok":false}';
+  }
+}
+
+function guardarEntrega(codigo) {
+  const ficha = leerEntrega(codigo);
+  const json = JSON.stringify(ficha);
+  if (ficha.ok) CacheService.getScriptCache().put(claveEntrega(codigo), json, CACHE_SEGUNDOS);
+  else CacheService.getScriptCache().remove(claveEntrega(codigo));
+  return json;
+}
+
+function leerEntrega(codigo) {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const zona = ss.getSpreadsheetTimeZone();
+  const hoja = ss.getSheetByName(H_ENT);
+  const celda = buscarCodigo(hoja, codigo).findNext();
+  if (!celda) return { ok: false };
+  const f = hoja.getRange(celda.getRow(), 1, 1, COL_ENT.link + 1).getValues()[0];
+
+  const estado = ESTADOS_ENT[f[COL_ENT.estado]];
+  if (!estado) return { ok: false };
+  if (estado === 'pausada' || estado === 'anulada') return { ok: true, estado: estado, codigo: codigo };
+
+  const cfg = leerConfig(ss);
+  const logo = texto(f[COL_ENT.logoCliente]);
+  return {
+    ok: true,
+    estado: estado,
+    codigo: codigo,
+    zona: zona,
+    cliente: texto(f[COL_ENT.cliente]),
+    titulo: texto(f[COL_ENT.titulo]),
+    mensaje: texto(f[COL_ENT.mensaje]),
+    logoCliente: /^https:\/\//.test(logo) ? logo : '',
+    limite: dia(f[COL_ENT.limite], zona),
+    archivos: leerArchivos(ss, codigo, zona),
+    config: { whatsapp: texto(cfg.whatsapp), mail: texto(cfg.mail), instagram: texto(cfg.instagram) }
+  };
+}
+
+function leerArchivos(ss, codigo, zona) {
+  return renglonesDe(ss.getSheetByName(H_ARC), codigo, COL_ARC.visible + 1)
+    .filter(function (r) {
+      return String(r[COL_ARC.codigo]) === codigo && texto(r[COL_ARC.nombre]) !== '' && r[COL_ARC.visible] !== 'Oculto';
+    })
+    .sort(function (a, b) { return numero(a[COL_ARC.orden]) - numero(b[COL_ARC.orden]); })
+    .map(function (r) {
+      const link = texto(r[COL_ARC.link]);
+      return {
+        nombre: texto(r[COL_ARC.nombre]),
+        tipo: TIPOS_ARC[r[COL_ARC.tipo]] || 'descarga',
+        link: /^https:\/\//.test(link) ? link : '',
+        detalle: texto(r[COL_ARC.detalle]),
+        fecha: dia(r[COL_ARC.fecha], zona),
+        // sin elegir, espera al pago: es lo más seguro
+        visible: VISIBLES_ARC[r[COL_ARC.visible]] || 'pago'
+      };
+    });
+}
+
+function vistaEntrega(ficha, hoy) {
+  if (!ficha.ok) return { ok: false };
+  if (ficha.estado === 'pausada' || ficha.estado === 'anulada') return ficha;
+
+  const fecha = hoy || Utilities.formatDate(new Date(), ficha.zona, 'yyyy-MM-dd');
+  const dias = ficha.limite ? diasEntre(fecha, ficha.limite) : null;
+  const pendiente = ficha.estado === 'pendiente';
+  const vencida = ficha.estado === 'borrada' || (ficha.estado === 'disponible' && dias !== null && dias < 0);
+
+  return {
+    ok: true,
+    estado: pendiente ? 'pendiente' : vencida ? 'vencida' : 'disponible',
+    codigo: ficha.codigo,
+    cliente: ficha.cliente,
+    titulo: ficha.titulo,
+    mensaje: ficha.mensaje,
+    logoCliente: ficha.logoCliente,
+    // el plazo corre recién desde que la entrega está disponible
+    limite: pendiente ? '' : ficha.limite,
+    dias: pendiente ? null : dias,
+    archivos: ficha.archivos
+      .filter(function (a) { return !pendiente || a.visible === 'parcial'; })
+      .map(function (a) {
+        const vencido = vencida && a.tipo === 'descarga';
+        return {
+          nombre: a.nombre,
+          tipo: a.tipo,
+          link: vencido ? '' : a.link,
+          detalle: a.detalle,
+          fecha: a.fecha,
+          parcial: a.visible === 'parcial',
+          vencido: vencido
+        };
+      }),
+    config: ficha.config
+  };
+}
+
+const diasEntre = function (desde, hasta) { return Math.round((Date.parse(hasta) - Date.parse(desde)) / 86400000); };
+
+/* ---------- avisos por mail ---------- */
+
+// lo ejecuta el activador de "Activar avisos por mail", una vez por día
+function avisosEntregas() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const hoja = ss.getSheetByName(H_ENT);
+  const zona = ss.getSpreadsheetTimeZone();
+  const cfg = leerConfig(ss);
+  const anticipo = numero(cfg.avisoEntregaDias) || AVISO_ENTREGA;
+  const hoy = Utilities.formatDate(new Date(), zona, 'yyyy-MM-dd');
+  const remitente = opcionesMail(cfg);
+
+  hoja.getRange(2, 1, FILAS, COL_ENT.link + 1).getValues().forEach(function (f, i) {
+    const limite = dia(f[COL_ENT.limite], zona);
+    const mail = texto(f[COL_ENT.mail]);
+    if (f[COL_ENT.estado] !== 'Disponible' || !limite || !mail) return;
+    const dias = diasEntre(hoy, limite);
+    const col = dias === 0 ? COL_ENT.avisoUltimo : COL_ENT.avisoPrevio;
+    if (dias < 0 || dias > anticipo || f[col] !== '') return;
+    try {
+      const aviso = textoAviso(f, dias, limite);
+      GmailApp.sendEmail(mail, aviso.asunto, aviso.cuerpo, remitente);
+      hoja.getRange(i + 2, col + 1).setValue(new Date());
+    } catch (err) {
+      // un mail mal escrito no frena a los demás; mañana se vuelve a intentar
+      console.error('No se pudo avisar a ' + f[COL_ENT.codigo] + ': ' + err.message);
+    }
+  });
+}
+
+// Gmail solo deja usar un remitente ya agregado en "Enviar correo como"
+function opcionesMail(cfg) {
+  const mail = texto(cfg.mail) || MAIL_FARA;
+  const opciones = { name: 'FÁRA', replyTo: mail };
+  if (GmailApp.getAliases().indexOf(mail) >= 0) opciones.from = mail;
+  return opciones;
+}
+
+function textoAviso(f, dias, limite) {
+  const cliente = texto(f[COL_ENT.cliente]);
+  const titulo = texto(f[COL_ENT.titulo]);
+  const fecha = limite.split('-').reverse().join('/');
+  const asunto = dias === 0 ? 'Hoy es el último día para descargar tu entrega de FÁRA'
+    : dias === 1 ? 'Mañana vence tu entrega de FÁRA'
+    : 'Tu entrega de FÁRA vence en ' + dias + ' días';
+  return {
+    asunto: asunto,
+    cuerpo: (cliente ? 'Hola ' + cliente + ',' : 'Hola,') + '\n\n' +
+      'Tu entrega' + (titulo ? ' "' + titulo + '"' : '') + ' está disponible hasta el ' + fecha + '.\n' +
+      'Descargá todo antes de esa fecha: después los archivos dejan de estar disponibles.\n\n' +
+      SITIO_ENTREGA + f[COL_ENT.codigo] + '\n\n' +
+      'Cualquier duda, respondé este mail.\n\nFÁRA'
+  };
+}
+
+function activarAvisos() {
+  const existe = ScriptApp.getProjectTriggers().some(function (t) { return t.getHandlerFunction() === 'avisosEntregas'; });
+  if (!existe) ScriptApp.newTrigger('avisosEntregas').timeBased().everyDays(1).atHour(9).inTimezone('America/Argentina/Buenos_Aires').create();
+  SpreadsheetApp.getUi().alert('Listo: los avisos salen solos todos los días a la mañana.');
 }
 
 function leerConfig(ss) {
@@ -186,7 +395,14 @@ function onOpen() {
     .addItem('Agregar ítem', 'agregarItem')
     .addItem('Ver todos los ítems', 'verTodosLosItems')
     .addSeparator()
+    .addItem('Nueva entrega', 'nuevaEntrega')
+    .addItem('Ver archivos de esta entrega', 'verArchivos')
+    .addItem('Agregar archivo', 'agregarArchivo')
+    .addItem('Ver todos los archivos', 'verTodosLosArchivos')
+    .addSeparator()
     .addItem('Activar carga rápida', 'activarCargaRapida')
+    .addItem('Agregar pestañas de entregas', 'agregarEntregas')
+    .addItem('Activar avisos por mail', 'activarAvisos')
     .addToUi();
 }
 
@@ -210,7 +426,7 @@ function verItems() {
     SpreadsheetApp.getUi().alert('Pará el cursor en la fila de una cotización y volvé a tocar Ver ítems.');
     return;
   }
-  filtrarItems(ss.getSheetByName(H_ITEMS), codigo).activate();
+  filtrarPorCodigo(ss.getSheetByName(H_ITEMS), codigo).activate();
 }
 
 function agregarItem() {
@@ -222,7 +438,7 @@ function agregarItem() {
   }
   const items = ss.getSheetByName(H_ITEMS);
   const fila = sumarRenglon(items, codigo);
-  filtrarItems(items, codigo).activate();
+  filtrarPorCodigo(items, codigo).activate();
   items.getRange(fila, COL_ITEM.servicio + 1).activate();
 }
 
@@ -232,22 +448,72 @@ function verTodosLosItems() {
   items.activate();
 }
 
-// la cotización de la fila activa, o la que se está viendo en Ítems
-function codigoActivo(ss) {
-  const hoja = ss.getActiveSheet();
-  const fila = ss.getActiveRange().getRow();
-  if (hoja.getName() === H_COT) return fila > 1 ? texto(hoja.getRange(fila, COL.codigo + 1).getValue()) : '';
-  if (hoja.getName() !== H_ITEMS) return '';
-  const filtro = hoja.getFilter();
-  const criterio = filtro && filtro.getColumnFilterCriteria(COL_ITEM.codigo + 1);
-  if (criterio) return texto(criterio.getCriteriaValues()[0]);
-  return fila > 1 ? texto(hoja.getRange(fila, COL_ITEM.codigo + 1).getValue()) : '';
+function nuevaEntrega() {
+  const ui = SpreadsheetApp.getUi();
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  if (!ss.getSheetByName(H_ENT)) {
+    ui.alert('Primero tocá FÁRA → Agregar pestañas de entregas.');
+    return;
+  }
+  const r = ui.prompt('Nueva entrega', 'Código de cliente: 3 letras, por ejemplo CEN', ui.ButtonSet.OK_CANCEL);
+  if (r.getSelectedButton() !== ui.Button.OK) return;
+  const prefijo = r.getResponseText().trim().toUpperCase();
+  if (!/^[A-Z]{3}$/.test(prefijo)) {
+    ui.alert('Tienen que ser 3 letras, sin acentos ni números.');
+    return;
+  }
+  const creada = crearEntrega(ss, prefijo);
+  ui.alert('Entrega creada en Borrador', 'Completala, cargá sus archivos y pasala a Pendiente de pago o Disponible:\n\n' + SITIO_ENTREGA + creada.codigo, ui.ButtonSet.OK);
 }
 
-function filtrarItems(items, codigo) {
-  const filtro = items.getFilter() || items.getRange(1, 1, FILAS + 1, COL_ITEM.importe + 1).createFilter();
-  filtro.setColumnFilterCriteria(COL_ITEM.codigo + 1, SpreadsheetApp.newFilterCriteria().whenTextEqualTo(codigo).build());
-  return items;
+function verArchivos() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const codigo = codigoActivo(ss, H_ENT, H_ARC);
+  if (!codigo) {
+    SpreadsheetApp.getUi().alert('Pará el cursor en la fila de una entrega y volvé a tocar Ver archivos.');
+    return;
+  }
+  filtrarPorCodigo(ss.getSheetByName(H_ARC), codigo).activate();
+}
+
+function agregarArchivo() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const codigo = codigoActivo(ss, H_ENT, H_ARC);
+  if (!codigo) {
+    SpreadsheetApp.getUi().alert('Pará el cursor en la fila de una entrega o abrí sus archivos con Ver archivos.');
+    return;
+  }
+  const archivos = ss.getSheetByName(H_ARC);
+  const fila = sumarArchivo(archivos, codigo);
+  filtrarPorCodigo(archivos, codigo).activate();
+  archivos.getRange(fila, COL_ARC.nombre + 1).activate();
+}
+
+function verTodosLosArchivos() {
+  const archivos = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(H_ARC);
+  quitarFiltro(archivos);
+  archivos.activate();
+}
+
+// el código de la fila activa, o el que se está viendo en la pestaña de renglones.
+// En todas estas pestañas el código está en la columna A.
+function codigoActivo(ss, padre, renglones) {
+  const nombrePadre = padre || H_COT;
+  const nombreRenglones = renglones || H_ITEMS;
+  const hoja = ss.getActiveSheet();
+  const fila = ss.getActiveRange().getRow();
+  if (hoja.getName() === nombrePadre) return fila > 1 ? texto(hoja.getRange(fila, 1).getValue()) : '';
+  if (hoja.getName() !== nombreRenglones) return '';
+  const filtro = hoja.getFilter();
+  const criterio = filtro && filtro.getColumnFilterCriteria(1);
+  if (criterio) return texto(criterio.getCriteriaValues()[0]);
+  return fila > 1 ? texto(hoja.getRange(fila, 1).getValue()) : '';
+}
+
+function filtrarPorCodigo(hoja, codigo) {
+  const filtro = hoja.getFilter() || hoja.getRange(1, 1, FILAS + 1, hoja.getLastColumn()).createFilter();
+  filtro.setColumnFilterCriteria(1, SpreadsheetApp.newFilterCriteria().whenTextEqualTo(codigo).build());
+  return hoja;
 }
 
 function quitarFiltro(items) {
@@ -263,6 +529,31 @@ function sumarRenglon(items, codigo) {
   items.getRange(fila, COL_ITEM.codigo + 1, 1, 2).setValues([[codigo, orden + 1]]);
   items.getRange(fila, COL_ITEM.mostrar + 1).setValue(true);
   return fila;
+}
+
+function sumarArchivo(archivos, codigo) {
+  const orden = archivos.getRange(2, 1, FILAS, 2).getValues()
+    .filter(function (r) { return r[0] === codigo; })
+    .reduce(function (max, r) { return Math.max(max, numero(r[1])); }, 0);
+  const fila = primeraLibre(archivos);
+  archivos.getRange(fila, COL_ARC.codigo + 1, 1, 2).setValues([[codigo, orden + 1]]);
+  archivos.getRange(fila, COL_ARC.tipo + 1).setValue('Descarga');
+  archivos.getRange(fila, COL_ARC.visible + 1).setValue('Al pagar');
+  return fila;
+}
+
+function crearEntrega(ss, prefijo) {
+  const hoja = ss.getSheetByName(H_ENT);
+  const archivos = ss.getSheetByName(H_ARC);
+  quitarFiltro(archivos);
+  const codigo = codigoNuevo(hoja, prefijo);
+  const fila = primeraLibre(hoja);
+  hoja.getRange(fila, COL_ENT.codigo + 1, 1, 2).setValues([[codigo, prefijo]]);
+  hoja.getRange(fila, COL_ENT.estado + 1).setValue('Borrador');
+  // tres renglones ya unidos a la entrega: los vacíos no se muestran
+  [1, 2, 3].forEach(function () { sumarArchivo(archivos, codigo); });
+  hoja.getRange(fila, COL_ENT.cliente + 1).activate();
+  return { codigo: codigo, fila: fila };
 }
 
 function crearCotizacion(ss, prefijo) {
@@ -322,6 +613,15 @@ function onEdit(e) {
     refrescarFilas(hoja, e.range);
     return;
   }
+  if (hoja.getName() === H_ENT) {
+    ordenarPlazo(hoja, e.range);
+    refrescarFilas(hoja, e.range, guardarEntrega);
+    return;
+  }
+  if (hoja.getName() === H_ARC) {
+    refrescarFilas(hoja, e.range, guardarEntrega);
+    return;
+  }
   if (hoja.getName() !== H_ITEMS) return;
 
   if (e.range.getNumRows() === 1 && e.range.getColumn() === COL_ITEM.servicio + 1) completarDesdeCatalogo(hoja, fila, e.value);
@@ -333,12 +633,29 @@ function onEdit(e) {
   refrescarFilas(hoja, e.range);
 }
 
-// el código siempre está en la columna A, en Cotizaciones y en Ítems
-function refrescarFilas(hoja, rango) {
+// el código siempre está en la columna A, en todas las pestañas
+function refrescarFilas(hoja, rango, guardar) {
   const codigos = hoja.getRange(rango.getRow(), 1, rango.getNumRows(), 1).getValues()
     .map(function (r) { return texto(r[0]); })
     .filter(function (c, i, todos) { return c !== '' && todos.indexOf(c) === i; });
-  codigos.forEach(guardarEnCache);
+  codigos.forEach(function (c) { (guardar || guardarEnCache)(c); });
+}
+
+// el plazo arranca al pasar a Disponible, y una fecha nueva vuelve a habilitar los avisos
+function ordenarPlazo(hoja, rango) {
+  const toca = function (col) { return rango.getColumn() <= col + 1 && rango.getLastColumn() >= col + 1; };
+  if (!toca(COL_ENT.estado) && !toca(COL_ENT.limite)) return;
+  const dias = numero(leerConfig(hoja.getParent()).plazoEntregaDias) || PLAZO_ENTREGA;
+  for (let fila = rango.getRow(); fila <= rango.getLastRow(); fila++) {
+    if (toca(COL_ENT.limite)) hoja.getRange(fila, COL_ENT.avisoPrevio + 1, 1, 2).clearContent();
+    const estado = hoja.getRange(fila, COL_ENT.estado + 1).getValue();
+    const limite = hoja.getRange(fila, COL_ENT.limite + 1);
+    if (toca(COL_ENT.estado) && estado === 'Disponible' && limite.getValue() === '') {
+      const vence = new Date();
+      vence.setDate(vence.getDate() + dias);
+      limite.setValue(vence);
+    }
+  }
 }
 
 function marcarCambio(hoja, fila) {
@@ -377,6 +694,7 @@ function setup() {
   armarItems(ss);
   armarCatalogo(ss);
   armarConfig(ss);
+  sumarPestanasEntregas(ss);
   ss.deleteSheet(inicial);
 
   cargarEjemplo(ss);
@@ -401,10 +719,10 @@ function lista(hoja, fila, col, filas, opciones) {
 }
 
 // filas apenas alternadas para leer mejor
-function bandas(hoja, columnas, formula) {
-  hoja.setConditionalFormatRules([SpreadsheetApp.newConditionalFormatRule()
+function bandas(hoja, columnas, formula, reglasPrevias) {
+  hoja.setConditionalFormatRules((reglasPrevias || []).concat([SpreadsheetApp.newConditionalFormatRule()
     .whenFormulaSatisfied(formula).setBackground(C_BANDA)
-    .setRanges([hoja.getRange(2, 1, FILAS, columnas)]).build()]);
+    .setRanges([hoja.getRange(2, 1, FILAS, columnas)]).build()]));
 }
 
 function automatica(hoja, col) {
@@ -502,6 +820,107 @@ function armarConfig(ss) {
   h.setColumnWidth(1, 340);
   h.setColumnWidth(2, 420);
   h.setColumnWidth(3, 120);
+}
+
+// suma las entregas a una planilla ya armada, sin tocar lo que hay
+function agregarEntregas() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  if (ss.getSheetByName(H_ENT)) {
+    SpreadsheetApp.getUi().alert('Las pestañas de entregas ya están.');
+    return;
+  }
+  sumarPestanasEntregas(ss);
+  ss.getSheetByName(H_ENT).activate();
+  SpreadsheetApp.getUi().alert('Listo: ya están las pestañas Entregas y Archivos.');
+}
+
+function sumarPestanasEntregas(ss) {
+  armarEntregas(ss);
+  armarArchivos(ss);
+  sumarConfigEntregas(ss);
+  sumarUsoEntregas(ss);
+}
+
+function armarEntregas(ss) {
+  const h = ss.insertSheet(H_ENT);
+  encabezado(h, ['Código', 'Código de cliente', 'Cliente', 'Mail del cliente', 'Título de la entrega', 'Mensaje',
+    'Logo del cliente (link)', 'Fecha límite', 'Estado', 'Aviso previo enviado', 'Aviso último día enviado', 'Link'],
+    [COL_ENT.codigo, COL_ENT.avisoPrevio, COL_ENT.avisoUltimo, COL_ENT.link]);
+
+  lista(h, 2, COL_ENT.estado, FILAS, ['Borrador'].concat(Object.keys(ESTADOS_ENT)));
+  h.getRange(2, COL_ENT.mail + 1, FILAS, 1).setDataValidation(
+    SpreadsheetApp.newDataValidation().requireTextIsEmail().setAllowInvalid(false).build());
+  h.getRange(2, COL_ENT.limite + 1, FILAS, 1).setNumberFormat('dd/mm/yyyy').setDataValidation(
+    SpreadsheetApp.newDataValidation().requireDate().setAllowInvalid(false).build());
+  h.getRange(2, COL_ENT.avisoPrevio + 1, FILAS, 2).setNumberFormat('dd/mm/yyyy');
+  h.getRange(2, COL_ENT.codigo + 1, FILAS, 1).setNumberFormat('@');
+  h.getRange(2, COL_ENT.link + 1).setFormula('=ARRAYFORMULA(IF(A2:A="";"";"' + SITIO_ENTREGA + '"&A2:A))');
+
+  [COL_ENT.codigo, COL_ENT.avisoPrevio, COL_ENT.avisoUltimo, COL_ENT.link].forEach(function (c) { automatica(h, c); });
+  // en rojo: venció y falta borrar o cerrar la carpeta. Al pasar a Archivos borrados se apaga
+  const vencida = SpreadsheetApp.newConditionalFormatRule()
+    .whenFormulaSatisfied('=AND($A2<>"";$I2="Disponible";$H2<>"";$H2<TODAY())')
+    .setBackground(C_ROJO).setFontColor(C_CREMA)
+    .setRanges([h.getRange(2, 1, FILAS, COL_ENT.link + 1)]).build();
+  bandas(h, COL_ENT.link + 1, '=AND($A2<>"";ISEVEN(ROW()))', [vencida]);
+  h.setColumnWidths(1, COL_ENT.link + 1, 130);
+  h.setColumnWidth(COL_ENT.mail + 1, 220);
+  h.setColumnWidth(COL_ENT.titulo + 1, 240);
+  h.setColumnWidth(COL_ENT.mensaje + 1, 280);
+  h.setColumnWidth(COL_ENT.link + 1, 360);
+  h.setFrozenColumns(3);
+}
+
+function armarArchivos(ss) {
+  const h = ss.insertSheet(H_ARC);
+  encabezado(h, ['Código', 'Orden', 'Qué entregás', 'Tipo', 'Link', 'Detalle', 'Fecha', 'Cuándo se ve'], []);
+
+  lista(h, 2, COL_ARC.tipo, FILAS, Object.keys(TIPOS_ARC));
+  lista(h, 2, COL_ARC.visible, FILAS, Object.keys(VISIBLES_ARC));
+  h.getRange(2, COL_ARC.fecha + 1, FILAS, 1).setNumberFormat('dd/mm/yyyy');
+  h.getRange(2, COL_ARC.codigo + 1, FILAS, 1).setNumberFormat('@');
+
+  // cada entrega toma su color según su fila en Entregas
+  bandas(h, COL_ARC.visible + 1, '=AND($A2<>"";ISEVEN(MATCH($A2;INDIRECT("' + H_ENT + '!$A:$A");0)))');
+  h.setColumnWidths(1, COL_ARC.visible + 1, 110);
+  h.setColumnWidth(COL_ARC.nombre + 1, 240);
+  h.setColumnWidth(COL_ARC.link + 1, 320);
+  h.setColumnWidth(COL_ARC.detalle + 1, 280);
+}
+
+function sumarConfigEntregas(ss) {
+  const h = ss.getSheetByName(H_CONFIG);
+  const filas = [
+    ['Entregas: días para descargar', PLAZO_ENTREGA, 'plazoEntregaDias'],
+    ['Entregas: días antes para avisar por mail', AVISO_ENTREGA, 'avisoEntregaDias']
+  ];
+  const desde = h.getLastRow() + 1;
+  h.getRange(desde, 1, filas.length, 3).setValues(filas).setFontFamily('Archivo');
+  h.getRange(desde, 3, filas.length, 1).setBackground(C_CREMA2).protect().setDescription('No cambiar').setWarningOnly(true);
+}
+
+function sumarUsoEntregas(ss) {
+  const h = ss.getSheetByName(H_USO);
+  const lineas = [
+    [''],
+    ['Crear una entrega'],
+    ['1. Menú FÁRA → Nueva entrega. Escribí las 3 letras del cliente.'],
+    ['2. En Entregas, completá la fila. Con mail, le llegan los avisos de vencimiento.'],
+    ['3. Parado en esa fila, tocá FÁRA → Ver archivos y cargá un renglón por cosa que entregás.'],
+    ['Tipo: Descarga vence. Web no vence. Entregado es sin link, como una impresión o una charla, y queda como registro.'],
+    ['Cuándo se ve: Al pagar, Entrega parcial (se ve antes del pago) u Oculto.'],
+    ['4. Elegí el Estado y mandale el link de la última columna.'],
+    [''],
+    ['Estados de una entrega'],
+    ['Borrador: el link dice que no está disponible.'],
+    ['Pendiente de pago: avisa que falta el pago y muestra solo las entregas parciales. El plazo no corre.'],
+    ['Disponible: se ve todo. Si la Fecha límite está vacía, se completa sola con los días de Config.'],
+    ['Fila en rojo: venció. Borrá o cerrá la carpeta y pasala a Archivos borrados.'],
+    ['Pausada y Anulada: un mensaje, sin datos ni links.']
+  ];
+  const desde = h.getLastRow() + 1;
+  h.getRange(desde, 1, lineas.length, 1).setValues(lineas).setFontFamily('Archivo').setBackground(C_CREMA).setFontColor(C_ESPRESSO).setWrap(true);
+  [1, 9].forEach(function (i) { h.getRange(desde + i, 1).setFontWeight('bold').setFontSize(13); });
 }
 
 function armarUso(ss) {

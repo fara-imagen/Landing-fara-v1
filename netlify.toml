@@ -11,6 +11,12 @@
   to = "/cotizacion/index.html"
   status = 200
 
+# Entregas: todas las direcciones /entrega/<codigo> muestran la misma plantilla
+[[redirects]]
+  from = "/entrega/*"
+  to = "/entrega/index.html"
+  status = 200
+
 [[headers]]
   for = "/*"
   [headers.values]
@@ -36,3 +42,10 @@
   for = "/cotizacion/*"
   [headers.values]
     X-Robots-Tag = "noindex, nofollow"
+
+# Las entregas tampoco, y el código de cada cliente no viaja a otros sitios
+[[headers]]
+  for = "/entrega/*"
+  [headers.values]
+    X-Robots-Tag = "noindex, nofollow"
+    Referrer-Policy = "no-referrer"
