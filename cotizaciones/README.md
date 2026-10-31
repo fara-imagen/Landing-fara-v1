@@ -5,9 +5,9 @@ Los datos viven en la planilla privada **FÁRA · Cotizaciones** (cuenta fara.im
 Para crear o cambiar una cotización no hace falta deploy: editás la planilla y el cliente ve el cambio al recargar.
 
 ## Crear una cotización
-1. En la planilla: menú **FÁRA → Nueva cotización**. Escribí las 3 letras del cliente.
-2. En **Cotizaciones**, completá la fila nueva.
-3. Parado en esa fila, tocá **FÁRA → Ver ítems** y completá los renglones. Si elegís un servicio del Catálogo, se cargan solos la descripción y el precio. Para sumar otro renglón: **FÁRA → Agregar ítem**.
+1. En la planilla: menú **FÁRA Cotizaciones → Nueva cotización**. Escribí las 3 letras del cliente.
+2. En **Cotizaciones**, completá la fila nueva. **Empresa** es el nombre de la marca. **Nombre para el mail** es a quién le escribís: pasa solo a la entrega y es el saludo de los avisos.
+3. Parado en esa fila, tocá **FÁRA Cotizaciones → Ver ítems** y completá los renglones. Si elegís un servicio del Catálogo, se cargan solos la descripción y el precio. Para sumar otro renglón: **FÁRA Cotizaciones → Agregar ítem**.
 4. Cambiá el **Estado** a `Enviada` y mandale al cliente el link de la última columna.
 
 Para el mismo cliente podés crear todas las cotizaciones que quieras: cada una tiene su propio código y su propio link.
@@ -25,7 +25,7 @@ En la columna **Pago** elegí:
 Con cualquier pago marcado, la página saca el botón de aceptar y deja de vencer. El link sigue activo como registro hasta que la pases a `Anulada`.
 
 ## Cambiar una cotización
-Editá la celda en la planilla. Listo. Para volver a ver todos los ítems: **FÁRA → Ver todos los ítems**.
+Editá la celda en la planilla. Listo. Para volver a ver todos los ítems: **FÁRA Cotizaciones → Ver todos los ítems**.
 
 ## Sacarla de la web
 Cambiá el Estado a `Anulada` o `Pausada`: el cliente ve un mensaje, sin datos ni precios.
@@ -38,6 +38,11 @@ No borres filas: quedan como historial.
 | Aceptada | La propuesta completa con el aviso de aceptada |
 | Vencida | La propuesta completa y el botón para pedir actualización |
 | Pausada / Anulada | Solo un mensaje |
+
+## Aceptar una cotización
+El botón de la página solo te manda un WhatsApp. La cotización queda aceptada recién cuando vos cambiás el Estado a `Aceptada` en la planilla.
+
+Al ponerla en `Aceptada`, o al marcar un pago, se crea sola su entrega con los mismos ítems, una sola vez. Ver `entregas/README.md`.
 
 ## Qué no tocar
 - Columnas con encabezado rojo: son automáticas.
@@ -53,7 +58,7 @@ No borres filas: quedan como historial.
 6. **Implementar → Nueva implementación**, engranaje → **Aplicación web**.
 7. Ejecutar como: **Yo**. Quién tiene acceso: **Cualquier persona**. Tocá **Implementar**.
 8. Copiá la URL que termina en `/exec` y pegala en `API`, en `assets/js/cotizacion.js`.
-9. En la planilla, tocá **FÁRA → Activar carga rápida** y aceptá el permiso. Mantiene listas las cotizaciones enviadas para que abran enseguida.
+9. En la planilla, tocá **FÁRA Cotizaciones → Activar carga rápida** y aceptá el permiso. Mantiene listas las cotizaciones enviadas para que abran enseguida.
 
 Cada cotización queda guardada en una copia rápida de Google, que se actualiza sola al editar la planilla. Excepción: si borrás una fila entera en vez de usar `Anulada`, la copia puede seguir viéndose hasta 6 horas.
 

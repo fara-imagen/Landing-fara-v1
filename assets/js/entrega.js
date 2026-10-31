@@ -117,6 +117,7 @@
   function renglon(a) {
     const enProceso = a.tipo === 'proceso';
     const visita = enProceso ? h('mark', {}, 'En proceso')
+      : a.bloqueado ? h('mark', {}, 'Se habilita con el pago')
       : lleno(a.link) ? boton('btn-accent', BOTONES[a.tipo] || 'Abrir', a.link, (BOTONES[a.tipo] || 'Abrir') + ': ' + a.nombre) : null;
     const pie = a.vencido ? 'Venció el plazo de descarga'
       : enProceso && lleno(a.fecha) ? 'Fecha estimada: ' + fechaLarga(a.fecha)

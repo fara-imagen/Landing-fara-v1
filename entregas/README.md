@@ -5,10 +5,19 @@ Los datos viven en la misma planilla privada **FÁRA · Cotizaciones**, en las p
 La página no guarda archivos: muestra links a Drive, Pixieset, una web o lo que uses.
 Para crear o cambiar una entrega no hace falta deploy: editás la planilla y el cliente ve el cambio al recargar.
 
-## Crear una entrega
-1. En la planilla: menú **FÁRA → Nueva entrega**. Escribí las 3 letras del cliente.
-2. En **Entregas**, completá la fila. Con **Mail del cliente** le llegan los avisos de vencimiento.
-3. Parado en esa fila, tocá **FÁRA → Ver archivos** y cargá un renglón por cada cosa que entregás. Para sumar otro: **FÁRA → Agregar archivo**.
+## Sola, al aceptar una cotización
+Cuando ponés una cotización en `Aceptada`, o marcás un pago, se crea sola su entrega, una sola vez:
+- Toma empresa, nombre, título y logo de la cotización.
+- Cada ítem de la cotización aparece en Archivos con Tipo `En proceso`. Podés agregar, cambiar u ocultar lo que quieras.
+- Queda en Estado `En proceso`. El cliente no ve nada hasta que le mandes el link, que está en la pestaña Entregas.
+- Falta solo el **Mail del cliente**, porque la cotización no lo tiene. Sin mail no salen los avisos.
+
+El botón Aceptar de la página solo te manda un WhatsApp: no crea nada.
+
+## Crear una entrega suelta
+1. En la planilla: menú **FÁRA Entregas → Nueva entrega**. Escribí las 3 letras del cliente.
+2. En **Entregas**, completá la fila. **Empresa** es lo que sale en la página. **Nombre para el mail** es el saludo: con `Leandro` el mail dice "Hola Leandro,". También podés poner `equipo de Ceniza`. Con **Mail del cliente** le llegan los avisos de vencimiento.
+3. Parado en esa fila, tocá **FÁRA Entregas → Ver archivos** y cargá un renglón por cada cosa que entregás. Para sumar otro: **FÁRA Entregas → Agregar archivo**.
 4. Elegí el **Estado** y mandale al cliente el link de la última columna.
 
 Un renglón con link muestra un botón. Sin link, se ve solo el texto.
@@ -24,8 +33,8 @@ Un renglón con link muestra un botón. Sin link, se ve solo el texto.
 
 | Cuándo se ve | Qué pasa |
 |---|---|
-| Al pagar | Aparece recién en Disponible |
-| Entrega parcial | Aparece también en Pendiente de pago, bajo el título **Entregas parciales** |
+| Al pagar | Con link, se abre recién en Disponible. En `En proceso` se lista con la etiqueta **Se habilita con el pago** |
+| Entrega parcial | Se abre desde ya, también en Pendiente de pago, bajo el título **Entregas parciales** |
 | Oculto | No aparece nunca |
 
 ## Entrega parcial antes del pago
@@ -35,14 +44,17 @@ Un renglón con link muestra un botón. Sin link, se ve solo el texto.
 
 Los links de `Al pagar` no llegan al navegador del cliente hasta ese momento. Ni mirando el código de la página los puede ver.
 
-## Cliente que paga por adelantado
+## Trabajo en marcha
 Te sirve de lista para vos y para el cliente: ve todo lo acordado y cómo avanza.
-1. Cargá un renglón por cada cosa que le vas a entregar, con Tipo `En proceso`.
-2. Pasá la entrega a `En proceso` y mandale el link.
-3. Cuando terminás algo, cambiá ese renglón a `Descarga`, `Web` o `Entregado` y pegá el link. El cliente lo ve al recargar.
-4. Cuando esté todo, pasá la entrega a `Disponible`. Ahí arranca el plazo y salen los avisos.
+1. Mandale el link cuando quieras. La entrega ya está en `En proceso`.
+2. Cuando terminás algo, cambiá ese renglón a `Descarga`, `Web` o `Entregado` y pegá el link.
+3. Cuando esté todo, pasá la entrega a `Disponible`. Ahí arranca el plazo y salen los avisos.
 
 Mientras la entrega esté en `En proceso` no vence nada y no sale ningún mail.
+
+**Si ya pagó todo:** los renglones vienen en `Entrega parcial` y el link se abre apenas lo pegás. Si marcás `Pagado total` después, cambian solos.
+
+**Si pagó la mitad o nada:** los renglones vienen en `Al pagar`. Aunque pegues el link, el cliente no lo ve hasta el pago. Para darle algo antes, marcá ese renglón `Entrega parcial`.
 
 ## Estados
 
@@ -50,7 +62,7 @@ Mientras la entrega esté en `En proceso` no vence nada y no sale ningún mail.
 |---|---|
 | Borrador | "Esta entrega no está disponible" |
 | Pendiente de pago | "Tu trabajo está listo", el aviso de pago y solo las entregas parciales. El plazo no corre |
-| En proceso | "Tu trabajo está en marcha" y todo lo cargado, salvo lo que esté Oculto. El plazo no corre |
+| En proceso | "Tu trabajo está en marcha" y la lista, salvo lo Oculto. Lo que espera el pago sale sin link. El plazo no corre |
 | Disponible | Todo, con la fecha límite y el aviso para descargar |
 | Archivos borrados | El mensaje de plazo terminado, con botón de WhatsApp |
 | Pausada / Anulada | Solo un mensaje |
@@ -92,17 +104,13 @@ No borres filas: si borrás una fila entera, la copia rápida puede seguir mostr
 - Columnas con encabezado rojo: son automáticas.
 - El código de una entrega ya enviada: si cambia, el link deja de funcionar.
 
-## Instalación (una sola vez)
-Esto va en la planilla que ya funciona. No toca las cotizaciones.
+## La planilla
+Los colores de las pestañas separan cada cosa:
+- **Ámbar:** cotizaciones. Cotizaciones, Ítems y Catálogo.
+- **Petróleo:** entregas. Entregas y Archivos.
+- **Gris:** general. Cómo usar y Config.
 
-1. Abrí la planilla con la cuenta fara.imagen@gmail.com.
-2. **Extensiones → Apps Script**. Borrá lo que hay, pegá todo `cotizaciones/Code.gs` y tocá **Guardar**.
-3. Volvé a la planilla y recargá la página para que aparezca el menú nuevo.
-4. Tocá **FÁRA → Agregar pestañas de entregas**. Google pide un permiso nuevo para mandar mails desde Gmail: aceptalo. Puede avisar que el script no está verificado, igual que la primera vez. Si después de aceptar no aparecen las pestañas, tocá de nuevo la misma opción.
-5. Tocá **FÁRA → Activar avisos por mail**.
-6. En Apps Script: **Implementar → Gestionar implementaciones → lápiz → Versión: Nueva versión → Implementar**. La URL no cambia.
-
-Hasta que hagas estos pasos, los links de entrega dicen "no disponible". Las cotizaciones siguen andando igual.
+Cada sección tiene su menú: **FÁRA Cotizaciones** y **FÁRA Entregas**.
 
 ## Dónde está cada cosa
 - `entrega/index.html`: la plantilla.
