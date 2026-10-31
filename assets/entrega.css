@@ -14,6 +14,9 @@
   .ent-solo{display:block;max-width:760px;}
   .ent-solo .ent-estado{position:static;}
   .ent-solo .post-hero h1{font-size:44px;}
+  /* sin renglones, barra y pie acompañan a la única columna */
+  body:has(.ent-solo) .cot-nav{max-width:696px;}
+  body:has(.ent-solo) .footer .wrap{max-width:760px;}
 }
 
 /* mensaje de la planilla: una nota al pasar, no parte de la página */
