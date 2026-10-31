@@ -97,6 +97,10 @@
         boton('btn-accent', 'Escribime por WhatsApp',
           linkWhatsApp(wa, 'Hola Matías, te escribo por el pago de la entrega ' + e.codigo + '.')));
     }
+    if (e.estado === 'proceso') {
+      return aviso('Tu trabajo está en marcha',
+        'Acá vas a ver cada parte a medida que la termine. Cuando esté todo listo, acá vas a ver la fecha para descargarlo.');
+    }
     if (e.estado === 'vencida') {
       return aviso('El plazo de descarga terminó',
         'Los archivos ya no están disponibles. Escribime y vemos cómo te los reenvío.',
@@ -111,8 +115,11 @@
   }
 
   function renglon(a) {
-    const visita = lleno(a.link) ? boton('btn-accent', BOTONES[a.tipo] || 'Abrir', a.link, (BOTONES[a.tipo] || 'Abrir') + ': ' + a.nombre) : null;
+    const enProceso = a.tipo === 'proceso';
+    const visita = enProceso ? h('mark', {}, 'En proceso')
+      : lleno(a.link) ? boton('btn-accent', BOTONES[a.tipo] || 'Abrir', a.link, (BOTONES[a.tipo] || 'Abrir') + ': ' + a.nombre) : null;
     const pie = a.vencido ? 'Venció el plazo de descarga'
+      : enProceso && lleno(a.fecha) ? 'Fecha estimada: ' + fechaLarga(a.fecha)
       : a.tipo === 'entregado' && lleno(a.fecha) ? 'Entregado el ' + fechaLarga(a.fecha)
       : a.tipo === 'entregado' ? 'Entregado'
       : lleno(a.fecha) ? fechaLarga(a.fecha) : '';

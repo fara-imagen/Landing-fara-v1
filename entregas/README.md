@@ -20,6 +20,7 @@ Un renglón con link muestra un botón. Sin link, se ve solo el texto.
 | Descarga | Drive, Pixieset o cualquier link | Sí |
 | Web | Su web o landing | No |
 | Entregado | Lo que no se descarga: impresiones 2D/3D, una charla por Zoom. Queda como registro y puede llevar un link, por ejemplo a una foto | No |
+| En proceso | Lo que todavía falta. Sale con la etiqueta **En proceso**, sin link. En **Fecha** podés poner una fecha estimada | No |
 
 | Cuándo se ve | Qué pasa |
 |---|---|
@@ -34,12 +35,22 @@ Un renglón con link muestra un botón. Sin link, se ve solo el texto.
 
 Los links de `Al pagar` no llegan al navegador del cliente hasta ese momento. Ni mirando el código de la página los puede ver.
 
+## Cliente que paga por adelantado
+Te sirve de lista para vos y para el cliente: ve todo lo acordado y cómo avanza.
+1. Cargá un renglón por cada cosa que le vas a entregar, con Tipo `En proceso`.
+2. Pasá la entrega a `En proceso` y mandale el link.
+3. Cuando terminás algo, cambiá ese renglón a `Descarga`, `Web` o `Entregado` y pegá el link. El cliente lo ve al recargar.
+4. Cuando esté todo, pasá la entrega a `Disponible`. Ahí arranca el plazo y salen los avisos.
+
+Mientras la entrega esté en `En proceso` no vence nada y no sale ningún mail.
+
 ## Estados
 
 | Estado | Qué ve el cliente |
 |---|---|
 | Borrador | "Esta entrega no está disponible" |
 | Pendiente de pago | "Tu trabajo está listo", el aviso de pago y solo las entregas parciales. El plazo no corre |
+| En proceso | "Tu trabajo está en marcha" y todo lo cargado, salvo lo que esté Oculto. El plazo no corre |
 | Disponible | Todo, con la fecha límite y el aviso para descargar |
 | Archivos borrados | El mensaje de plazo terminado, con botón de WhatsApp |
 | Pausada / Anulada | Solo un mensaje |

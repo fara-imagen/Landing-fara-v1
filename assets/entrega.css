@@ -25,6 +25,7 @@
 .ent-item .meta svg{width:16px;height:16px;flex:none;fill:none;stroke:var(--salvia);stroke-width:3;stroke-linecap:round;stroke-linejoin:round;}
 .ent-item .btn{width:100%;}
 .ent-item-vencido h3{color:var(--muted);}
+.ent-item mark{justify-self:start;}
 @media (min-width:768px){
   .ent-item.post-body{grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:24px;padding:24px 32px;}
   .ent-item .btn{width:auto;min-width:150px;}

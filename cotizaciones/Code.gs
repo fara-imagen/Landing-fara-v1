@@ -48,10 +48,10 @@ const COL_ENT = {
 };
 const COL_ARC = { codigo: 0, orden: 1, nombre: 2, tipo: 3, link: 4, detalle: 5, fecha: 6, visible: 7 };
 const ESTADOS_ENT = {
-  'Pendiente de pago': 'pendiente', 'Disponible': 'disponible', 'Archivos borrados': 'borrada',
-  'Pausada': 'pausada', 'Anulada': 'anulada'
+  'Pendiente de pago': 'pendiente', 'En proceso': 'proceso', 'Disponible': 'disponible',
+  'Archivos borrados': 'borrada', 'Pausada': 'pausada', 'Anulada': 'anulada'
 };
-const TIPOS_ARC = { 'Descarga': 'descarga', 'Web': 'web', 'Entregado': 'entregado' };
+const TIPOS_ARC = { 'Descarga': 'descarga', 'Web': 'web', 'Entregado': 'entregado', 'En proceso': 'proceso' };
 const VISIBLES_ARC = { 'Al pagar': 'pago', 'Entrega parcial': 'parcial', 'Oculto': 'oculto' };
 
 /* ---------- web ---------- */
@@ -98,7 +98,7 @@ function refrescarCache() {
   const entregas = ss.getSheetByName(H_ENT);
   if (!entregas) return;
   entregas.getRange(2, 1, FILAS, COL_ENT.estado + 1).getValues()
-    .filter(function (r) { return texto(r[COL_ENT.codigo]) !== '' && ['pendiente', 'disponible'].indexOf(ESTADOS_ENT[r[COL_ENT.estado]]) >= 0; })
+    .filter(function (r) { return texto(r[COL_ENT.codigo]) !== '' && ['pendiente', 'proceso', 'disponible'].indexOf(ESTADOS_ENT[r[COL_ENT.estado]]) >= 0; })
     .forEach(function (r) { guardarEntrega(texto(r[COL_ENT.codigo])); });
 }
 
@@ -275,19 +275,20 @@ function vistaEntrega(ficha, hoy) {
   const fecha = hoy || Utilities.formatDate(new Date(), ficha.zona, 'yyyy-MM-dd');
   const dias = ficha.limite ? diasEntre(fecha, ficha.limite) : null;
   const pendiente = ficha.estado === 'pendiente';
+  const sinPlazo = pendiente || ficha.estado === 'proceso';
   const vencida = ficha.estado === 'borrada' || (ficha.estado === 'disponible' && dias !== null && dias < 0);
 
   return {
     ok: true,
-    estado: pendiente ? 'pendiente' : vencida ? 'vencida' : 'disponible',
+    estado: sinPlazo ? ficha.estado : vencida ? 'vencida' : 'disponible',
     codigo: ficha.codigo,
     cliente: ficha.cliente,
     titulo: ficha.titulo,
     mensaje: ficha.mensaje,
     logoCliente: ficha.logoCliente,
     // el plazo corre recién desde que la entrega está disponible
-    limite: pendiente ? '' : ficha.limite,
-    dias: pendiente ? null : dias,
+    limite: sinPlazo ? '' : ficha.limite,
+    dias: sinPlazo ? null : dias,
     archivos: ficha.archivos
       .filter(function (a) { return !pendiente || a.visible === 'parcial'; })
       .map(function (a) {
@@ -295,7 +296,8 @@ function vistaEntrega(ficha, hoy) {
         return {
           nombre: a.nombre,
           tipo: a.tipo,
-          link: vencido ? '' : a.link,
+          // lo que está en proceso todavía no se abre, aunque el renglón ya tenga link
+          link: vencido || a.tipo === 'proceso' ? '' : a.link,
           detalle: a.detalle,
           fecha: a.fecha,
           parcial: a.visible === 'parcial',
@@ -907,13 +909,14 @@ function sumarUsoEntregas(ss) {
     ['1. Menú FÁRA → Nueva entrega. Escribí las 3 letras del cliente.'],
     ['2. En Entregas, completá la fila. Con mail, le llegan los avisos de vencimiento.'],
     ['3. Parado en esa fila, tocá FÁRA → Ver archivos y cargá un renglón por cosa que entregás.'],
-    ['Tipo: Descarga vence. Web no vence. Entregado es sin link, como una impresión o una charla, y queda como registro.'],
+    ['Tipo: Descarga vence. Web no vence. Entregado es sin link, como una impresión o una charla, y queda como registro. En proceso es lo que todavía falta: cuando esté, cambiá el Tipo y pegá el link.'],
     ['Cuándo se ve: Al pagar, Entrega parcial (se ve antes del pago) u Oculto.'],
     ['4. Elegí el Estado y mandale el link de la última columna.'],
     [''],
     ['Estados de una entrega'],
     ['Borrador: el link dice que no está disponible.'],
     ['Pendiente de pago: avisa que falta el pago y muestra solo las entregas parciales. El plazo no corre.'],
+    ['En proceso: para el cliente que ya pagó. Ve todo lo cargado mientras lo vas terminando. El plazo no corre y no salen mails.'],
     ['Disponible: se ve todo. Si la Fecha límite está vacía, se completa sola con los días de Config.'],
     ['Fila en rojo: venció. Borrá o cerrá la carpeta y pasala a Archivos borrados.'],
     ['Pausada y Anulada: un mensaje, sin datos ni links.']
