@@ -81,7 +81,8 @@
 
   function calcular(c) {
     const items = (c.items || []).map(function (it) {
-      const bruto = (lleno(it.cantidad) ? num(it.cantidad) : 1) * num(it.precio);
+      /* el precio es el total del renglón: la cantidad es solo informativa */
+      const bruto = num(it.precio);
       const descuento = bruto * Math.min(num(it.descuentoPct), 100) / 100;
       return { bruto: bruto, descuento: descuento, neto: bruto - descuento };
     });
@@ -131,8 +132,7 @@
       ? String(it.entregables).split('\n').map(function (t) { return t.trim(); }).filter(Boolean) : [];
     const cantidad = lleno(it.cantidad) ? num(it.cantidad) : 1;
     const conPrecio = cuenta.bruto > 0;
-    const detalle = (cantidad === 1 && !lleno(it.unidad)) ? '' : cantidad + (lleno(it.unidad) ? ' ' + it.unidad : '') +
-      (cantidad !== 1 && lleno(it.precio) ? ' × ' + plata(num(it.precio), c.moneda) : '');
+    const detalle = (cantidad === 1 && !lleno(it.unidad)) ? '' : cantidad + (lleno(it.unidad) ? ' ' + it.unidad : '');
     return h('article', { class: 'post-body cot-item' },
       h('h3', {}, it.servicio || ''),
       lleno(it.descripcion) && h('p', { class: 'cot-texto' }, it.descripcion),
@@ -218,11 +218,12 @@
       actualizada.textContent = 'Última actualización: ' + fechaLarga(c.actualizada);
       actualizada.hidden = false;
     }
-    const legal = d.getElementById('cotDisclaimer');
+    const disclaimer = d.getElementById('cotDisclaimer');
     if (lleno(c.disclaimer)) {
-      legal.textContent = c.disclaimer;
-      legal.hidden = false;
+      disclaimer.textContent = c.disclaimer;
+      disclaimer.hidden = false;
     }
+    d.getElementById('cotLegal').hidden = actualizada.hidden && disclaimer.hidden;
     d.getElementById('cotPie').hidden = false;
   }
 
@@ -284,10 +285,12 @@
         boton('btn-accent', 'Pedir actualización',
           linkWhatsApp(wa, 'Hola Matías, la propuesta ' + c.codigo + ' venció. ¿Me la actualizás?'))),
       aceptada && aviso('Propuesta aceptada', 'Gracias. Ya estamos trabajando con estos valores. Cualquier duda, escribime.'),
-      lleno(c.intro) && h('div', { class: 'post-body cot-texto' }, c.intro),
-      itemsVisibles,
-      resumen(c, t, acciones),
-      condiciones(c)
+      h('div', { class: 'cot-cuerpo' },
+        h('div', { class: 'cot-detalle' },
+          lleno(c.intro) && h('div', { class: 'post-body cot-texto' }, c.intro),
+          itemsVisibles),
+        resumen(c, t, acciones),
+        condiciones(c))
     ));
     pie(c);
   }

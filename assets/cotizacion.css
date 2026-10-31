@@ -10,7 +10,18 @@
 
 .cot-nav{max-width:696px;min-height:52px;padding-right:20px;}
 .cot-logo-cliente{height:30px;width:auto;max-width:120px;object-fit:contain;}
-.cot + .footer .wrap{max-width:760px;}
+.cot-logo-cliente[hidden]{display:none;}
+
+/* compu: detalle a la izquierda, resumen siempre a la vista a la derecha */
+.cot-cuerpo{display:grid;grid-template-columns:minmax(0,1fr);}
+@media (min-width:1000px){
+  .cot-wrap{max-width:1120px;}
+  .cot-nav{max-width:1056px;}
+  .cot-cuerpo{grid-template-columns:minmax(0,1fr) 380px;column-gap:28px;}
+  .cot-detalle{grid-column:1;grid-row:1;}
+  .cot-cuerpo > .cot-seccion{grid-column:1;grid-row:2;}
+  .cot-cuerpo > .cot-resumen,.cot-cuerpo > .cot-sk-resumen{grid-column:2;grid-row:1 / span 2;position:sticky;top:92px;align-self:start;margin-top:16px;}
+}
 
 /* bloques sin trama visible: precios siempre sobre fondo parejo */
 .cot .post-hero{background:var(--espresso);}
@@ -88,13 +99,23 @@
 .cot-acc-cuerpo strong{color:var(--espresso);font-weight:600;}
 .cot-acc-cuerpo p + p{margin-top:10px;}
 
-/* pie */
-.cot-legal{flex-basis:100%;font-size:13px;line-height:1.5;}
+/* pie: marca y contacto arriba, datos legales debajo, siempre alineados */
+.cot + .footer{padding:40px 0 48px;}
+.cot + .footer .wrap{display:grid;grid-template-columns:minmax(0,1fr);gap:14px;max-width:760px;}
+.cot-legal{display:grid;gap:6px;padding-top:14px;border-top:1px solid var(--line);font-size:13px;line-height:1.5;overflow-wrap:anywhere;}
+.cot-legal[hidden]{display:none;}
+@media (min-width:768px){
+  .cot + .footer .wrap{grid-template-columns:auto minmax(0,1fr);align-items:center;}
+  .cot + .footer .footer-links{justify-content:flex-end;}
+  .cot-legal{grid-column:1 / -1;}
+}
+@media (min-width:1000px){ .cot + .footer .wrap{max-width:1120px;} }
 
 /* carga */
 .cot-sk{margin-top:16px;border-radius:var(--radius);background:var(--crema-2);animation:cot-pulso 1.4s ease-in-out infinite;}
 .cot-sk-hero{height:365px;margin-top:20px;background:var(--espresso-2);}
 @media (min-width:768px){ .cot-sk-hero{height:399px;} }
+@media (min-width:1000px){ .cot-sk-hero{height:353px;} }
 .cot-sk-texto{height:120px;}
 .cot-sk-item{height:190px;}
 .cot-sk-resumen{height:300px;background:var(--espresso-2);}

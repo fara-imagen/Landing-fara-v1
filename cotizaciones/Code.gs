@@ -134,7 +134,13 @@ const dia = function (v, zona) {
 /* ---------- menú ---------- */
 
 function onOpen() {
-  SpreadsheetApp.getUi().createMenu('FÁRA').addItem('Nueva cotización', 'nuevaCotizacion').addToUi();
+  SpreadsheetApp.getUi().createMenu('FÁRA')
+    .addItem('Nueva cotización', 'nuevaCotizacion')
+    .addSeparator()
+    .addItem('Ver ítems de esta cotización', 'verItems')
+    .addItem('Agregar ítem', 'agregarItem')
+    .addItem('Ver todos los ítems', 'verTodosLosItems')
+    .addToUi();
 }
 
 function nuevaCotizacion() {
@@ -150,10 +156,73 @@ function nuevaCotizacion() {
   ui.alert('Cotización creada en Borrador', 'Completala y pasala a Enviada para activarla:\n\n' + SITIO + creada.codigo, ui.ButtonSet.OK);
 }
 
+function verItems() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const codigo = codigoActivo(ss);
+  if (!codigo) {
+    SpreadsheetApp.getUi().alert('Pará el cursor en la fila de una cotización y volvé a tocar Ver ítems.');
+    return;
+  }
+  filtrarItems(ss.getSheetByName(H_ITEMS), codigo).activate();
+}
+
+function agregarItem() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const codigo = codigoActivo(ss);
+  if (!codigo) {
+    SpreadsheetApp.getUi().alert('Pará el cursor en la fila de una cotización o abrí sus ítems con Ver ítems.');
+    return;
+  }
+  const items = ss.getSheetByName(H_ITEMS);
+  const fila = sumarRenglon(items, codigo);
+  filtrarItems(items, codigo).activate();
+  items.getRange(fila, COL_ITEM.servicio + 1).activate();
+}
+
+function verTodosLosItems() {
+  const items = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(H_ITEMS);
+  quitarFiltro(items);
+  items.activate();
+}
+
+// la cotización de la fila activa, o la que se está viendo en Ítems
+function codigoActivo(ss) {
+  const hoja = ss.getActiveSheet();
+  const fila = ss.getActiveRange().getRow();
+  if (hoja.getName() === H_COT) return fila > 1 ? texto(hoja.getRange(fila, COL.codigo + 1).getValue()) : '';
+  if (hoja.getName() !== H_ITEMS) return '';
+  const filtro = hoja.getFilter();
+  const criterio = filtro && filtro.getColumnFilterCriteria(COL_ITEM.codigo + 1);
+  if (criterio) return texto(criterio.getCriteriaValues()[0]);
+  return fila > 1 ? texto(hoja.getRange(fila, COL_ITEM.codigo + 1).getValue()) : '';
+}
+
+function filtrarItems(items, codigo) {
+  const filtro = items.getFilter() || items.getRange(1, 1, FILAS + 1, COL_ITEM.importe + 1).createFilter();
+  filtro.setColumnFilterCriteria(COL_ITEM.codigo + 1, SpreadsheetApp.newFilterCriteria().whenTextEqualTo(codigo).build());
+  return items;
+}
+
+function quitarFiltro(items) {
+  const filtro = items.getFilter();
+  if (filtro) filtro.remove();
+}
+
+function sumarRenglon(items, codigo) {
+  const orden = items.getRange(2, 1, FILAS, 2).getValues()
+    .filter(function (r) { return r[0] === codigo; })
+    .reduce(function (max, r) { return Math.max(max, numero(r[1])); }, 0);
+  const fila = primeraLibre(items);
+  items.getRange(fila, COL_ITEM.codigo + 1, 1, 2).setValues([[codigo, orden + 1]]);
+  items.getRange(fila, COL_ITEM.mostrar + 1).setValue(true);
+  return fila;
+}
+
 function crearCotizacion(ss, prefijo) {
   const hoja = ss.getSheetByName(H_COT);
   const items = ss.getSheetByName(H_ITEMS);
   const cfg = leerConfig(ss);
+  quitarFiltro(items);
   const codigo = codigoNuevo(hoja, prefijo);
   const hoy = new Date();
   const vence = new Date(hoy.getTime());
@@ -165,11 +234,7 @@ function crearCotizacion(ss, prefijo) {
   hoja.getRange(fila, COL.actualizada + 1).setValue(hoy);
 
   // tres renglones de ítems ya unidos a la cotización: los vacíos no se muestran
-  const fi = primeraLibre(items);
-  [1, 2, 3].forEach(function (n, i) {
-    items.getRange(fi + i, COL_ITEM.codigo + 1, 1, 2).setValues([[codigo, n]]);
-    items.getRange(fi + i, COL_ITEM.mostrar + 1).setValue(true);
-  });
+  [1, 2, 3].forEach(function () { sumarRenglon(items, codigo); });
   hoja.getRange(fila, COL.cliente + 1).activate();
   return { codigo: codigo, fila: fila };
 }
@@ -235,6 +300,7 @@ const C_CREMA2 = '#E9DFCB';
 const C_ESPRESSO = '#1A1410';
 const C_VERDE = '#7A8B6F';
 const C_ROJO = '#A8473A';
+const C_BANDA = '#F7F2E8';
 
 function setup() {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
@@ -272,6 +338,13 @@ function lista(hoja, fila, col, filas, opciones) {
   hoja.getRange(fila, col + 1, filas, 1).setDataValidation(regla);
 }
 
+// filas apenas alternadas para leer mejor
+function bandas(hoja, columnas, formula) {
+  hoja.setConditionalFormatRules([SpreadsheetApp.newConditionalFormatRule()
+    .whenFormulaSatisfied(formula).setBackground(C_BANDA)
+    .setRanges([hoja.getRange(2, 1, FILAS, columnas)]).build()]);
+}
+
 function automatica(hoja, col) {
   hoja.getRange(2, col + 1, FILAS, 1).setBackground(C_CREMA2).protect()
     .setDescription('Columna automática').setWarningOnly(true);
@@ -301,6 +374,7 @@ function armarCotizaciones(ss) {
   h.getRange(2, COL.link + 1).setFormula('=ARRAYFORMULA(IF(A2:A="";"";"' + SITIO + '"&A2:A))');
 
   [COL.codigo, COL.total, COL.actualizada, COL.link].forEach(function (c) { automatica(h, c); });
+  bandas(h, COL.link + 1, '=AND($A2<>"";ISEVEN(ROW()))');
   h.setColumnWidths(1, 23, 130);
   h.setColumnWidth(COL.intro + 1, 280);
   h.setColumnWidth(COL.titulo + 1, 240);
@@ -311,7 +385,7 @@ function armarCotizaciones(ss) {
 function armarItems(ss) {
   const h = ss.insertSheet(H_ITEMS);
   encabezado(h, ['Código', 'Orden', 'Servicio', 'Descripción', 'Entregables (uno por renglón)', 'Cantidad', 'Unidad',
-    'Precio unitario', 'Descuento %', 'Mostrar', 'Importe'], [COL_ITEM.importe]);
+    'Precio', 'Descuento %', 'Mostrar', 'Importe'], [COL_ITEM.importe]);
 
   const hojaCatalogo = ss.getSheetByName(H_CAT) || ss.insertSheet(H_CAT);
   const catalogo = SpreadsheetApp.newDataValidation()
@@ -324,9 +398,11 @@ function armarItems(ss) {
   h.getRange(2, COL_ITEM.importe + 1, FILAS, 1).setNumberFormat('#,##0');
   h.getRange(2, COL_ITEM.codigo + 1, FILAS, 1).setNumberFormat('@');
   h.getRange(2, COL_ITEM.importe + 1).setFormula(
-    '=ARRAYFORMULA(IF(A2:A="";"";IF(J2:J=TRUE;IF(F2:F="";1;F2:F)*H2:H*(1-IF(I2:I<1;I2:I;I2:I/100));0)))');
+    '=ARRAYFORMULA(IF(A2:A="";"";IF(J2:J=TRUE;H2:H*(1-IF(I2:I<1;I2:I;I2:I/100));0)))');
 
   automatica(h, COL_ITEM.importe);
+  // cada cotización toma su color según su fila en Cotizaciones
+  bandas(h, COL_ITEM.importe + 1, '=AND($A2<>"";ISEVEN(MATCH($A2;INDIRECT("' + H_COT + '!$A:$A");0)))');
   h.setColumnWidths(1, 11, 110);
   h.setColumnWidth(COL_ITEM.servicio + 1, 200);
   h.setColumnWidth(COL_ITEM.descripcion + 1, 300);
@@ -374,11 +450,11 @@ function armarUso(ss) {
     ['Crear una cotización'],
     ['1. Menú FÁRA → Nueva cotización. Escribí las 3 letras del cliente.'],
     ['2. En Cotizaciones, completá la fila nueva.'],
-    ['3. En Ítems, completá los renglones con ese código. Para sumar otro, copiá el código en una fila libre.'],
+    ['3. Parado en esa fila, tocá FÁRA → Ver ítems y completá los renglones. Para sumar otro: FÁRA → Agregar ítem. En Precio va el total del renglón: la cantidad no multiplica.'],
     ['4. Cambiá el Estado a Enviada y mandale el link de la última columna.'],
     [''],
     ['Cambiar una cotización'],
-    ['Editá la celda. El cliente ve el cambio al recargar la página.'],
+    ['Editá la celda. El cliente ve el cambio al recargar la página. Para volver a la lista completa: FÁRA → Ver todos los ítems.'],
     [''],
     ['Estados'],
     ['Borrador: el link dice que no está disponible.'],
@@ -415,7 +491,7 @@ function cargarEjemplo(ss) {
 
   const items = ss.getSheetByName(H_ITEMS);
   items.getRange(2, COL_ITEM.servicio + 1, 3, 7).setValues([
-    ['Fotos de producto', 'Sesión en estudio con fondo y luz definidos para tu marca.', '12 fotos editadas\nFormato web y redes', 12, 'fotos', 25000, 10],
+    ['Fotos de producto', 'Sesión en estudio con fondo y luz definidos para tu marca.', '12 fotos editadas\nFormato web y redes', 12, 'fotos', 300000, 10],
     ['Landing', 'Una página con tu oferta y botón de WhatsApp.', '', 1, '', 350000, 0],
     ['Menú digital', 'Carta online que editás desde una planilla.', '', 1, '', 150000, 0]
   ]);

@@ -7,11 +7,15 @@ Para crear o cambiar una cotización no hace falta deploy: editás la planilla y
 ## Crear una cotización
 1. En la planilla: menú **FÁRA → Nueva cotización**. Escribí las 3 letras del cliente.
 2. En **Cotizaciones**, completá la fila nueva.
-3. En **Ítems**, completá los renglones con ese código. Si elegís un servicio del Catálogo, se cargan solos la descripción y el precio. Para sumar otro renglón, copiá el código en una fila libre.
+3. Parado en esa fila, tocá **FÁRA → Ver ítems** y completá los renglones. Si elegís un servicio del Catálogo, se cargan solos la descripción y el precio. Para sumar otro renglón: **FÁRA → Agregar ítem**.
 4. Cambiá el **Estado** a `Enviada` y mandale al cliente el link de la última columna.
 
+Para el mismo cliente podés crear todas las cotizaciones que quieras: cada una tiene su propio código y su propio link.
+
+En **Precio** va el total de ese renglón. La cantidad es informativa: no multiplica.
+
 ## Cambiar una cotización
-Editá la celda en la planilla. Listo.
+Editá la celda en la planilla. Listo. Para volver a ver todos los ítems: **FÁRA → Ver todos los ítems**.
 
 ## Sacarla de la web
 Cambiá el Estado a `Anulada` o `Pausada`: el cliente ve un mensaje, sin datos ni precios.
