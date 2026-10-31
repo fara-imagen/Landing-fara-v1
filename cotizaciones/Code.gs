@@ -13,6 +13,7 @@ const SITIO = 'https://faraimagen.com.ar/cotizacion/';
 const LETRAS = 'abcdefghjkmnpqrstuvwxyz23456789'; // sin 0, o, 1, l, i
 const LARGO_CODIGO = 8;
 const FILAS = 500;
+const CACHE_SEGUNDOS = 21600; // 6 horas, el máximo de Google
 
 const H_USO = 'Cómo usar';
 const H_COT = 'Cotizaciones';
@@ -35,25 +36,57 @@ const COL_ITEM = {
 
 function doGet(e) {
   const pedido = String((e && e.parameter && e.parameter.codigo) || '');
+  if (!/^[A-Z]{3}-[a-z2-9]{6,8}$/.test(pedido)) return responder('{"ok":false}');
   try {
-    return responder(buscarCotizacion(pedido));
+    const guardada = CacheService.getScriptCache().get(claveCache(pedido));
+    if (guardada) return responder(guardada);
+    return responder(guardarEnCache(pedido));
   } catch (err) {
-    return responder({ ok: false });
+    return responder('{"ok":false}');
   }
 }
 
-function responder(obj) {
-  return ContentService.createTextOutput(JSON.stringify(obj)).setMimeType(ContentService.MimeType.JSON);
+function responder(json) {
+  return ContentService.createTextOutput(json).setMimeType(ContentService.MimeType.JSON);
+}
+
+/* ---------- copia rápida ----------
+   Abrir la planilla es lo que más tarda, así que cada cotización queda lista en la
+   caché de Google. Al editarla en la planilla, onEdit() la vuelve a armar en el momento. */
+
+function claveCache(codigo) {
+  return 'cot:' + codigo;
+}
+
+function guardarEnCache(codigo) {
+  const datos = buscarCotizacion(codigo);
+  const json = JSON.stringify(datos);
+  if (datos.ok) CacheService.getScriptCache().put(claveCache(codigo), json, CACHE_SEGUNDOS);
+  else CacheService.getScriptCache().remove(claveCache(codigo));
+  return json;
+}
+
+// mantiene listas las cotizaciones enviadas: lo ejecuta el activador de "Activar carga rápida"
+function refrescarCache() {
+  SpreadsheetApp.getActiveSpreadsheet().getSheetByName(H_COT).getRange(2, 1, FILAS, COL.estado + 1).getValues()
+    .filter(function (r) { return texto(r[COL.codigo]) !== '' && r[COL.estado] === 'Enviada'; })
+    .forEach(function (r) { guardarEnCache(texto(r[COL.codigo])); });
+}
+
+function activarCargaRapida() {
+  const existe = ScriptApp.getProjectTriggers().some(function (t) { return t.getHandlerFunction() === 'refrescarCache'; });
+  if (!existe) ScriptApp.newTrigger('refrescarCache').timeBased().everyHours(4).create();
+  refrescarCache();
+  SpreadsheetApp.getUi().alert('Listo: las cotizaciones enviadas quedan siempre preparadas.');
 }
 
 function buscarCotizacion(codigo) {
-  if (!/^[A-Z]{3}-[a-z2-9]{6,8}$/.test(codigo)) return { ok: false };
-
   const ss = SpreadsheetApp.getActiveSpreadsheet();
   const zona = ss.getSpreadsheetTimeZone();
-  const filas = ss.getSheetByName(H_COT).getDataRange().getValues().slice(1);
-  const f = filas.find(function (r) { return String(r[COL.codigo]) === codigo; });
-  if (!f) return { ok: false };
+  const hoja = ss.getSheetByName(H_COT);
+  const celda = buscarCodigo(hoja, codigo).findNext();
+  if (!celda) return { ok: false };
+  const f = hoja.getRange(celda.getRow(), 1, 1, COL.link + 1).getValues()[0];
 
   const estado = String(f[COL.estado]).trim().toLowerCase();
   if (['enviada', 'aceptada', 'vencida', 'pausada', 'anulada'].indexOf(estado) < 0) return { ok: false };
@@ -96,8 +129,18 @@ function buscarCotizacion(codigo) {
   };
 }
 
+function buscarCodigo(hoja, codigo) {
+  return hoja.getRange(2, 1, FILAS, 1).createTextFinder(codigo).matchCase(true).matchEntireCell(true);
+}
+
 function leerItems(ss, codigo) {
-  return ss.getSheetByName(H_ITEMS).getDataRange().getValues().slice(1)
+  const hoja = ss.getSheetByName(H_ITEMS);
+  const filas = buscarCodigo(hoja, codigo).findAll().map(function (c) { return c.getRow(); });
+  if (!filas.length) return [];
+  // solo el tramo donde están sus renglones, no la pestaña entera
+  const desde = Math.min.apply(null, filas);
+  const hasta = Math.max.apply(null, filas);
+  return hoja.getRange(desde, 1, hasta - desde + 1, COL_ITEM.mostrar + 1).getValues()
     .filter(function (r) {
       return String(r[COL_ITEM.codigo]) === codigo && r[COL_ITEM.mostrar] === true && texto(r[COL_ITEM.servicio]) !== '';
     })
@@ -140,6 +183,8 @@ function onOpen() {
     .addItem('Ver ítems de esta cotización', 'verItems')
     .addItem('Agregar ítem', 'agregarItem')
     .addItem('Ver todos los ítems', 'verTodosLosItems')
+    .addSeparator()
+    .addItem('Activar carga rápida', 'activarCargaRapida')
     .addToUi();
 }
 
@@ -265,8 +310,13 @@ function onEdit(e) {
   const hoja = e.range.getSheet();
   const fila = e.range.getRow();
 
+  if (hoja.getName() === H_CONFIG) {
+    refrescarCache();
+    return;
+  }
   if (hoja.getName() === H_COT) {
     if (e.range.getColumn() !== COL.actualizada + 1) marcarCambio(hoja, fila);
+    refrescarFilas(hoja, e.range);
     return;
   }
   if (hoja.getName() !== H_ITEMS) return;
@@ -277,6 +327,15 @@ function onEdit(e) {
   const cot = e.source.getSheetByName(H_COT);
   const n = cot.getRange(2, COL.codigo + 1, FILAS, 1).getValues().findIndex(function (r) { return r[0] === codigo; });
   if (codigo && n >= 0) marcarCambio(cot, n + 2);
+  refrescarFilas(hoja, e.range);
+}
+
+// el código siempre está en la columna A, en Cotizaciones y en Ítems
+function refrescarFilas(hoja, rango) {
+  const codigos = hoja.getRange(rango.getRow(), 1, rango.getNumRows(), 1).getValues()
+    .map(function (r) { return texto(r[0]); })
+    .filter(function (c, i, todos) { return c !== '' && todos.indexOf(c) === i; });
+  codigos.forEach(guardarEnCache);
 }
 
 function marcarCambio(hoja, fila) {

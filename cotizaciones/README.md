@@ -43,6 +43,9 @@ No borres filas: quedan como historial.
 6. **Implementar → Nueva implementación**, engranaje → **Aplicación web**.
 7. Ejecutar como: **Yo**. Quién tiene acceso: **Cualquier persona**. Tocá **Implementar**.
 8. Copiá la URL que termina en `/exec` y pegala en `API`, en `assets/js/cotizacion.js`.
+9. En la planilla, tocá **FÁRA → Activar carga rápida** y aceptá el permiso. Mantiene listas las cotizaciones enviadas para que abran enseguida.
+
+Cada cotización queda guardada en una copia rápida de Google, que se actualiza sola al editar la planilla. Excepción: si borrás una fila entera en vez de usar `Anulada`, la copia puede seguir viéndose hasta 6 horas.
 
 Si más adelante cambia `Code.gs`: **Implementar → Gestionar implementaciones → lápiz → Versión: Nueva versión → Implementar**. La URL no cambia.
 
