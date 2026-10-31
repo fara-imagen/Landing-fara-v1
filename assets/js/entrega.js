@@ -80,6 +80,7 @@
       h('span', { class: 'eyebrow' }, 'Entrega', h('span', { class: 'cot-codigo' }, e.codigo)),
       h('h1', {}, lleno(e.titulo) ? e.titulo : 'Tu entrega'),
       lleno(e.cliente) && h('p', { class: 'cot-para' }, 'Para ' + e.cliente),
+      lleno(e.mensaje) && h('p', { class: 'cot-para cot-texto' }, e.mensaje),
       datos.childElementCount ? datos : null,
       e.estado === 'disponible' && e.dias !== null && h('p', { class: 'cot-plazo' }, h('mark', {}, textoPlazo(e.dias)))
     );
@@ -99,7 +100,7 @@
     }
     if (e.estado === 'proceso') {
       return aviso('Tu trabajo está en marcha',
-        'Acá vas a ver cada parte a medida que la termine. Cuando esté todo listo, acá vas a ver la fecha para descargarlo.');
+        'Vas a ver cada parte a medida que la termine.');
     }
     if (e.estado === 'vencida') {
       return aviso('El plazo de descarga terminó',
@@ -190,8 +191,7 @@
     mostrar(h('div', { class: 'wrap cot-wrap' },
       cabecera(e),
       avisoEstado(e),
-      lleno(e.mensaje) && h('div', { class: 'post-body cot-texto' }, e.mensaje),
-      seccion(pendiente ? 'Entregas parciales' : 'Tu entrega', e.archivos)
+      seccion(pendiente ? 'Entregas parciales' : 'Qué incluye', e.archivos)
     ));
     pie(e);
   }

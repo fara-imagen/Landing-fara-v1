@@ -825,9 +825,10 @@ function armarCotizaciones(ss) {
 
   // con la planilla en es_AR las fórmulas separan con punto y coma
   const neto = "SUMIF('" + H_ITEMS + "'!A2:A;A2:A;'" + H_ITEMS + "'!K2:K)";
-  h.getRange(2, COL.total + 1).setFormula(
-    '=ARRAYFORMULA(IF(A2:A="";"";IF(K2:K="%";' + neto + '*(1-IF(L2:L<1;L2:L;L2:L/100));' + neto + '-L2:L)))');
-  h.getRange(2, COL.link + 1).setFormula('=ARRAYFORMULA(IF(A2:A="";"";"' + SITIO + '"&A2:A))');
+  // las fórmulas van en el encabezado: así sobreviven si se borra la primera fila de datos
+  h.getRange(1, COL.total + 1).setFormula(
+    '={"Total";ARRAYFORMULA(IF(A2:A="";"";IF(K2:K="%";' + neto + '*(1-IF(L2:L<1;L2:L;L2:L/100));' + neto + '-L2:L)))}');
+  h.getRange(1, COL.link + 1).setFormula('={"Link";ARRAYFORMULA(IF(A2:A="";"";"' + SITIO + '"&A2:A))}');
 
   [COL.codigo, COL.total, COL.actualizada, COL.link].forEach(function (c) { automatica(h, c); });
   bandas(h, COL.link + 1, '=AND($A2<>"";ISEVEN(ROW()))');
@@ -853,8 +854,8 @@ function armarItems(ss) {
   h.getRange(2, COL_ITEM.descuentoPct + 1, FILAS, 1).setNumberFormat('0"%"');
   h.getRange(2, COL_ITEM.importe + 1, FILAS, 1).setNumberFormat('#,##0');
   h.getRange(2, COL_ITEM.codigo + 1, FILAS, 1).setNumberFormat('@');
-  h.getRange(2, COL_ITEM.importe + 1).setFormula(
-    '=ARRAYFORMULA(IF(A2:A="";"";IF(J2:J=TRUE;H2:H*(1-IF(I2:I<1;I2:I;I2:I/100));0)))');
+  h.getRange(1, COL_ITEM.importe + 1).setFormula(
+    '={"Importe";ARRAYFORMULA(IF(A2:A="";"";IF(J2:J=TRUE;H2:H*(1-IF(I2:I<1;I2:I;I2:I/100));0)))}');
 
   automatica(h, COL_ITEM.importe);
   // cada cotización toma su color según su fila en Cotizaciones
@@ -930,7 +931,7 @@ function armarEntregas(ss) {
     SpreadsheetApp.newDataValidation().requireDate().setAllowInvalid(false).build());
   h.getRange(2, COL_ENT.avisoPrevio + 1, FILAS, 2).setNumberFormat('dd/mm/yyyy');
   h.getRange(2, COL_ENT.codigo + 1, FILAS, 1).setNumberFormat('@');
-  h.getRange(2, COL_ENT.link + 1).setFormula('=ARRAYFORMULA(IF(A2:A="";"";"' + SITIO_ENTREGA + '"&A2:A))');
+  h.getRange(1, COL_ENT.link + 1).setFormula('={"Link";ARRAYFORMULA(IF(A2:A="";"";"' + SITIO_ENTREGA + '"&A2:A))}');
 
   automaticas.forEach(function (c) { automatica(h, c); });
   // en rojo: venció y falta borrar o cerrar la carpeta. Al pasar a Archivos borrados se apaga

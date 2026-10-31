@@ -16,7 +16,7 @@ El botón Aceptar de la página solo te manda un WhatsApp: no crea nada.
 
 ## Crear una entrega suelta
 1. En la planilla: menú **FÁRA Entregas → Nueva entrega**. Escribí las 3 letras del cliente.
-2. En **Entregas**, completá la fila. **Empresa** es lo que sale en la página. **Nombre para el mail** es el saludo: con `Leandro` el mail dice "Hola Leandro,". También podés poner `equipo de Ceniza`. Con **Mail del cliente** le llegan los avisos de vencimiento.
+2. En **Entregas**, completá la fila. **Empresa** es lo que sale en la página. **Nombre para el mail** es el saludo: con `Leandro` el mail dice "Hola Leandro,". También podés poner `equipo de Ceniza`. **Mensaje** es opcional: sale arriba, debajo del título, y si queda vacío no se ve nada. Con **Mail del cliente** le llegan los avisos de vencimiento.
 3. Parado en esa fila, tocá **FÁRA Entregas → Ver archivos** y cargá un renglón por cada cosa que entregás. Para sumar otro: **FÁRA Entregas → Agregar archivo**.
 4. Elegí el **Estado** y mandale al cliente el link de la última columna.
 
