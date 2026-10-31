@@ -18,6 +18,7 @@
   const DIAS_URGENTE = 5;
   const BOTONES = { descarga: 'Descargar', web: 'Abrir', entregado: 'Ver' };
   const CANDADO = 'M7 11V8a5 5 0 0 1 10 0v3M6 11h12v9H6z';
+  const IMPORTANTE = 'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM12 11v5M12 8v.01';
 
   const raiz = d.getElementById('ent');
 
@@ -91,11 +92,15 @@
     return h('div', { class: 'cot-aviso' + (clase ? ' ' + clase : '') }, h('h2', {}, titulo), h('p', {}, texto), botonAviso);
   }
 
+  function avisoConIcono(ruta, titulo, texto, botonAviso, clase) {
+    const cartel = aviso(titulo, texto, botonAviso, 'ent-aviso-icono ' + clase);
+    cartel.querySelector('h2').prepend(icono(ruta));
+    return cartel;
+  }
+
   /* lo que espera el pago: candado fino y color apenas marcado */
   function avisoBloqueado(titulo, texto, botonAviso) {
-    const cartel = aviso(titulo, texto, botonAviso, 'ent-aviso-bloqueado');
-    cartel.querySelector('h2').prepend(icono(CANDADO));
-    return cartel;
+    return avisoConIcono(CANDADO, titulo, texto, botonAviso, 'ent-aviso-bloqueado');
   }
 
   /* en proceso, un renglón sin "Entrega parcial" sigue esperando el pago */
@@ -124,7 +129,7 @@
     }
     if (e.dias === null || !e.archivos.some(function (a) { return a.tipo === 'proceso' || (a.tipo === 'descarga' && lleno(a.link)); })) return null;
     const urgente = e.dias <= DIAS_URGENTE;
-    return aviso(e.dias === 0 ? 'Hoy es el último día para descargar' : 'Descargá antes del ' + fechaLarga(e.limite),
+    return avisoConIcono(IMPORTANTE, e.dias === 0 ? 'Hoy es el último día para descargar' : 'Descargá antes del ' + fechaLarga(e.limite),
       'Guardá todo en tu compu o en tu nube. ' + (e.dias === 0 ? 'Mañana' : 'Después de esa fecha') + ' los archivos se borran.',
       h('p', { class: 'ent-letra-chica' }, 'Si necesitás recuperarlos después de esa fecha, tiene un costo extra.'),
       urgente ? 'ent-aviso-urgente' : '');

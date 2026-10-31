@@ -25,12 +25,13 @@
 /* aviso de plazo: urgente cuando quedan pocos días */
 .ent-aviso-urgente{background:var(--espresso);color:var(--on-dark);}
 .ent-aviso-urgente p{color:var(--on-dark-muted);}
-.cot-aviso p.ent-letra-chica{font-size:13px;line-height:1.5;}
+.cot-aviso p.ent-letra-chica{font-size:13px;line-height:1.5;font-style:italic;}
 
 /* falta el pago: apenas teñido, con candado fino */
 .ent-aviso-bloqueado{background:rgba(168,71,58,.07);border:1px solid rgba(168,71,58,.2);}
-.ent-aviso-bloqueado h2{display:flex;align-items:center;gap:10px;}
-.ent-aviso-bloqueado h2 svg{width:20px;height:20px;flex:none;fill:none;stroke:#A8473A;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;}
+.ent-aviso-icono h2{display:flex;align-items:flex-start;gap:10px;}
+.ent-aviso-icono h2 svg{width:22px;height:22px;flex:none;margin-top:1px;fill:none;stroke:var(--ambar);stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+.ent-aviso-bloqueado h2 svg{stroke:#A8473A;}
 
 /* renglones */
 .ent-lista{display:grid;gap:12px;margin-top:12px;}
