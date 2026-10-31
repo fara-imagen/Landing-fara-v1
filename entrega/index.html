@@ -29,8 +29,8 @@
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@100..125,400..700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/assets/style.css?v=3">
 <link rel="stylesheet" href="/assets/cotizacion.css?v=6">
-<link rel="stylesheet" href="/assets/entrega.css?v=1">
-<script src="/assets/js/entrega.js?v=1" defer></script>
+<link rel="stylesheet" href="/assets/entrega.css?v=2">
+<script src="/assets/js/entrega.js?v=2" defer></script>
 </head>
 <body>
 
@@ -45,10 +45,15 @@
 
 <main class="cot ent" id="ent" aria-busy="true">
   <!-- Estado de carga: misma forma que la página final, para que nada salte -->
-  <div class="wrap cot-wrap" aria-label="Cargando la entrega" role="status">
-    <div class="cot-sk ent-sk-hero"></div>
-    <div class="cot-sk ent-sk-aviso"></div>
-    <div class="cot-sk cot-sk-item"></div>
+  <div class="wrap cot-wrap ent-wrap" aria-label="Cargando la entrega" role="status">
+    <div class="ent-estado">
+      <div class="cot-sk ent-sk-hero"></div>
+      <div class="cot-sk ent-sk-aviso"></div>
+    </div>
+    <div class="ent-entregas">
+      <div class="cot-sk cot-sk-item"></div>
+      <div class="cot-sk cot-sk-item"></div>
+    </div>
   </div>
   <noscript>
     <div class="wrap nf-box cot-noscript">

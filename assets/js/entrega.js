@@ -17,6 +17,7 @@
   const ESPERA_MAX = 20000;
   const DIAS_URGENTE = 5;
   const BOTONES = { descarga: 'Descargar', web: 'Abrir', entregado: 'Ver' };
+  const CANDADO = 'M7 11V8a5 5 0 0 1 10 0v3M6 11h12v9H6z';
 
   const raiz = d.getElementById('ent');
 
@@ -80,9 +81,9 @@
       h('span', { class: 'eyebrow' }, 'Entrega', h('span', { class: 'cot-codigo' }, e.codigo)),
       h('h1', {}, lleno(e.titulo) ? e.titulo : 'Tu entrega'),
       lleno(e.cliente) && h('p', { class: 'cot-para' }, 'Para ' + e.cliente),
-      lleno(e.mensaje) && h('p', { class: 'cot-para cot-texto' }, e.mensaje),
       datos.childElementCount ? datos : null,
-      e.estado === 'disponible' && e.dias !== null && h('p', { class: 'cot-plazo' }, h('mark', {}, textoPlazo(e.dias)))
+      e.estado === 'disponible' && e.dias !== null && h('p', { class: 'cot-plazo' }, h('mark', {}, textoPlazo(e.dias))),
+      lleno(e.mensaje) && h('p', { class: 'ent-nota cot-texto' }, e.mensaje)
     );
   }
 
@@ -90,17 +91,30 @@
     return h('div', { class: 'cot-aviso' + (clase ? ' ' + clase : '') }, h('h2', {}, titulo), h('p', {}, texto), botonAviso);
   }
 
+  /* lo que espera el pago: candado fino y color apenas marcado */
+  function avisoBloqueado(titulo, texto, botonAviso) {
+    const cartel = aviso(titulo, texto, botonAviso, 'ent-aviso-bloqueado');
+    cartel.querySelector('h2').prepend(icono(CANDADO));
+    return cartel;
+  }
+
+  /* en proceso, un renglón sin "Entrega parcial" sigue esperando el pago */
+  function faltaPago(e) {
+    return e.estado === 'pendiente' || (e.estado === 'proceso' && e.archivos.some(function (a) { return !a.parcial; }));
+  }
+
   function avisoEstado(e) {
     const wa = (e.config || {}).whatsapp;
     if (e.estado === 'pendiente') {
-      return aviso('Tu trabajo está listo',
+      return avisoBloqueado('Tu trabajo está listo',
         'La entrega completa se habilita cuando se complete el pago. Apenas esté, la vas a ver en este mismo link.',
         boton('btn-accent', 'Escribime por WhatsApp',
           linkWhatsApp(wa, 'Hola Matías, te escribo por el pago de la entrega ' + e.codigo + '.')));
     }
     if (e.estado === 'proceso') {
-      return aviso('Tu trabajo está en marcha',
-        'Vas a ver cada parte a medida que la termine.');
+      return faltaPago(e)
+        ? avisoBloqueado('Tu trabajo está en marcha', 'La entrega completa se habilita cuando se complete el pago.')
+        : aviso('Tu trabajo está en marcha', 'Vas a ver cada parte a medida que la termine.');
     }
     if (e.estado === 'vencida') {
       return aviso('El plazo de descarga terminó',
@@ -118,7 +132,7 @@
   function renglon(a) {
     const enProceso = a.tipo === 'proceso';
     const visita = enProceso ? h('mark', {}, 'En proceso')
-      : a.bloqueado ? h('mark', {}, 'Se habilita con el pago')
+      : a.bloqueado ? h('mark', { class: 'ent-marca-bloqueada' }, 'Se habilita con el pago')
       : lleno(a.link) ? boton('btn-accent', BOTONES[a.tipo] || 'Abrir', a.link, (BOTONES[a.tipo] || 'Abrir') + ': ' + a.nombre) : null;
     const pie = a.vencido ? 'Venció el plazo de descarga'
       : enProceso && lleno(a.fecha) ? 'Fecha estimada: ' + fechaLarga(a.fecha)
@@ -139,6 +153,16 @@
     return h('section', { class: 'cot-seccion', 'aria-label': titulo },
       h('h2', {}, titulo),
       h.apply(null, ['div', { class: 'ent-lista' }].concat(archivos.map(renglon))));
+  }
+
+  function listados(e) {
+    if (e.estado === 'pendiente') return [seccion('Entregas parciales', e.archivos)];
+    if (e.estado !== 'proceso') return [seccion('Qué incluye', e.archivos)];
+    const listos = e.archivos.filter(function (a) {
+      return a.tipo !== 'proceso' && !a.bloqueado;
+    });
+    const faltan = e.archivos.filter(function (a) { return listos.indexOf(a) < 0; });
+    return [seccion('Entregas parciales', listos), seccion(listos.length ? 'Qué falta' : 'Qué incluye', faltan)];
   }
 
   function pie(e) {
@@ -186,12 +210,12 @@
       logo.hidden = false;
     }
     e.archivos = e.archivos || [];
-    const pendiente = e.estado === 'pendiente';
+    const secciones = listados(e).filter(Boolean);
 
-    mostrar(h('div', { class: 'wrap cot-wrap' },
-      cabecera(e),
-      avisoEstado(e),
-      seccion(pendiente ? 'Entregas parciales' : 'Qué incluye', e.archivos)
+    /* compu: el estado de un lado, siempre a la vista, y lo que se entrega del otro */
+    mostrar(h('div', { class: 'wrap cot-wrap ent-wrap' + (secciones.length ? '' : ' ent-solo') },
+      h('div', { class: 'ent-estado' }, cabecera(e), avisoEstado(e)),
+      secciones.length ? h.apply(null, ['div', { class: 'ent-entregas' }].concat(secciones)) : null
     ));
     pie(e);
   }
