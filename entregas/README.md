@@ -14,13 +14,15 @@ Cuando ponés una cotización en `Aceptada`, o marcás un pago, se crea sola su 
 
 El botón Aceptar de la página solo te manda un WhatsApp: no crea nada.
 
+Una vez creada es independiente: si cambiás la cotización, la entrega no cambia, y si anulás la cotización, la entrega hay que anularla aparte.
+
 ## Crear una entrega suelta
 1. En la planilla: menú **FÁRA Entregas → Nueva entrega**. Escribí las 3 letras del cliente.
 2. En **Entregas**, completá la fila. **Empresa** es lo que sale en la página. **Nombre para el mail** es el saludo: con `Leandro` el mail dice "Hola Leandro,". También podés poner `equipo de Ceniza`. **Mensaje** es opcional: sale arriba, debajo del título, y si queda vacío no se ve nada. Con **Mail del cliente** le llegan los avisos de vencimiento.
 3. Parado en esa fila, tocá **FÁRA Entregas → Ver archivos** y cargá un renglón por cada cosa que entregás. Para sumar otro: **FÁRA Entregas → Agregar archivo**.
 4. Elegí el **Estado** y mandale al cliente el link de la última columna.
 
-Un renglón con link muestra un botón. Sin link, se ve solo el texto.
+Un renglón con link muestra un botón. Sin link, se ve solo el texto. Podés pegar el link con o sin `https://`. Si la dirección no sirve, la celda se pone en rojo.
 
 ## Qué cargar en Archivos
 
@@ -33,7 +35,7 @@ Un renglón con link muestra un botón. Sin link, se ve solo el texto.
 
 | Cuándo se ve | Qué pasa |
 |---|---|
-| Al pagar | Con link, se abre recién en Disponible. En `En proceso` se lista con la etiqueta **Se habilita con el pago** |
+| Al pagar | Con link, se abre recién en Disponible. Si la entrega viene de una cotización, en `En proceso` se lista con la etiqueta **Se habilita con el pago**. En una entrega suelta, `En proceso` no bloquea: para hacerlo, usá `Pendiente de pago` |
 | Entrega parcial | Se abre desde ya, también en Pendiente de pago, bajo el título **Entregas parciales** |
 | Oculto | No aparece nunca |
 
@@ -56,6 +58,8 @@ Mientras la entrega esté en `En proceso` no vence nada y no sale ningún mail.
 
 **Si pagó la mitad o nada:** los renglones vienen en `Al pagar`. Aunque pegues el link, el cliente no lo ve hasta el pago. Para darle algo antes, marcá ese renglón `Entrega parcial`.
 
+Con **FÁRA Entregas → Agregar archivo**, el renglón nuevo copia el `Cuándo se ve` del último renglón de esa entrega.
+
 ## Estados
 
 | Estado | Qué ve el cliente |
@@ -67,6 +71,8 @@ Mientras la entrega esté en `En proceso` no vence nada y no sale ningún mail.
 | Vencida | Se pone sola el día después de la Fecha límite. El mensaje de plazo terminado, con botón de WhatsApp |
 | Archivos borrados | Lo mismo que Vencida. Lo ponés vos cuando ya borraste la carpeta |
 | Pausada / Anulada | Solo un mensaje |
+
+Si en la entrega no hay nada para descargar, por ejemplo solo una web, no vence, no sale la fecha y no salen avisos.
 
 Al pasar el límite, una entrega `Disponible` vence sola en la web, y a la mañana siguiente su Estado cambia a `Vencida` en la planilla: se ocultan los links de tipo Descarga y aparece el botón de WhatsApp para pedir los archivos. Lo de tipo Web y Entregado sigue a la vista.
 
@@ -82,7 +88,7 @@ El cliente puede descargar hasta el final del día de la fecha límite, hora de 
 
 ## Avisos por mail
 El cliente recibe un mail 5 días antes y otro el último día. Salen solos a la mañana, solo con la entrega en `Disponible`.
-- Para cambiar los 5 días: **Config → Entregas: días antes para avisar por mail**.
+- Para cambiar los 5 días: **Config → Entregas: días antes para avisar por mail**. Con `0` no sale ningún aviso.
 - Si la dejás con menos de 5 días, el primer aviso sale al día siguiente de cargarla y el último, el último día.
 - Las columnas **Aviso previo enviado** y **Aviso último día enviado** muestran cuándo salió cada uno.
 - Sin mail en la fila, no sale nada. Si un mail falla, se vuelve a intentar al día siguiente.

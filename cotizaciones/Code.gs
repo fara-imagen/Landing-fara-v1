@@ -4,7 +4,6 @@
  *
  * doGet() ......... recibe un código y devuelve solo esa cotización o entrega.
  * setup() ......... arma la planilla entera. Se ejecuta una sola vez.
- * agregarEntregas() suma las pestañas de entregas a una planilla ya armada.
  * Menús FÁRA ...... "Nueva cotización" y "Nueva entrega" generan el código y dejan la fila lista.
  * onEdit() ........ completa datos del Catálogo, la última modificación y la fecha límite,
  *                   y crea la entrega de una cotización al aceptarla o marcar un pago.
@@ -228,7 +227,7 @@ function leerEntrega(codigo) {
   const hoja = ss.getSheetByName(H_ENT);
   const celda = buscarCodigo(hoja, codigo).findNext();
   if (!celda) return { ok: false };
-  const f = hoja.getRange(celda.getRow(), 1, 1, COL_ENT.link + 1).getValues()[0];
+  const f = hoja.getRange(celda.getRow(), 1, 1, COL_ENT.cotizacion + 1).getValues()[0];
 
   const estado = ESTADOS_ENT[f[COL_ENT.estado]];
   if (!estado) return { ok: false };
@@ -246,8 +245,9 @@ function leerEntrega(codigo) {
     mensaje: texto(f[COL_ENT.mensaje]),
     logoCliente: /^https:\/\//.test(logo) ? logo : '',
     limite: dia(f[COL_ENT.limite], zona),
+    cotizacion: texto(f[COL_ENT.cotizacion]),
     archivos: leerArchivos(ss, codigo, zona),
-    config: { whatsapp: texto(cfg.whatsapp), mail: texto(cfg.mail), instagram: texto(cfg.instagram) }
+    config: { whatsapp: texto(cfg.whatsapp), mail: texto(cfg.mail), instagram: texto(cfg.instagram), avisoDias: diasDeAviso(cfg) }
   };
 }
 
@@ -258,11 +258,10 @@ function leerArchivos(ss, codigo, zona) {
     })
     .sort(function (a, b) { return numero(a[COL_ARC.orden]) - numero(b[COL_ARC.orden]); })
     .map(function (r) {
-      const link = texto(r[COL_ARC.link]);
       return {
         nombre: texto(r[COL_ARC.nombre]),
         tipo: TIPOS_ARC[r[COL_ARC.tipo]] || 'descarga',
-        link: /^https:\/\//.test(link) ? link : '',
+        link: linkValido(r[COL_ARC.link]),
         detalle: texto(r[COL_ARC.detalle]),
         fecha: dia(r[COL_ARC.fecha], zona),
         // sin elegir, espera al pago: es lo más seguro
@@ -278,8 +277,9 @@ function vistaEntrega(ficha, hoy) {
   const fecha = hoy || Utilities.formatDate(new Date(), ficha.zona, 'yyyy-MM-dd');
   const dias = ficha.limite ? diasEntre(fecha, ficha.limite) : null;
   const pendiente = ficha.estado === 'pendiente';
-  const sinPlazo = pendiente || ficha.estado === 'proceso';
-  const vencida = ficha.estado === 'borrada' || (ficha.estado === 'disponible' && dias !== null && dias < 0);
+  // sin nada para descargar no hay plazo: una web o un trabajo entregado no vencen
+  const sinPlazo = pendiente || ficha.estado === 'proceso' || (ficha.estado === 'disponible' && !ficha.archivos.some(vence));
+  const vencida = ficha.estado === 'borrada' || (ficha.estado === 'disponible' && !sinPlazo && dias !== null && dias < 0);
 
   return {
     ok: true,
@@ -293,11 +293,12 @@ function vistaEntrega(ficha, hoy) {
     limite: sinPlazo ? '' : ficha.limite,
     dias: sinPlazo ? null : dias,
     archivos: ficha.archivos
-      .filter(function (a) { return !pendiente || a.visible === 'parcial'; })
+      .filter(function (a) { return (!pendiente || a.visible === 'parcial') && !(vencida && a.tipo === 'proceso'); })
       .map(function (a) {
         const vencido = vencida && a.tipo === 'descarga';
-        // en proceso, lo que espera el pago se lista sin su link
-        const bloqueado = ficha.estado === 'proceso' && a.visible === 'pago' && a.tipo !== 'proceso' && a.link !== '';
+        // en proceso, lo que espera el pago de su cotización se lista sin su link
+        const esperaPago = ficha.estado === 'proceso' && a.visible === 'pago' && !!ficha.cotizacion;
+        const bloqueado = esperaPago && a.tipo !== 'proceso' && a.link !== '';
         return {
           nombre: a.nombre,
           tipo: a.tipo,
@@ -307,6 +308,7 @@ function vistaEntrega(ficha, hoy) {
           fecha: a.fecha,
           parcial: a.visible === 'parcial',
           vencido: vencido,
+          esperaPago: esperaPago,
           bloqueado: bloqueado
         };
       }),
@@ -315,6 +317,15 @@ function vistaEntrega(ficha, hoy) {
 }
 
 const diasEntre = function (desde, hasta) { return Math.round((Date.parse(hasta) - Date.parse(desde)) / 86400000); };
+const vence = function (a) { return a.tipo === 'proceso' || (a.tipo === 'descarga' && a.link !== ''); };
+// 0 en Config apaga los avisos; vacío usa el valor de siempre
+const diasDeAviso = function (cfg) { return texto(cfg.avisoEntregaDias) === '' ? AVISO_ENTREGA : numero(cfg.avisoEntregaDias); };
+// acepta el link como se copie del navegador, con o sin https://. Nada que no sea una dirección web
+const linkValido = function (v) {
+  const link = texto(v);
+  if (/^https?:\/\//i.test(link)) return link;
+  return /^[a-z0-9-]+(\.[a-z0-9-]+)+([/?#]|$)/i.test(link) ? 'https://' + link : '';
+};
 
 /* ---------- avisos por mail ---------- */
 
@@ -324,30 +335,31 @@ function avisosEntregas() {
   const hoja = ss.getSheetByName(H_ENT);
   const zona = ss.getSpreadsheetTimeZone();
   const cfg = leerConfig(ss);
-  const anticipo = numero(cfg.avisoEntregaDias) || AVISO_ENTREGA;
+  const anticipo = diasDeAviso(cfg);
   const hoy = Utilities.formatDate(new Date(), zona, 'yyyy-MM-dd');
   const remitente = opcionesMail(cfg);
 
   hoja.getRange(2, 1, FILAS, COL_ENT.link + 1).getValues().forEach(function (f, i) {
     const limite = dia(f[COL_ENT.limite], zona);
-    if (f[COL_ENT.estado] !== 'Disponible' || !limite) return;
+    const codigo = texto(f[COL_ENT.codigo]);
+    if (f[COL_ENT.estado] !== 'Disponible' || !limite || !leerArchivos(ss, codigo, zona).some(vence)) return;
     const dias = diasEntre(hoy, limite);
     if (dias < 0) {
       // queda en rojo hasta que borres la carpeta y la pases a Archivos borrados
       hoja.getRange(i + 2, COL_ENT.estado + 1).setValue('Vencida');
-      guardarEntrega(texto(f[COL_ENT.codigo]));
+      guardarEntrega(codigo);
       return;
     }
     const mail = texto(f[COL_ENT.mail]);
     const col = dias === 0 ? COL_ENT.avisoUltimo : COL_ENT.avisoPrevio;
-    if (!mail || dias > anticipo || f[col] !== '') return;
+    if (!mail || !anticipo || dias > anticipo || f[col] !== '') return;
     try {
       const aviso = textoAviso(f, dias, limite);
       GmailApp.sendEmail(mail, aviso.asunto, aviso.cuerpo, Object.assign({ htmlBody: aviso.html }, remitente));
       hoja.getRange(i + 2, col + 1).setValue(new Date());
     } catch (err) {
       // un mail mal escrito no frena a los demás; mañana se vuelve a intentar
-      console.error('No se pudo avisar a ' + f[COL_ENT.codigo] + ': ' + err.message);
+      console.error('No se pudo avisar a ' + codigo + ': ' + err.message);
     }
   });
 }
@@ -394,7 +406,7 @@ function mailHtml(encabezado, hola, disponible, borrado, costo, link) {
     '<p style="' + parrafo + '">' + escapar(hola) + '</p>' +
     '<p style="' + parrafo + '">' + escapar(disponible) + ' ' + escapar(borrado) + '</p>' +
     '<table role="presentation" cellpadding="0" cellspacing="0" style="margin:22px 0;"><tr><td style="background:' + C_AMBAR + ';border-radius:10px;">' +
-    '<a href="' + link + '" style="display:inline-block;padding:14px 28px;' + letra + 'font-size:16px;font-weight:bold;color:#FFFFFF;text-decoration:none;">Ver mi entrega</a>' +
+    '<a href="' + link + '" style="display:inline-block;padding:14px 28px;' + letra + 'font-size:16px;font-weight:bold;color:' + C_ESPRESSO + ';text-decoration:none;">Ver mi entrega</a>' +
     '</td></tr></table>' +
     '<p style="margin:0;' + letra + 'font-size:13px;line-height:1.5;font-style:italic;color:' + C_MARRON + ';">' + escapar(costo) + '</p>' +
     '</td></tr><tr><td style="padding:16px 28px 22px;border-top:1px solid ' + C_CREMA2 + ';' + letra + 'font-size:13px;line-height:1.5;color:' + C_MARRON + ';">' +
@@ -578,13 +590,15 @@ function sumarRenglon(items, codigo) {
 }
 
 function sumarArchivo(archivos, codigo) {
-  const orden = archivos.getRange(2, 1, FILAS, 2).getValues()
-    .filter(function (r) { return r[0] === codigo; })
-    .reduce(function (max, r) { return Math.max(max, numero(r[1])); }, 0);
+  const propios = archivos.getRange(2, 1, FILAS, COL_ARC.visible + 1).getValues()
+    .filter(function (r) { return r[0] === codigo; });
+  const orden = propios.reduce(function (max, r) { return Math.max(max, numero(r[COL_ARC.orden])); }, 0);
+  // si la entrega ya está abierta, lo nuevo también
+  const anterior = propios.length ? propios[propios.length - 1][COL_ARC.visible] : '';
   const fila = primeraLibre(archivos);
   archivos.getRange(fila, COL_ARC.codigo + 1, 1, 2).setValues([[codigo, orden + 1]]);
   archivos.getRange(fila, COL_ARC.tipo + 1).setValue('Descarga');
-  archivos.getRange(fila, COL_ARC.visible + 1).setValue('Al pagar');
+  archivos.getRange(fila, COL_ARC.visible + 1).setValue(anterior === 'Entrega parcial' ? anterior : 'Al pagar');
   return fila;
 }
 
@@ -780,7 +794,6 @@ const C_CREMA = '#F2EBDD';
 const C_CREMA2 = '#E9DFCB';
 const C_ESPRESSO = '#1A1410';
 const C_MARRON = '#5C5047';
-const C_VERDE = '#7A8B6F';
 const C_ROJO = '#A8473A';
 const C_AMBAR = '#C8873A'; // pestañas y encabezados de cotizaciones
 const C_PETROLEO = '#2F5D62'; // pestañas y encabezados de entregas
@@ -800,7 +813,8 @@ function setup() {
   armarItems(ss);
   armarCatalogo(ss);
   armarConfig(ss);
-  sumarPestanasEntregas(ss);
+  armarEntregas(ss);
+  armarArchivos(ss);
   ss.deleteSheet(inicial);
   ordenarPestanas(ss);
 
@@ -930,7 +944,9 @@ function armarConfig(ss) {
     ['Medios de pago (alias, bancos, cuotas)', '', 'mediosPago'],
     ['Disclaimer por defecto', '', 'disclaimer'],
     ['Condiciones por defecto', '', 'condiciones'],
-    ['Impuestos (por ejemplo: Los precios no incluyen IVA.)', '', 'impuestos']
+    ['Impuestos (por ejemplo: Los precios no incluyen IVA.)', '', 'impuestos'],
+    ['Entregas: días para descargar', PLAZO_ENTREGA, 'plazoEntregaDias'],
+    ['Entregas: días antes para avisar por mail', AVISO_ENTREGA, 'avisoEntregaDias']
   ];
   h.getRange(2, 2, filas.length, 1).setNumberFormat('@');
   h.getRange(2, 1, filas.length, 3).setValues(filas);
@@ -938,25 +954,6 @@ function armarConfig(ss) {
   h.setColumnWidth(1, 340);
   h.setColumnWidth(2, 420);
   h.setColumnWidth(3, 120);
-}
-
-// suma las entregas a una planilla ya armada, sin tocar lo que hay
-function agregarEntregas() {
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
-  if (ss.getSheetByName(H_ENT)) {
-    SpreadsheetApp.getUi().alert('Las pestañas de entregas ya están.');
-    return;
-  }
-  sumarPestanasEntregas(ss);
-  ss.getSheetByName(H_ENT).activate();
-  SpreadsheetApp.getUi().alert('Listo: ya están las pestañas Entregas y Archivos.');
-}
-
-function sumarPestanasEntregas(ss) {
-  armarEntregas(ss);
-  armarArchivos(ss);
-  sumarConfigEntregas(ss);
-  sumarUsoEntregas(ss);
 }
 
 function armarEntregas(ss) {
@@ -978,7 +975,7 @@ function armarEntregas(ss) {
   automaticas.forEach(function (c) { automatica(h, c); });
   // en rojo: venció y falta borrar o cerrar la carpeta. Al pasar a Archivos borrados se apaga
   const vencida = SpreadsheetApp.newConditionalFormatRule()
-    .whenFormulaSatisfied('=AND($A2<>"";OR($J2="Vencida";AND($J2="Disponible";$I2<>"";$I2<TODAY())))')
+    .whenFormulaSatisfied('=AND($A2<>"";$J2="Vencida")')
     .setBackground(C_ROJO).setFontColor(C_CREMA)
     .setRanges([h.getRange(2, 1, FILAS, COL_ENT.link + 1)]).build();
   bandas(h, COL_ENT.link + 1, '=AND($A2<>"";ISEVEN(ROW()))', [vencida]);
@@ -1000,85 +997,79 @@ function armarArchivos(ss) {
   h.getRange(2, COL_ARC.fecha + 1, FILAS, 1).setNumberFormat('dd/mm/yyyy');
   h.getRange(2, COL_ARC.codigo + 1, FILAS, 1).setNumberFormat('@');
 
+  // un link que no se va a abrir queda a la vista
+  const linkMalo = SpreadsheetApp.newConditionalFormatRule()
+    .whenFormulaSatisfied('=AND($E2<>"";NOT(REGEXMATCH($E2;"(?i)^(https?://|[a-z0-9-]+(\\.[a-z0-9-]+)+([/?#]|$))")))')
+    .setBackground(C_ROJO).setFontColor(C_CREMA)
+    .setRanges([h.getRange(2, COL_ARC.link + 1, FILAS, 1)]).build();
   // cada entrega toma su color según su fila en Entregas
-  bandas(h, COL_ARC.visible + 1, '=AND($A2<>"";ISEVEN(MATCH($A2;INDIRECT("' + H_ENT + '!$A:$A");0)))');
+  bandas(h, COL_ARC.visible + 1, '=AND($A2<>"";ISEVEN(MATCH($A2;INDIRECT("' + H_ENT + '!$A:$A");0)))', [linkMalo]);
   h.setColumnWidths(1, COL_ARC.visible + 1, 110);
   h.setColumnWidth(COL_ARC.nombre + 1, 240);
   h.setColumnWidth(COL_ARC.link + 1, 320);
   h.setColumnWidth(COL_ARC.detalle + 1, 280);
 }
 
-function sumarConfigEntregas(ss) {
-  const h = ss.getSheetByName(H_CONFIG);
-  const filas = [
-    ['Entregas: días para descargar', PLAZO_ENTREGA, 'plazoEntregaDias'],
-    ['Entregas: días antes para avisar por mail', AVISO_ENTREGA, 'avisoEntregaDias']
-  ];
-  const desde = h.getLastRow() + 1;
-  h.getRange(desde, 1, filas.length, 3).setValues(filas).setFontFamily('Archivo');
-  h.getRange(desde, 3, filas.length, 1).setBackground(C_CREMA2).protect().setDescription('No cambiar').setWarningOnly(true);
-}
-
-function sumarUsoEntregas(ss) {
-  const h = ss.getSheetByName(H_USO);
-  const lineas = [
-    [''],
-    ['Crear una entrega'],
-    ['Se crea sola al aceptar una cotización. Para una entrega suelta:'],
-    ['1. Menú FÁRA Entregas → Nueva entrega. Escribí las 3 letras del cliente.'],
-    ['2. En Entregas, completá la fila. Empresa sale en la página; Nombre para el mail es el saludo: Hola Leandro. Con mail, le llegan los avisos de vencimiento.'],
-    ['3. Parado en esa fila, tocá FÁRA Entregas → Ver archivos y cargá un renglón por cosa que entregás.'],
-    ['Tipo: Descarga vence. Web no vence. Entregado es sin link, como una impresión o una charla, y queda como registro. En proceso es lo que todavía falta: cuando esté, cambiá el Tipo y pegá el link.'],
-    ['Cuándo se ve: Al pagar, Entrega parcial (se ve antes del pago) u Oculto.'],
-    ['4. Elegí el Estado y mandale el link de la última columna.'],
-    [''],
-    ['Estados de una entrega'],
-    ['Borrador: el link dice que no está disponible.'],
-    ['Pendiente de pago: avisa que falta el pago y muestra solo las entregas parciales. El plazo no corre.'],
-    ['En proceso: el cliente ve la lista mientras la vas terminando. Lo marcado Al pagar sale sin link hasta que lo pague. El plazo no corre y no salen mails.'],
-    ['Disponible: se ve todo. Si la Fecha límite está vacía, se completa sola con los días de Config.'],
-    ['Vencida: pasa sola el día después de la Fecha límite y la fila se pone en rojo. Borrá o cerrá la carpeta y pasala a Archivos borrados.'],
-    ['Pausada y Anulada: un mensaje, sin datos ni links.']
-  ];
-  const desde = h.getLastRow() + 1;
-  h.getRange(desde, 1, lineas.length, 1).setValues(lineas).setFontFamily('Archivo').setBackground(C_CREMA).setFontColor(C_ESPRESSO).setWrap(true);
-  [1, 10].forEach(function (i) { h.getRange(desde + i, 1).setFontWeight('bold').setFontSize(13); });
-}
-
 function armarUso(ss) {
   const h = ss.insertSheet(H_USO);
   const lineas = [
-    ['FÁRA · Cotizaciones'],
-    ['Esta planilla es privada. El cliente solo ve su cotización en la web, con su link.'],
-    [''],
-    ['Crear una cotización'],
-    ['1. Menú FÁRA Cotizaciones → Nueva cotización. Escribí las 3 letras del cliente.'],
-    ['2. En Cotizaciones, completá la fila nueva.'],
-    ['3. Parado en esa fila, tocá FÁRA Cotizaciones → Ver ítems y completá los renglones. Para sumar otro: Agregar ítem. En Precio va el total del renglón: la cantidad no multiplica.'],
-    ['4. Cambiá el Estado a Enviada y mandale el link de la última columna.'],
-    [''],
-    ['Cambiar una cotización'],
-    ['Editá la celda. El cliente ve el cambio al recargar la página. Para volver a la lista completa: FÁRA Cotizaciones → Ver todos los ítems.'],
-    [''],
-    ['Estados'],
-    ['Borrador: el link dice que no está disponible.'],
-    ['Enviada: se ve completa. Si pasa la fecha de vencimiento, se muestra vencida sola.'],
-    ['Aceptada: se ve completa con el aviso de aceptada. Al ponerla vos en Aceptada, o marcar un pago, se crea sola su entrega con los mismos ítems.'],
-    ['Pago: elegí Anticipo pagado o Pagado total a medida que cobrás. Si te paga otro anticipo, cambiá primero Anticipo %. El link sigue activo como registro.'],
-    ['Pausada y Anulada: un mensaje, sin datos ni precios.'],
-    ['Vencida: se ve completa con el botón para pedir actualización.'],
-    [''],
-    ['Qué se puede tocar'],
-    ['Encabezado de color: se puede editar.'],
-    ['Encabezado rojo: automático, no lo toques.'],
-    ['No borres cotizaciones: quedan como historial. Para sacarlas de la web, usá Anulada.']
+    'FÁRA · Cotizaciones y entregas',
+    'Esta planilla es privada. El cliente solo ve lo suyo en la web, con su link.',
+    '',
+    'COTIZACIONES · pestañas ámbar · menú FÁRA Cotizaciones',
+    'Crear una cotización',
+    '1. Menú FÁRA Cotizaciones → Nueva cotización. Escribí las 3 letras del cliente.',
+    '2. En Cotizaciones, completá la fila nueva. Empresa es la marca. Nombre para el mail es a quién le escribís.',
+    '3. Parado en esa fila, tocá FÁRA Cotizaciones → Ver ítems y completá los renglones. Para sumar otro: Agregar ítem. En Precio va el total del renglón: la cantidad no multiplica.',
+    '4. Cambiá el Estado a Enviada y mandale el link de la última columna.',
+    '',
+    'Cambiar una cotización',
+    'Editá la celda. El cliente ve el cambio al recargar la página. Para volver a la lista completa: FÁRA Cotizaciones → Ver todos los ítems.',
+    '',
+    'Estados',
+    'Borrador: el link dice que no está disponible.',
+    'Enviada: se ve completa. Si pasa la fecha de vencimiento, se muestra vencida sola.',
+    'Aceptada: se ve completa con el aviso de aceptada. Al ponerla vos en Aceptada, o marcar un pago, se crea sola su entrega con los mismos ítems.',
+    'Pago: elegí Anticipo pagado o Pagado total a medida que cobrás. Si te paga otro anticipo, cambiá primero Anticipo %. El link sigue activo como registro.',
+    'Vencida: se ve completa con el botón para pedir actualización.',
+    'Pausada y Anulada: un mensaje, sin datos ni precios.',
+    '',
+    'ENTREGAS · pestañas petróleo · menú FÁRA Entregas',
+    'Cómo nace una entrega',
+    'Sola: al poner una cotización en Aceptada, o marcar un pago, aparece en Entregas con sus ítems en Archivos. Completá el Mail del cliente.',
+    'Suelta: menú FÁRA Entregas → Nueva entrega. Escribí las 3 letras del cliente y completá la fila.',
+    'Empresa sale en la página. Nombre para el mail es el saludo: Hola Leandro.',
+    'Parado en la fila, tocá FÁRA Entregas → Ver archivos. Podés agregar, cambiar u ocultar renglones. Mandale el link de la columna Link.',
+    '',
+    'Archivos',
+    'Tipo: Descarga vence. Web no vence. Entregado es sin link, como una impresión o una charla. En proceso es lo que todavía falta: cuando esté, cambiá el Tipo y pegá el link.',
+    'Cuándo se ve: Al pagar espera el pago. Entrega parcial se abre desde ya. Oculto no aparece.',
+    'Un link marcado en rojo no se va a abrir: revisalo.',
+    '',
+    'Estados',
+    'Borrador: el link dice que no está disponible.',
+    'Pendiente de pago: avisa que falta el pago y muestra solo las entregas parciales. El plazo no corre.',
+    'En proceso: el cliente ve la lista mientras la vas terminando. Lo que espera el pago sale sin link. El plazo no corre y no salen mails.',
+    'Disponible: se ve todo. Si la Fecha límite está vacía, se completa sola con los días de Config.',
+    'Vencida: pasa sola el día después de la Fecha límite y la fila se pone en rojo. Borrá o cerrá la carpeta y pasala a Archivos borrados.',
+    'Pausada y Anulada: un mensaje, sin datos ni links.',
+    '',
+    'GENERAL · pestañas grises',
+    'Qué se puede tocar',
+    'Encabezado de color: se puede editar.',
+    'Encabezado rojo: automático, no lo toques.',
+    'No borres filas: quedan como historial. Para sacar algo de la web, usá Anulada u Oculto.'
   ];
-  h.getRange(1, 1, lineas.length, 1).setValues(lineas).setFontFamily('Archivo').setBackground(C_CREMA).setFontColor(C_ESPRESSO).setWrap(true);
+  h.getRange(1, 1, lineas.length, 1).setValues(lineas.map(function (l) { return [l]; }))
+    .setFontFamily('Archivo').setBackground(C_CREMA).setFontColor(C_ESPRESSO).setWrap(true);
   h.setColumnWidth(1, 720);
   h.getRange(1, 1).setFontSize(20).setFontWeight('bold');
-  [4, 10, 13, 21].forEach(function (f) { h.getRange(f, 1).setFontWeight('bold').setFontSize(13); });
-  h.getRange(22, 1).setBackground(C_AMBAR).setFontColor(C_CREMA);
-  h.getRange(23, 1).setBackground(C_ROJO).setFontColor(C_CREMA);
+  [[4, C_AMBAR], [22, C_PETROLEO], [41, C_GRIS]].forEach(function (b) {
+    h.getRange(b[0], 1).setBackground(b[1]).setFontColor(C_CREMA).setFontWeight('bold').setFontSize(13);
+  });
+  [5, 11, 14, 23, 29, 34, 42].forEach(function (f) { h.getRange(f, 1).setFontWeight('bold').setFontSize(12); });
+  h.getRange(43, 1).setBackground(C_PETROLEO).setFontColor(C_CREMA);
+  h.getRange(44, 1).setBackground(C_ROJO).setFontColor(C_CREMA);
   h.setHiddenGridlines(true);
 }
 

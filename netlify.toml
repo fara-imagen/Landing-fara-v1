@@ -17,6 +17,19 @@
   to = "/entrega/index.html"
   status = 200
 
+# Los manuales y el script de la planilla viven en el repo, no en la web
+[[redirects]]
+  from = "/cotizaciones/*"
+  to = "/404.html"
+  status = 404
+  force = true
+
+[[redirects]]
+  from = "/entregas/*"
+  to = "/404.html"
+  status = 404
+  force = true
+
 [[headers]]
   for = "/*"
   [headers.values]

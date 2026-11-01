@@ -103,9 +103,8 @@
     return avisoConIcono(CANDADO, titulo, texto, botonAviso, 'ent-aviso-bloqueado');
   }
 
-  /* en proceso, un renglón sin "Entrega parcial" sigue esperando el pago */
   function faltaPago(e) {
-    return e.estado === 'pendiente' || (e.estado === 'proceso' && e.archivos.some(function (a) { return !a.parcial; }));
+    return e.archivos.some(function (a) { return a.esperaPago; });
   }
 
   function avisoEstado(e) {
@@ -127,9 +126,10 @@
         boton('btn-accent', 'Pedir los archivos',
           linkWhatsApp(wa, 'Hola Matías, venció la entrega ' + e.codigo + '. ¿Me reenviás los archivos?')));
     }
-    if (e.dias === null || !e.archivos.some(function (a) { return a.tipo === 'proceso' || (a.tipo === 'descarga' && lleno(a.link)); })) return null;
-    const urgente = e.dias <= DIAS_URGENTE;
-    return avisoConIcono(IMPORTANTE, e.dias === 0 ? 'Hoy es el último día para descargar' : 'Descargá antes del ' + fechaLarga(e.limite),
+    if (e.dias === null) return null;
+    const anticipo = (e.config || {}).avisoDias;
+    const urgente = e.dias <= (lleno(anticipo) ? Number(anticipo) : DIAS_URGENTE);
+    return avisoConIcono(IMPORTANTE, e.dias === 0 ? 'Hoy es el último día para descargar' : 'Descargá hasta el ' + fechaLarga(e.limite),
       'Guardá todo en tu compu o en tu nube. ' + (e.dias === 0 ? 'Mañana' : 'Después de esa fecha') + ' los archivos se borran.',
       h('p', { class: 'ent-letra-chica' }, 'Si necesitás recuperarlos después de esa fecha, tiene un costo extra.'),
       urgente ? 'ent-aviso-urgente' : '');

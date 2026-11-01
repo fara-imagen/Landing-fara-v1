@@ -44,6 +44,8 @@ El botón de la página solo te manda un WhatsApp. La cotización queda aceptada
 
 Al ponerla en `Aceptada`, o al marcar un pago, se crea sola su entrega con los mismos ítems, una sola vez. Ver `entregas/README.md`.
 
+Después de eso son independientes: los cambios en la cotización no pasan a la entrega, y anular la cotización no anula la entrega.
+
 ## Qué no tocar
 - Columnas con encabezado rojo: son automáticas.
 - La columna Clave de la pestaña Config.
@@ -57,7 +59,7 @@ Al ponerla en `Aceptada`, o al marcar un pago, se crea sola su entrega con los m
 5. Google pide permiso: **Revisar permisos**, elegí la cuenta, **Configuración avanzada**, **Ir a… (no seguro)**, **Permitir**. Ese aviso aparece porque el script es tuyo y no está verificado por Google.
 6. **Implementar → Nueva implementación**, engranaje → **Aplicación web**.
 7. Ejecutar como: **Yo**. Quién tiene acceso: **Cualquier persona**. Tocá **Implementar**.
-8. Copiá la URL que termina en `/exec` y pegala en `API`, en `assets/js/cotizacion.js`.
+8. Copiá la URL que termina en `/exec` y pegala en `API`, en `assets/js/cotizacion.js` y en `assets/js/entrega.js`.
 9. En la planilla, tocá **FÁRA Cotizaciones → Activar carga rápida** y aceptá el permiso. Mantiene listas las cotizaciones enviadas para que abran enseguida.
 
 Cada cotización queda guardada en una copia rápida de Google, que se actualiza sola al editar la planilla. Excepción: si borrás una fila entera en vez de usar `Anulada`, la copia puede seguir viéndose hasta 6 horas.
