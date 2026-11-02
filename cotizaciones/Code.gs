@@ -8,6 +8,7 @@
  * onEdit() ........ completa datos del Catálogo, la última modificación y la fecha límite,
  *                   y crea la entrega de una cotización al aceptarla o marcar un pago.
  * avisosEntregas() manda los mails de vencimiento y marca las vencidas. Corre solo una vez por día.
+ * Panel ......... pantalla para el celular, solo para fara.imagen@gmail.com. Se publica aparte, como "Solo yo".
  *
  * Instrucciones en cotizaciones/README.md y entregas/README.md.
  */
@@ -59,6 +60,12 @@ const VISIBLES_ARC = { 'Al pagar': 'pago', 'Entrega parcial': 'parcial', 'Oculto
 /* ---------- web ---------- */
 
 function doGet(e) {
+  const params = (e && e.parameter) || {};
+  // el panel solo se abre con la cuenta de FÁRA: la implementación pública nunca lo muestra
+  if (params.panel !== undefined || (!params.codigo && !params.entrega)) {
+    if (esAdmin()) return panelPagina();
+    if (params.panel !== undefined) return responder('{"ok":false}');
+  }
   if (e && e.parameter && e.parameter.entrega) return responder(pedirEntrega(String(e.parameter.entrega)));
   const pedido = String((e && e.parameter && e.parameter.codigo) || '');
   if (!RE_CODIGO.test(pedido)) return responder('{"ok":false}');
@@ -686,7 +693,11 @@ function crearCotizacion(ss, prefijo) {
 
   // tres renglones de ítems ya unidos a la cotización: los vacíos no se muestran
   [1, 2, 3].forEach(function () { sumarRenglon(items, codigo); });
-  hoja.getRange(fila, COL.cliente + 1).activate();
+  try {
+    hoja.getRange(fila, COL.cliente + 1).activate();
+  } catch (err) {
+    // desde el panel no hay planilla abierta que mover
+  }
   return { codigo: codigo, fila: fila };
 }
 
@@ -786,6 +797,553 @@ function completarDesdeCatalogo(hoja, fila, servicio) {
   const precio = hoja.getRange(fila, COL_ITEM.precio + 1);
   if (desc.getValue() === '') desc.setValue(base[1]);
   if (precio.getValue() === '' && base[2] !== '') precio.setValue(base[2]);
+}
+
+/* ---------- panel para el celular ----------
+   Se abre solo con la cuenta de FÁRA, desde la implementación "Solo yo" (se ejecuta como
+   quien entra). Cada función que llama la pantalla vuelve a comprobarlo en el servidor.
+   Escribir por script no dispara onEdit, así que cada acción hace a mano lo mismo que él. */
+
+const ADMIN = 'fara.imagen@gmail.com';
+const ESTADOS_COT = ['Borrador', 'Enviada', 'Aceptada', 'Vencida', 'Anulada', 'Pausada'];
+const MAX_TEXTO = 500;
+const MAX_ITEMS = 30;
+
+function esAdmin() {
+  try {
+    return Session.getActiveUser().getEmail().toLowerCase() === ADMIN;
+  } catch (err) {
+    return false;
+  }
+}
+
+function exigirAdmin() {
+  if (!esAdmin()) throw new Error('Sin acceso.');
+}
+
+function panelPagina() {
+  return HtmlService.createHtmlOutput(htmlPanel()).setTitle('FÁRA')
+    .addMetaTag('viewport', 'width=device-width, initial-scale=1');
+}
+
+// lo que se escribe en la planilla: una celda que empieza con = se tomaría como fórmula
+const dato = function (v, max) {
+  const t = texto(v).slice(0, max || MAX_TEXTO);
+  return /^[=+\-@]/.test(t) ? ' ' + t : t;
+};
+const elegir = function (v, opciones) {
+  if (opciones.indexOf(v) < 0) throw new Error('Ese valor no es válido.');
+  return v;
+};
+const importe = function (v) {
+  const n = Number(v);
+  if (v === '' || v === null || v === undefined || !isFinite(n) || n < 0) throw new Error('Un número no es válido.');
+  return n;
+};
+const pedirCodigo = function (v) {
+  const codigo = texto(v);
+  if (!RE_CODIGO.test(codigo)) throw new Error('Código no válido.');
+  return codigo;
+};
+
+function filaDe(hoja, codigo) {
+  const celda = buscarCodigo(hoja, codigo).findNext();
+  if (!celda) throw new Error('No encontré ' + codigo + '.');
+  return celda.getRow();
+}
+
+function leerCatalogo(ss) {
+  return ss.getSheetByName(H_CAT).getRange(2, 1, FILAS, 3).getValues()
+    .filter(function (r) { return texto(r[0]) !== ''; })
+    .map(function (r) { return { servicio: texto(r[0]), descripcion: texto(r[1]), precio: r[2] === '' ? '' : numero(r[2]) }; });
+}
+
+function panelDatos() {
+  exigirAdmin();
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const zona = ss.getSpreadsheetTimeZone();
+  const cotizaciones = ss.getSheetByName(H_COT).getRange(2, 1, FILAS, COL.link + 1).getValues()
+    .filter(function (r) { return texto(r[COL.codigo]) !== ''; })
+    .map(function (r) {
+      return {
+        codigo: texto(r[COL.codigo]), empresa: texto(r[COL.cliente]), contacto: texto(r[COL.contacto]),
+        titulo: texto(r[COL.titulo]), estado: texto(r[COL.estado]), pago: texto(r[COL.pago]),
+        moneda: r[COL.moneda] === 'USD' ? 'USD' : 'ARS', total: numero(r[COL.total])
+      };
+    }).reverse();
+  const entregas = ss.getSheetByName(H_ENT).getRange(2, 1, FILAS, COL_ENT.cotizacion + 1).getValues()
+    .filter(function (r) { return texto(r[COL_ENT.codigo]) !== ''; })
+    .map(function (r) {
+      return {
+        codigo: texto(r[COL_ENT.codigo]), empresa: texto(r[COL_ENT.empresa]), contacto: texto(r[COL_ENT.saludo]),
+        titulo: texto(r[COL_ENT.titulo]), estado: texto(r[COL_ENT.estado]), limite: dia(r[COL_ENT.limite], zona),
+        cotizacion: texto(r[COL_ENT.cotizacion])
+      };
+    }).reverse();
+  return {
+    cotizaciones: cotizaciones,
+    entregas: entregas,
+    catalogo: leerCatalogo(ss),
+    sitio: SITIO,
+    sitioEntrega: SITIO_ENTREGA,
+    opciones: {
+      estadosCot: ESTADOS_COT,
+      pagos: Object.keys(PAGOS),
+      estadosEnt: ['Borrador'].concat(Object.keys(ESTADOS_ENT)),
+      tipos: Object.keys(TIPOS_ARC),
+      visibles: Object.keys(VISIBLES_ARC)
+    }
+  };
+}
+
+function panelNuevaCotizacion(d) {
+  exigirAdmin();
+  d = d || {};
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const prefijo = texto(d.prefijo).toUpperCase();
+  if (!/^[A-Z]{3}$/.test(prefijo)) throw new Error('Son 3 letras, sin acentos ni números.');
+  const catalogo = leerCatalogo(ss);
+  const elegidos = (Array.isArray(d.items) ? d.items : []).slice(0, MAX_ITEMS).map(function (it) {
+    const base = catalogo.filter(function (c) { return c.servicio === texto(it && it.servicio); })[0];
+    if (!base) throw new Error('Ese servicio no está en el Catálogo.');
+    const precio = it.precio === '' || it.precio === null || it.precio === undefined ? base.precio : importe(it.precio);
+    return { servicio: base.servicio, descripcion: base.descripcion, precio: precio };
+  });
+  const extra = d.extra || {};
+  const moneda = extra.moneda ? elegir(extra.moneda, ['ARS', 'USD']) : 'ARS';
+  const conDescuento = texto(extra.descuentoValor) !== '';
+  const descuentoTipo = conDescuento ? elegir(extra.descuentoTipo, ['%', 'Monto']) : '';
+  const descuentoValor = conDescuento ? importe(extra.descuentoValor) : '';
+  const anticipo = texto(extra.anticipoPct) === '' ? '' : importe(extra.anticipoPct);
+  if (anticipo !== '' && anticipo > 100) throw new Error('El anticipo no puede pasar de 100.');
+  const empresa = dato(d.empresa, 120), contacto = dato(d.contacto, 120), titulo = dato(d.titulo, 200);
+  if (!empresa) throw new Error('Falta la empresa.');
+
+  const hoja = ss.getSheetByName(H_COT);
+  const items = ss.getSheetByName(H_ITEMS);
+  const creada = crearCotizacion(ss, prefijo);
+  hoja.getRange(creada.fila, COL.cliente + 1, 1, 4).setValues([[empresa, contacto, titulo, dato(extra.intro, 1000)]]);
+  hoja.getRange(creada.fila, COL.moneda + 1).setValue(moneda);
+  if (conDescuento) {
+    hoja.getRange(creada.fila, COL.descuentoTipo + 1, 1, 3).setValues([[descuentoTipo, descuentoValor, dato(extra.descuentoMotivo, 200)]]);
+  }
+  hoja.getRange(creada.fila, COL.formaPago + 1).setValue(dato(extra.formaPago, 300));
+  if (anticipo !== '') hoja.getRange(creada.fila, COL.anticipoPct + 1).setValue(anticipo);
+  hoja.getRange(creada.fila, COL.plazoEntrega + 1).setValue(dato(extra.plazoEntrega, 200));
+  hoja.getRange(creada.fila, COL.notas + 1).setValue(dato(extra.notas, 1000));
+
+  // crearCotizacion deja tres renglones vacíos unidos a la cotización: se usan primero
+  const libres = buscarCodigo(items, creada.codigo).findAll().map(function (c) { return c.getRow(); })
+    .sort(function (a, b) { return a - b; });
+  elegidos.forEach(function (it, i) {
+    const fila = libres[i] || sumarRenglon(items, creada.codigo);
+    items.getRange(fila, COL_ITEM.servicio + 1, 1, 2).setValues([[it.servicio, it.descripcion]]);
+    if (it.precio !== '') items.getRange(fila, COL_ITEM.precio + 1).setValue(it.precio);
+  });
+  marcarCambio(hoja, creada.fila);
+  guardarEnCache(creada.codigo);
+  return panelDatos();
+}
+
+function panelCambiarCotizacion(codigo, campo, valor) {
+  exigirAdmin();
+  codigo = pedirCodigo(codigo);
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const hoja = ss.getSheetByName(H_COT);
+  const opciones = { estado: ESTADOS_COT, pago: Object.keys(PAGOS) }[campo];
+  if (!opciones) throw new Error('Ese dato no se cambia desde el panel.');
+  elegir(valor, opciones);
+  const fila = filaDe(hoja, codigo);
+  hoja.getRange(fila, (campo === 'estado' ? COL.estado : COL.pago) + 1).setValue(valor);
+  marcarCambio(hoja, fila);
+  guardarEnCache(codigo);
+  entregaDeCotizacion(ss, hoja, fila);
+  return panelDatos();
+}
+
+function panelCambiarEntrega(codigo, campo, valor) {
+  exigirAdmin();
+  codigo = pedirCodigo(codigo);
+  if (campo !== 'estado') throw new Error('Ese dato no se cambia desde el panel.');
+  elegir(valor, ['Borrador'].concat(Object.keys(ESTADOS_ENT)));
+  const hoja = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(H_ENT);
+  const celda = hoja.getRange(filaDe(hoja, codigo), COL_ENT.estado + 1);
+  celda.setValue(valor);
+  ordenarPlazo(hoja, celda);
+  guardarEntrega(codigo);
+  return panelDatos();
+}
+
+function panelRenglones(codigo) {
+  exigirAdmin();
+  codigo = pedirCodigo(codigo);
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const zona = ss.getSpreadsheetTimeZone();
+  filaDe(ss.getSheetByName(H_ENT), codigo);
+  return renglonesDe(ss.getSheetByName(H_ARC), codigo, COL_ARC.visible + 1)
+    .filter(function (r) { return String(r[COL_ARC.codigo]) === codigo; })
+    .sort(function (a, b) { return numero(a[COL_ARC.orden]) - numero(b[COL_ARC.orden]); })
+    .map(function (r) {
+      return {
+        orden: numero(r[COL_ARC.orden]), nombre: texto(r[COL_ARC.nombre]), tipo: texto(r[COL_ARC.tipo]) || 'Descarga',
+        link: texto(r[COL_ARC.link]), detalle: texto(r[COL_ARC.detalle]), fecha: dia(r[COL_ARC.fecha], zona),
+        visible: texto(r[COL_ARC.visible]) || 'Al pagar'
+      };
+    });
+}
+
+// vacío borra el link; si no, tiene que ser una dirección web que la página pueda abrir
+const linkDelPanel = function (v) {
+  if (texto(v) === '') return '';
+  const link = linkValido(v);
+  if (!link) throw new Error('Ese link no sirve. Pegalo como lo copiaste del navegador.');
+  return link.slice(0, 1000);
+};
+
+function panelSumarArchivo(codigo, d) {
+  exigirAdmin();
+  codigo = pedirCodigo(codigo);
+  d = d || {};
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  filaDe(ss.getSheetByName(H_ENT), codigo);
+  const nombre = dato(d.nombre, 200);
+  if (!nombre) throw new Error('Falta el nombre de lo que entregás.');
+  const tipo = elegir(d.tipo || 'Descarga', Object.keys(TIPOS_ARC));
+  const visible = d.visible ? elegir(d.visible, Object.keys(VISIBLES_ARC)) : '';
+  const link = linkDelPanel(d.link);
+  const archivos = ss.getSheetByName(H_ARC);
+  const fila = sumarArchivo(archivos, codigo);
+  archivos.getRange(fila, COL_ARC.nombre + 1, 1, 2).setValues([[nombre, tipo]]);
+  archivos.getRange(fila, COL_ARC.link + 1, 1, 2).setValues([[link, dato(d.detalle, 300)]]);
+  if (visible) archivos.getRange(fila, COL_ARC.visible + 1).setValue(visible);
+  guardarEntrega(codigo);
+  return panelRenglones(codigo);
+}
+
+function panelEditarArchivo(codigo, orden, campo, valor) {
+  exigirAdmin();
+  codigo = pedirCodigo(codigo);
+  const columna = { tipo: COL_ARC.tipo, visible: COL_ARC.visible, link: COL_ARC.link }[campo];
+  if (columna === undefined) throw new Error('Ese dato no se cambia desde el panel.');
+  const nuevo = campo === 'tipo' ? elegir(valor, Object.keys(TIPOS_ARC))
+    : campo === 'visible' ? elegir(valor, Object.keys(VISIBLES_ARC)) : linkDelPanel(valor);
+  const archivos = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(H_ARC);
+  const i = archivos.getRange(2, 1, FILAS, COL_ARC.visible + 1).getValues()
+    .findIndex(function (r) { return String(r[COL_ARC.codigo]) === codigo && numero(r[COL_ARC.orden]) === numero(orden); });
+  if (i < 0) throw new Error('No encontré ese renglón.');
+  archivos.getRange(i + 2, columna + 1).setValue(nuevo);
+  guardarEntrega(codigo);
+  return panelRenglones(codigo);
+}
+
+// Todo lo que viene de la planilla se escribe como texto (textContent): nunca como HTML.
+// El código de abajo no usa comillas invertidas ni signo de pesos con llaves.
+function htmlPanel() {
+  return String.raw`<!doctype html>
+<html lang="es"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FÁRA</title>
+<style>
+:root{--crema:#F2EBDD;--crema2:#E9DFCB;--espresso:#1A1410;--marron:#5C5047;--ambar:#C8873A;--petroleo:#2F5D62;--rojo:#A8473A;--blanco:#FFFDF8;--acento:var(--ambar)}
+body.ent{--acento:var(--petroleo)}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--crema);color:var(--espresso);font:16px/1.4 Arial,Helvetica,sans-serif;padding-bottom:88px}
+header{position:sticky;top:0;z-index:5;background:var(--espresso);color:var(--crema);padding:12px 16px;display:flex;align-items:center;justify-content:space-between}
+header b{letter-spacing:.18em;font-size:18px}
+header span{font-size:13px;opacity:.7}
+main{max-width:720px;margin:0 auto;padding:16px}
+nav{position:fixed;bottom:0;left:0;right:0;z-index:5;display:flex;background:var(--espresso);padding:8px;gap:8px}
+nav button{flex:1;min-height:48px;border:0;border-radius:12px;background:transparent;color:var(--crema);font:inherit;font-weight:bold}
+nav button[aria-selected=true]{color:var(--espresso)}
+nav button.cot[aria-selected=true]{background:var(--ambar)}
+nav button.ent[aria-selected=true]{background:#7FB3B8}
+.nuevo{width:100%;min-height:52px;border:0;border-radius:14px;background:var(--acento);color:#fff;font:inherit;font-weight:bold;margin-bottom:14px}
+.tarjeta{background:var(--blanco);border-radius:14px;margin-bottom:10px;border-left:6px solid var(--acento);overflow:hidden}
+.cab{display:block;width:100%;text-align:left;border:0;background:transparent;font:inherit;color:inherit;padding:14px;min-height:56px}
+.cab strong{display:block;font-size:17px}
+.cab small{display:block;color:var(--marron);margin-top:2px}
+.fila{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:8px}
+.marca{display:inline-block;padding:3px 10px;border-radius:999px;background:var(--crema2);font-size:13px;font-weight:bold}
+.marca.ok{background:var(--acento);color:#fff}
+.marca.mal{background:var(--rojo);color:#fff}
+.total{margin-left:auto;font-weight:bold}
+.cuerpo{padding:0 14px 14px;border-top:1px solid var(--crema2)}
+.cuerpo h4{margin:14px 0 6px;font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:var(--marron)}
+.fichas{display:flex;flex-wrap:wrap;gap:6px}
+.ficha{min-height:44px;padding:0 14px;border:2px solid var(--crema2);border-radius:999px;background:#fff;font:inherit;color:var(--espresso)}
+.ficha[aria-pressed=true]{background:var(--acento);border-color:var(--acento);color:#fff;font-weight:bold}
+.acc{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.btn{min-height:46px;padding:0 16px;border:2px solid var(--acento);border-radius:12px;background:#fff;color:var(--espresso);font:inherit;font-weight:bold;text-decoration:none;display:inline-flex;align-items:center;justify-content:center}
+.btn.lleno{background:var(--acento);color:#fff}
+.btn.wa{border-color:#1f8f4d;color:#1f8f4d}
+.renglon{background:var(--crema);border-radius:10px;padding:10px;margin-top:8px}
+.renglon b{display:block}
+.renglon small{color:var(--marron)}
+label{display:block;font-size:13px;font-weight:bold;margin:12px 0 4px;color:var(--marron)}
+input,select,textarea{width:100%;min-height:46px;padding:10px 12px;border:2px solid var(--crema2);border-radius:10px;background:#fff;font:inherit;color:var(--espresso)}
+textarea{min-height:76px}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--acento)}
+.hoja{position:fixed;inset:0;z-index:20;background:var(--crema);overflow:auto;padding:0 0 100px}
+.hoja .barra{position:sticky;top:0;background:var(--espresso);color:var(--crema);padding:12px 16px;display:flex;justify-content:space-between;align-items:center}
+.hoja .barra button{background:none;border:0;color:var(--crema);font:inherit;min-height:44px}
+.hoja .interior{max-width:720px;margin:0 auto;padding:0 16px 16px}
+.servicio{display:flex;gap:10px;align-items:center;background:var(--blanco);border-radius:10px;padding:8px 10px;margin-top:8px}
+.servicio input[type=checkbox]{width:26px;height:26px;min-height:0;flex:none;accent-color:var(--ambar)}
+.servicio span{flex:1}
+.servicio input[type=text],.servicio input[type=number],.servicio input[inputmode]{width:110px;flex:none}
+details{margin-top:14px;background:var(--blanco);border-radius:10px;padding:10px 12px}
+summary{min-height:44px;display:flex;align-items:center;font-weight:bold;color:var(--marron)}
+.pie{position:fixed;left:0;right:0;bottom:0;background:var(--espresso);padding:10px 16px;display:flex;align-items:center;gap:12px;z-index:21}
+.pie .tot{color:var(--crema);flex:1;font-size:17px}
+.pie .btn{border-color:var(--ambar);background:var(--ambar);color:#fff}
+#aviso{position:fixed;left:16px;right:16px;bottom:96px;z-index:40;background:var(--espresso);color:var(--crema);padding:12px 14px;border-radius:12px;display:none}
+#aviso.mal{background:var(--rojo)}
+#vel{position:fixed;inset:0;z-index:30;background:rgba(242,235,221,.6);display:none;align-items:center;justify-content:center;font-weight:bold}
+.vacio{text-align:center;color:var(--marron);padding:30px 0}
+@media(min-width:900px){main{padding-top:28px}.cab strong{font-size:18px}}
+</style></head>
+<body class="cot">
+<header><b>FÁRA</b><span id="quien">Panel</span></header>
+<main id="app"></main>
+<nav role="tablist">
+<button role="tab" class="cot" id="t-cot" aria-selected="true">Cotizaciones</button>
+<button role="tab" class="ent" id="t-ent" aria-selected="false">Entregas</button>
+</nav>
+<div id="aviso" role="status"></div>
+<div id="vel">Un momento…</div>
+<div id="capa"></div>
+<script>
+(function () {
+  var RE = /^[A-Z]{3}-[a-z2-9]{6,8}$/;
+  var D = null, pestana = 'cot', abierta = '', renglones = {};
+
+  function h(tag, props) {
+    var el = document.createElement(tag);
+    Object.keys(props || {}).forEach(function (k) {
+      var v = props[k];
+      if (k === 'class') el.className = v;
+      else if (k.indexOf('on') === 0) el.addEventListener(k.slice(2), v);
+      else if (k === 'value') el.value = v;
+      else if (v !== false && v !== null && v !== undefined) el.setAttribute(k, v);
+    });
+    for (var i = 2; i < arguments.length; i++) {
+      [].concat(arguments[i]).forEach(function (c) {
+        if (c === null || c === undefined || c === false) return;
+        el.append(c.nodeType ? c : document.createTextNode(String(c)));
+      });
+    }
+    return el;
+  }
+  function plata(n, moneda) { return (moneda === 'USD' ? 'US$ ' : '$ ') + Number(n || 0).toLocaleString('es-AR'); }
+  function fechaCorta(iso) { var p = String(iso || '').split('-'); return p.length === 3 ? p[2] + '/' + p[1] + '/' + p[0] : ''; }
+
+  function srv(fn) {
+    var args = [].slice.call(arguments, 1);
+    return new Promise(function (ok, fail) {
+      var r = google.script.run.withSuccessHandler(ok).withFailureHandler(function (e) { fail(new Error(e && e.message ? e.message : 'No se pudo.')); });
+      r[fn].apply(r, args);
+    });
+  }
+  var timer;
+  function avisar(msg, mal) {
+    var a = document.getElementById('aviso');
+    a.textContent = msg; a.className = mal ? 'mal' : ''; a.style.display = 'block';
+    clearTimeout(timer); timer = setTimeout(function () { a.style.display = 'none'; }, mal ? 6000 : 2500);
+  }
+  function hacer(promesa, listo) {
+    var v = document.getElementById('vel'); v.style.display = 'flex';
+    return promesa.then(function (r) { v.style.display = 'none'; if (listo) listo(r); }, function (e) { v.style.display = 'none'; avisar(e.message, true); });
+  }
+
+  function copiar(texto) {
+    function viejo() {
+      var t = h('textarea', { value: texto }); document.body.append(t); t.select();
+      try { document.execCommand('copy'); avisar('Link copiado'); } catch (e) { avisar('No pude copiar', true); }
+      t.remove();
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(texto).then(function () { avisar('Link copiado'); }, viejo);
+    else viejo();
+  }
+  function botonesLink(codigo, contacto, esEntrega) {
+    if (!RE.test(codigo)) return null;
+    var link = (esEntrega ? D.sitioEntrega : D.sitio) + codigo;
+    var msg = 'Hola' + (contacto ? ' ' + contacto : '') + ', ' + (esEntrega ? 'acá está tu entrega: ' : 'te paso tu cotización: ') + link;
+    return h('div', { class: 'acc' },
+      h('button', { class: 'btn', onclick: function () { copiar(link); } }, 'Copiar link'),
+      h('a', { class: 'btn wa', target: '_blank', rel: 'noopener', href: 'https://wa.me/?text=' + encodeURIComponent(msg) }, 'Mandar por WhatsApp'));
+  }
+  function fichas(opciones, actual, elegir) {
+    return h('div', { class: 'fichas' }, opciones.map(function (o) {
+      return h('button', { class: 'ficha', 'aria-pressed': String(o === actual), onclick: function () { if (o !== actual) elegir(o); } }, o);
+    }));
+  }
+  function marca(txt, cls) { return h('span', { class: 'marca ' + (cls || '') }, txt); }
+
+  /* ---------- cotizaciones ---------- */
+  function pintarCot(app) {
+    app.append(h('button', { class: 'nuevo', onclick: abrirNueva }, '+ Nueva cotización'));
+    if (!D.cotizaciones.length) app.append(h('p', { class: 'vacio' }, 'Todavía no hay cotizaciones.'));
+    D.cotizaciones.forEach(function (c) {
+      var abre = abierta === c.codigo;
+      var t = h('div', { class: 'tarjeta' },
+        h('button', { class: 'cab', 'aria-expanded': String(abre), onclick: function () { abierta = abre ? '' : c.codigo; pintar(); } },
+          h('strong', {}, c.empresa || 'Sin empresa'),
+          h('small', {}, c.titulo || 'Sin título'),
+          h('span', { class: 'fila' }, marca(c.estado || 'Sin estado', c.estado === 'Enviada' || c.estado === 'Aceptada' ? 'ok' : ''),
+            marca(c.pago || 'Pendiente'), h('span', { class: 'total' }, plata(c.total, c.moneda)))));
+      if (abre) t.append(h('div', { class: 'cuerpo' },
+        h('h4', {}, 'Estado'),
+        fichas(D.opciones.estadosCot, c.estado, function (v) { cambiarCot(c.codigo, 'estado', v); }),
+        h('h4', {}, 'Pago'),
+        fichas(D.opciones.pagos, c.pago, function (v) { cambiarCot(c.codigo, 'pago', v); }),
+        botonesLink(c.codigo, c.contacto, false)));
+      app.append(t);
+    });
+  }
+  function cambiarCot(codigo, campo, valor) {
+    hacer(srv('panelCambiarCotizacion', codigo, campo, valor), function (r) { D = r; pintar(); avisar('Listo'); });
+  }
+
+  function abrirNueva() {
+    var capa = document.getElementById('capa');
+    var sel = {};
+    var f = {};
+    function campo(id, etiqueta, props, area) {
+      f[id] = h(area ? 'textarea' : 'input', props || {});
+      return [h('label', {}, etiqueta), f[id]];
+    }
+    var total = h('span', { class: 'tot' });
+    function sumar() {
+      var s = 0, n = 0;
+      Object.keys(sel).forEach(function (k) { if (sel[k].marca.checked) { n++; s += Number(String(sel[k].precio.value).replace(',', '.')) || 0; } });
+      total.textContent = n + (n === 1 ? ' ítem · ' : ' ítems · ') + plata(s, f.moneda.value);
+    }
+    var lista = D.catalogo.map(function (c) {
+      var marcaCh = h('input', { type: 'checkbox', 'aria-label': c.servicio, onchange: sumar });
+      var precio = h('input', { type: 'text', inputmode: 'decimal', placeholder: 'Precio', value: c.precio === '' ? '' : String(c.precio), 'aria-label': 'Precio de ' + c.servicio, oninput: sumar });
+      sel[c.servicio] = { marca: marcaCh, precio: precio };
+      return h('div', { class: 'servicio' }, marcaCh, h('span', {}, c.servicio), precio);
+    });
+    var intro = campo('intro', 'Mensaje de introducción', {}, true);
+    var cuerpo = h('div', { class: 'interior' },
+      campo('prefijo', '3 letras del cliente', { maxlength: '3', autocapitalize: 'characters', placeholder: 'CEN' }),
+      campo('empresa', 'Empresa', { maxlength: '120' }),
+      campo('contacto', 'Nombre para el mail', { maxlength: '120' }),
+      campo('titulo', 'Título de la propuesta', { maxlength: '200' }),
+      h('label', {}, 'Qué cotizás (del Catálogo)'),
+      lista.length ? lista : h('p', { class: 'vacio' }, 'El Catálogo está vacío.'),
+      h('details', {}, h('summary', {}, 'Más datos (poco usados)'),
+        intro,
+        h('label', {}, 'Moneda'), (f.moneda = h('select', { onchange: sumar }, h('option', { value: 'ARS' }, 'ARS'), h('option', { value: 'USD' }, 'USD'))),
+        h('label', {}, 'Tipo de descuento'), (f.descuentoTipo = h('select', {}, h('option', { value: '%' }, '%'), h('option', { value: 'Monto' }, 'Monto'))),
+        campo('descuentoValor', 'Descuento', { inputmode: 'decimal' }),
+        campo('descuentoMotivo', 'Motivo del descuento', { maxlength: '200' }),
+        campo('formaPago', 'Forma de pago', { maxlength: '300' }),
+        campo('anticipoPct', 'Anticipo %', { inputmode: 'decimal' }),
+        campo('plazoEntrega', 'Plazo de entrega', { maxlength: '200' }),
+        campo('notas', 'Notas', {}, true)));
+    var cerrar = function () { capa.textContent = ''; };
+    var crear = h('button', { class: 'btn', onclick: function () {
+      var items = Object.keys(sel).filter(function (k) { return sel[k].marca.checked; }).map(function (k) {
+        return { servicio: k, precio: String(sel[k].precio.value).replace(',', '.').trim() };
+      });
+      var num = function (id) { return String(f[id].value).replace(',', '.').trim(); };
+      var datos = { prefijo: f.prefijo.value, empresa: f.empresa.value, contacto: f.contacto.value, titulo: f.titulo.value, items: items,
+        extra: { intro: f.intro.value, moneda: f.moneda.value, descuentoTipo: f.descuentoTipo.value, descuentoValor: num('descuentoValor'),
+          descuentoMotivo: f.descuentoMotivo.value, formaPago: f.formaPago.value, anticipoPct: num('anticipoPct'),
+          plazoEntrega: f.plazoEntrega.value, notas: f.notas.value } };
+      hacer(srv('panelNuevaCotizacion', datos), function (r) {
+        D = r; pestana = 'cot'; abierta = D.cotizaciones[0] ? D.cotizaciones[0].codigo : ''; cerrar(); pintar(); avisar('Cotización creada en Borrador');
+      });
+    } }, 'Crear');
+    capa.textContent = '';
+    capa.append(h('div', { class: 'hoja' },
+      h('div', { class: 'barra' }, h('b', {}, 'Nueva cotización'), h('button', { onclick: cerrar }, 'Cerrar')),
+      cuerpo,
+      h('div', { class: 'pie' }, total, crear)));
+    sumar();
+  }
+
+  /* ---------- entregas ---------- */
+  function pintarEnt(app) {
+    if (!D.entregas.length) app.append(h('p', { class: 'vacio' }, 'Todavía no hay entregas.'));
+    D.entregas.forEach(function (e) {
+      var abre = abierta === e.codigo;
+      var t = h('div', { class: 'tarjeta' },
+        h('button', { class: 'cab', 'aria-expanded': String(abre), onclick: function () { abierta = abre ? '' : e.codigo; if (!abre) cargarRenglones(e.codigo); pintar(); } },
+          h('strong', {}, e.empresa || 'Sin empresa'),
+          h('small', {}, e.titulo || 'Sin título'),
+          h('span', { class: 'fila' }, marca(e.estado || 'Sin estado', e.estado === 'Disponible' ? 'ok' : e.estado === 'Vencida' ? 'mal' : ''),
+            e.limite ? marca('Hasta ' + fechaCorta(e.limite)) : null)));
+      if (abre) t.append(cuerpoEnt(e));
+      app.append(t);
+    });
+  }
+  function cargarRenglones(codigo) {
+    return srv('panelRenglones', codigo).then(function (r) { renglones[codigo] = r; pintar(); }, function (er) { avisar(er.message, true); });
+  }
+  function cuerpoEnt(e) {
+    var filas = renglones[e.codigo];
+    var cuerpo = h('div', { class: 'cuerpo' },
+      h('h4', {}, 'Estado'),
+      fichas(D.opciones.estadosEnt, e.estado, function (v) {
+        hacer(srv('panelCambiarEntrega', e.codigo, 'estado', v), function (r) { D = r; pintar(); avisar('Listo'); });
+      }),
+      botonesLink(e.codigo, e.contacto, true),
+      h('h4', {}, 'Renglones'));
+    if (!filas) { cuerpo.append(h('p', { class: 'vacio' }, 'Cargando…')); return cuerpo; }
+    if (!filas.length) cuerpo.append(h('p', { class: 'vacio' }, 'Sin renglones todavía.'));
+    filas.forEach(function (r) { cuerpo.append(renglon(e.codigo, r)); });
+    cuerpo.append(formRenglon(e.codigo));
+    return cuerpo;
+  }
+  function editarArchivo(codigo, orden, campo, valor) {
+    hacer(srv('panelEditarArchivo', codigo, orden, campo, valor), function (r) { renglones[codigo] = r; pintar(); avisar('Listo'); });
+  }
+  function renglon(codigo, r) {
+    var link = h('input', { type: 'url', inputmode: 'url', placeholder: 'Pegá el link', value: r.link, 'aria-label': 'Link de ' + (r.nombre || 'renglón') });
+    return h('div', { class: 'renglon' },
+      h('b', {}, r.nombre || 'Sin nombre'),
+      r.detalle ? h('small', {}, r.detalle) : null,
+      h('h4', {}, 'Tipo'), fichas(D.opciones.tipos, r.tipo, function (v) { editarArchivo(codigo, r.orden, 'tipo', v); }),
+      h('h4', {}, 'Cuándo se ve'), fichas(D.opciones.visibles, r.visible, function (v) { editarArchivo(codigo, r.orden, 'visible', v); }),
+      h('h4', {}, 'Link'), link,
+      h('div', { class: 'acc' }, h('button', { class: 'btn', onclick: function () { editarArchivo(codigo, r.orden, 'link', link.value); } }, 'Guardar link')));
+  }
+  function formRenglon(codigo) {
+    var nombre = h('input', { maxlength: '200', 'aria-label': 'Qué entregás' });
+    var tipo = h('select', {}, D.opciones.tipos.map(function (o) { return h('option', { value: o }, o); }));
+    var visible = h('select', {}, D.opciones.visibles.map(function (o) { return h('option', { value: o }, o); }));
+    var link = h('input', { type: 'url', inputmode: 'url', placeholder: 'Link (opcional)' });
+    var detalle = h('input', { maxlength: '300' });
+    return h('details', {}, h('summary', {}, '+ Agregar renglón'),
+      h('label', {}, 'Qué entregás'), nombre,
+      h('label', {}, 'Tipo'), tipo,
+      h('label', {}, 'Link'), link,
+      h('label', {}, 'Cuándo se ve'), visible,
+      h('label', {}, 'Detalle'), detalle,
+      h('div', { class: 'acc' }, h('button', { class: 'btn lleno', onclick: function () {
+        hacer(srv('panelSumarArchivo', codigo, { nombre: nombre.value, tipo: tipo.value, visible: visible.value, link: link.value, detalle: detalle.value }),
+          function (r) { renglones[codigo] = r; pintar(); avisar('Renglón agregado'); });
+      } }, 'Agregar')));
+  }
+
+  /* ---------- general ---------- */
+  function pintar() {
+    document.body.className = pestana;
+    ['cot', 'ent'].forEach(function (k) { document.getElementById('t-' + k).setAttribute('aria-selected', String(pestana === k)); });
+    var app = document.getElementById('app');
+    app.textContent = '';
+    if (!D) return;
+    if (pestana === 'cot') pintarCot(app); else pintarEnt(app);
+  }
+  function cambiarPestana(k) { pestana = k; abierta = ''; pintar(); }
+  document.getElementById('t-cot').addEventListener('click', function () { cambiarPestana('cot'); });
+  document.getElementById('t-ent').addEventListener('click', function () { cambiarPestana('ent'); });
+  hacer(srv('panelDatos'), function (r) { D = r; pintar(); });
+})();
+</script></body></html>`;
 }
 
 /* ---------- armado de la planilla ---------- */

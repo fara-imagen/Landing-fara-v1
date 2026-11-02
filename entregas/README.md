@@ -105,6 +105,21 @@ Por eso la fila `Vencida` queda en **rojo** en la planilla. Cuando la veas:
 1. Borrá la carpeta o cerrale el permiso en Drive o Pixieset.
 2. Pasá el Estado a `Archivos borrados`. El rojo se apaga.
 
+## Panel para el celular
+Una pantalla con la marca de FÁRA para manejar cotizaciones y entregas sin abrir la planilla. Vive dentro del mismo script, así que no necesita deploy de Netlify ni de Claude.
+- **Cotizaciones** (ámbar): lista con estado, pago y total. Tocá una para cambiar Estado y Pago con un toque, copiar el link o mandarlo por WhatsApp. **Nueva cotización**: 3 letras, empresa, nombre, título e ítems del Catálogo con el total a la vista. Lo poco usado está en **Más datos**.
+- **Entregas** (petróleo): lista con estado y fecha límite. Tocá una para cambiar el Estado, ver sus renglones, pegar un link, cambiar Tipo y Cuándo se ve, o agregar un renglón.
+- Cada acción hace lo mismo que editar la planilla: actualiza la última modificación y la copia rápida, completa la fecha límite y crea la entrega al aceptar o pagar.
+- La planilla sigue siendo editable como siempre. El panel no agrega columnas.
+
+**Seguridad.** Solo abre con la cuenta fara.imagen@gmail.com. El servidor lo comprueba en la pantalla y en cada acción, y valida estados, tipos y links. La dirección pública (la que usa la web) no da acceso al panel.
+
+**Publicarlo (una sola vez, lo hace Matías):**
+1. En el script: **Implementar → Nueva implementación → Aplicación web**.
+2. **Ejecutar como: Usuario que accede a la aplicación web**. **Quién tiene acceso: Solo yo**.
+3. Copiá la URL que termina en `/exec`, abrila en el celular y agregala a la pantalla de inicio.
+4. Para que la dirección pública traiga lo último, en su implementación elegí **Editar → Nueva versión**.
+
 ## Sacarla de la web
 Cambiá el Estado a `Anulada` o `Pausada`. Para sacar un solo renglón, ponelo en `Oculto`.
 No borres filas: si borrás una fila entera, la copia rápida puede seguir mostrando ese link hasta 6 horas.
