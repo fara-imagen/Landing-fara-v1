@@ -62,3 +62,12 @@
   [headers.values]
     X-Robots-Tag = "noindex, nofollow"
     Referrer-Policy = "no-referrer"
+
+# El panel es privado: no se indexa y solo puede hablar con el script de la planilla
+[[headers]]
+  for = "/panel-cotizaciones/*"
+  [headers.values]
+    X-Robots-Tag = "noindex, nofollow"
+    Referrer-Policy = "no-referrer"
+    Cache-Control = "no-cache"
+    Content-Security-Policy = "default-src 'none'; script-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https://res.cloudinary.com; connect-src https://script.google.com https://script.googleusercontent.com; base-uri 'none'; form-action 'none'; frame-ancestors 'none'"

@@ -106,19 +106,22 @@ Por eso la fila `Vencida` queda en **rojo** en la planilla. Cuando la veas:
 2. Pasá el Estado a `Archivos borrados`. El rojo se apaga.
 
 ## Panel para el celular
-Una pantalla con la marca de FÁRA para manejar cotizaciones y entregas sin abrir la planilla. Vive dentro del mismo script, así que no necesita deploy de Netlify ni de Claude.
-- **Cotizaciones** (ámbar): lista con estado, pago y total. Tocá una para cambiar Estado y Pago con un toque, copiar el link o mandarlo por WhatsApp. **Nueva cotización**: 3 letras, empresa, nombre, título e ítems del Catálogo con el total a la vista. Lo poco usado está en **Más datos**.
-- **Entregas** (petróleo): lista con estado y fecha límite. Tocá una para cambiar el Estado, ver sus renglones, pegar un link, cambiar Tipo y Cuándo se ve, o agregar un renglón.
+`faraimagen.com.ar/panel-cotizaciones` maneja cotizaciones y entregas sin abrir la planilla. La página no guarda datos: se los pide al script, y el script solo responde con la clave.
+- **Cotizaciones** (ámbar): lista con estado, pago y total. Tocá una para cambiar Estado y Pago con un toque, copiar el link o mandarlo por WhatsApp. **Nueva cotización**: 3 letras, empresa, nombre, título e ítems del Catálogo con el total a la vista. **Editar cotización** abre todo lo cargado: datos, ítems, descuento, condiciones y fecha de validez. Se puede agregar o quitar ítems. El cliente ve los cambios en su mismo link. Si ya tiene entrega, esa no cambia.
+- **Entregas** (petróleo): lista con estado y fecha límite. Tocá una para cambiar el Estado, ver sus renglones, pegar un link con **Guardar link**, cambiar Tipo y Cuándo se ve, o agregar un renglón.
 - Cada acción hace lo mismo que editar la planilla: actualiza la última modificación y la copia rápida, completa la fecha límite y crea la entrega al aceptar o pagar.
-- La planilla sigue siendo editable como siempre. El panel no agrega columnas.
+- **Agregar foto**: en un renglón, para dejar asentado lo que entregaste, como un fotolibro o una impresión 3D. El panel la achica a WebP y el renglón pasa a Tipo `Entregado`, con su link. Respeta lo elegido en Cuándo se ve.
+- La planilla sigue siendo editable como siempre.
 
-**Seguridad.** Solo abre con la cuenta fara.imagen@gmail.com. El servidor lo comprueba en la pantalla y en cada acción, y valida estados, tipos y links. La dirección pública (la que usa la web) no da acceso al panel.
+**Las fotos** quedan en la carpeta **FÁRA · Fotos de entregas** de Google Drive, que se crea sola. La podés renombrar o mover. Cualquiera con el link de una foto puede verla. Si borrás una foto, su link deja de funcionar: acordate de limpiar ese renglón. Si borrás la carpeta entera, se crea otra con la próxima foto.
 
-**Publicarlo (una sola vez, lo hace Matías):**
-1. En el script: **Implementar → Nueva implementación → Aplicación web**.
-2. **Ejecutar como: Usuario que accede a la aplicación web**. **Quién tiene acceso: Solo yo**.
-3. Copiá la URL que termina en `/exec`, abrila en el celular y agregala a la pantalla de inicio.
-4. Para que la dirección pública traiga lo último, en su implementación elegí **Editar → Nueva versión**.
+**Entrar.** La primera vez pegás la clave y ese celular la recuerda. **Salir** la borra de ese celular. Para tener un ícono: en Chrome, tres puntos → **Agregar a la pantalla principal**.
+
+**Crear o cambiar la clave.** Menú **FÁRA Cotizaciones → Crear clave del panel**. Se muestra una sola vez: guardala en tu gestor de contraseñas. Si perdés el celular o sospechás algo, creá otra: la anterior deja de servir en todos lados.
+
+**Seguridad.** Quien tenga la clave entra, así que no la mandes por chats compartidos ni la escribas en el repo. El script guarda solo su huella, no la clave. Después de 10 intentos mal deja de atender 15 minutos. El servidor valida estados, tipos y links. El panel no toca la planilla por fuera de estas acciones.
+
+**Si cambia el panel.** Lo que cambie en `Code.gs` necesita **Implementar → Gestionar implementaciones → lápiz → Nueva versión** en la implementación pública. La página se actualiza con el deploy.
 
 ## Sacarla de la web
 Cambiá el Estado a `Anulada` o `Pausada`. Para sacar un solo renglón, ponelo en `Oculto`.
@@ -140,6 +143,7 @@ Cada sección tiene su menú: **FÁRA Cotizaciones** y **FÁRA Entregas**.
 - `entrega/index.html`: la plantilla.
 - `assets/entrega.css`: estilos propios de la entrega. El resto sale de `style.css` y `cotizacion.css`.
 - `assets/js/entrega.js`: lee la entrega y la muestra.
+- `panel-cotizaciones/index.html`, `assets/panel.css` y `assets/js/panel.js`: el panel.
 - `cotizaciones/Code.gs`: el script de la planilla, compartido con las cotizaciones.
 - `netlify.toml`: la regla que manda `/entrega/*` a la plantilla.
 
