@@ -8,7 +8,7 @@
  * onEdit() ........ completa datos del Catálogo, la última modificación y la fecha límite,
  *                   y crea la entrega de una cotización al aceptarla o marcar un pago.
  * avisosEntregas() manda los mails de vencimiento y marca las vencidas. Corre solo una vez por día.
- * doPost() ........ atiende a faraimagen.com.ar/panel-cotizaciones: sin la clave no lee ni cambia nada.
+ * doPost() ........ atiende a faraimagen.com.ar/panel-cotizaciones: sin sesión no lee ni cambia nada.
  *
  * Instrucciones en cotizaciones/README.md y entregas/README.md.
  */
@@ -795,11 +795,15 @@ function completarDesdeCatalogo(hoja, fila, servicio) {
 }
 
 /* ---------- panel para el celular ----------
-   faraimagen.com.ar/panel-cotizaciones le habla a doPost(), y cada pedido trae la clave.
-   Acá solo queda su huella: la clave no se puede leer ni desde el script.
+   faraimagen.com.ar/panel-cotizaciones le habla a doPost(). La clave se usa una vez, para
+   abrir una sesión en ese celular; después cada pedido trae la sesión, no la clave.
+   Acá solo quedan huellas: ni la clave ni las sesiones se pueden leer desde el script.
    Escribir por script no dispara onEdit, así que cada acción hace a mano lo mismo que él. */
 
 const PROP_CLAVE = 'panelClave';
+const PROP_SESIONES = 'panelSesiones';
+const DIAS_SESION = 365;
+const MAX_SESIONES = 5;
 const PROP_CARPETA = 'panelCarpetaFotos';
 const CARPETA_FOTOS = 'FÁRA · Fotos de entregas';
 const MAX_FOTO = 10000000; // caracteres de la foto ya comprimida: unos 7 MB
@@ -816,21 +820,75 @@ function doPost(e) {
   } catch (err) {
     return responder('{"ok":false}');
   }
-  const cache = CacheService.getScriptCache();
-  const fallos = Number(cache.get('panel:fallos')) || 0;
-  if (fallos >= INTENTOS_PANEL) return responder('{"ok":false,"bloqueado":true}');
-  if (!claveCorrecta(pedido.clave)) {
-    cache.put('panel:fallos', String(fallos + 1), BLOQUEO_PANEL);
-    return responder('{"ok":false,"clave":true}');
+  if (pedido.accion === 'entrar') return entrarAlPanel(Array.isArray(pedido.args) ? pedido.args[0] : '');
+  if (!sesionValida(pedido.sesion)) return responder('{"ok":false,"sesion":true}');
+  if (pedido.accion === 'salir') {
+    cerrarSesion(pedido.sesion);
+    return responder('{"ok":true}');
   }
-  if (fallos) cache.remove('panel:fallos');
   if (!Object.prototype.hasOwnProperty.call(ACCIONES_PANEL, pedido.accion)) return responder('{"ok":false}');
+  // de a un pedido por vez: dos cambios juntos podrían pisar la misma fila
+  const candado = LockService.getScriptLock();
+  if (!candado.tryLock(20000)) return responder('{"ok":false,"error":"Hay otro cambio en curso. Probá de nuevo."}');
   try {
     const args = Array.isArray(pedido.args) ? pedido.args : [];
     return responder(JSON.stringify({ ok: true, datos: ACCIONES_PANEL[pedido.accion].apply(null, args) }));
   } catch (err) {
     return responder(JSON.stringify({ ok: false, error: err.message }));
+  } finally {
+    candado.releaseLock();
   }
+}
+
+// el bloqueo frena solo a quien prueba claves: los celulares con sesión siguen funcionando
+function entrarAlPanel(clave) {
+  const cache = CacheService.getScriptCache();
+  const fallos = Number(cache.get('panel:fallos')) || 0;
+  if (fallos >= INTENTOS_PANEL) return responder('{"ok":false,"bloqueado":true}');
+  if (!claveCorrecta(clave)) {
+    cache.put('panel:fallos', String(fallos + 1), BLOQUEO_PANEL);
+    return responder('{"ok":false,"clave":true}');
+  }
+  if (fallos) cache.remove('panel:fallos');
+  return responder(JSON.stringify({ ok: true, datos: { sesion: abrirSesion() } }));
+}
+
+function leerSesiones() {
+  try {
+    return JSON.parse(PropertiesService.getScriptProperties().getProperty(PROP_SESIONES) || '{}');
+  } catch (err) {
+    return {};
+  }
+}
+
+function guardarSesiones(sesiones) {
+  PropertiesService.getScriptProperties().setProperty(PROP_SESIONES, JSON.stringify(sesiones));
+}
+
+function abrirSesion() {
+  const sesion = Utilities.base64EncodeWebSafe(Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256, Utilities.getUuid() + Utilities.getUuid()));
+  const ahora = new Date().getTime();
+  const sesiones = leerSesiones();
+  const quedan = {};
+  // solo las vigentes y más nuevas: el total nunca pasa de MAX_SESIONES
+  Object.keys(sesiones).filter(function (h) { return sesiones[h] > ahora; })
+    .sort(function (a, b) { return sesiones[b] - sesiones[a]; })
+    .slice(0, MAX_SESIONES - 1)
+    .forEach(function (h) { quedan[h] = sesiones[h]; });
+  quedan[huella(sesion)] = ahora + DIAS_SESION * 86400000;
+  guardarSesiones(quedan);
+  return sesion;
+}
+
+function sesionValida(sesion) {
+  if (typeof sesion !== 'string' || !sesion) return false;
+  return leerSesiones()[huella(sesion)] > new Date().getTime();
+}
+
+function cerrarSesion(sesion) {
+  const sesiones = leerSesiones();
+  delete sesiones[huella(sesion)];
+  guardarSesiones(sesiones);
 }
 
 function huella(clave) {
@@ -846,13 +904,14 @@ function crearClavePanel() {
   const ui = SpreadsheetApp.getUi();
   const propiedades = PropertiesService.getScriptProperties();
   if (propiedades.getProperty(PROP_CLAVE)) {
-    const seguir = ui.alert('Crear clave del panel', 'Ya hay una clave. Si creás otra, la anterior deja de servir y hay que volver a entrar en cada celular. ¿Seguís?', ui.ButtonSet.YES_NO);
+    const seguir = ui.alert('Crear clave del panel', 'Ya hay una clave. Si creás otra, la anterior deja de servir y se cierra el panel en todos los celulares. ¿Seguís?', ui.ButtonSet.YES_NO);
     if (seguir !== ui.Button.YES) return;
   }
   const bytes = Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256, Utilities.getUuid() + Utilities.getUuid());
   let clave = '';
   for (let i = 0; i < 16; i++) clave += (i && i % 4 === 0 ? '-' : '') + LETRAS[(bytes[i] & 255) % LETRAS.length];
   propiedades.setProperty(PROP_CLAVE, huella(clave));
+  guardarSesiones({});
   ui.alert('Clave del panel', 'Copiala ahora: no se vuelve a mostrar.\n\n' + clave + '\n\nEntrá a faraimagen.com.ar/panel-cotizaciones desde tu celular y pegala una sola vez.', ui.ButtonSet.OK);
 }
 
@@ -872,7 +931,7 @@ const importe = function (v) {
 };
 const mailDelPanel = function (v) {
   const mail = texto(v).slice(0, 200);
-  if (mail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(mail)) throw new Error('Ese mail no parece válido.');
+  if (mail && !/^[^\s@=+\-][^\s@]*@[^\s@]+\.[^\s@]+$/.test(mail)) throw new Error('Ese mail no parece válido.');
   return mail;
 };
 const pedirCodigo = function (v) {
@@ -901,7 +960,7 @@ function panelDatos() {
     .map(function (r) {
       return {
         codigo: texto(r[COL.codigo]), empresa: texto(r[COL.cliente]), contacto: texto(r[COL.contacto]), mail: texto(r[COL.mail]),
-        titulo: texto(r[COL.titulo]), estado: texto(r[COL.estado]), pago: texto(r[COL.pago]),
+        titulo: texto(r[COL.titulo]), estado: texto(r[COL.estado]), pago: texto(r[COL.pago]), emision: dia(r[COL.emision], zona),
         moneda: r[COL.moneda] === 'USD' ? 'USD' : 'ARS', total: numero(r[COL.total])
       };
     }).reverse();
@@ -1031,6 +1090,37 @@ function panelCotizacion(codigo) {
         };
       })
   };
+}
+
+// borra de verdad: los renglones quedan libres y el link deja de funcionar
+function vaciarRenglones(hoja, codigo, columnas) {
+  buscarCodigo(hoja, codigo).findAll().forEach(function (c) { hoja.getRange(c.getRow(), 1, 1, columnas).clearContent(); });
+}
+
+function panelEliminarCotizacion(codigo) {
+  codigo = pedirCodigo(codigo);
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const hoja = ss.getSheetByName(H_COT);
+  const fila = filaDe(hoja, codigo);
+  // Total y Link son fórmulas del encabezado: se vacían solas
+  hoja.getRange(fila, 1, 1, COL.total).clearContent();
+  hoja.getRange(fila, COL.actualizada + 1).clearContent();
+  hoja.getRange(fila, COL.mail + 1).clearContent();
+  vaciarRenglones(ss.getSheetByName(H_ITEMS), codigo, COL_ITEM.mostrar + 1);
+  CacheService.getScriptCache().remove(claveCache(codigo));
+  return panelDatos();
+}
+
+function panelEliminarEntrega(codigo) {
+  codigo = pedirCodigo(codigo);
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const hoja = ss.getSheetByName(H_ENT);
+  const fila = filaDe(hoja, codigo);
+  hoja.getRange(fila, 1, 1, COL_ENT.link).clearContent();
+  hoja.getRange(fila, COL_ENT.cotizacion + 1).clearContent();
+  vaciarRenglones(ss.getSheetByName(H_ARC), codigo, COL_ARC.visible + 1);
+  CacheService.getScriptCache().remove(claveEntrega(codigo));
+  return panelDatos();
 }
 
 function panelGuardarCotizacion(codigo, d) {
@@ -1180,6 +1270,8 @@ const ACCIONES_PANEL = {
   nuevaCotizacion: panelNuevaCotizacion,
   cotizacion: panelCotizacion,
   guardarCotizacion: panelGuardarCotizacion,
+  eliminarCotizacion: panelEliminarCotizacion,
+  eliminarEntrega: panelEliminarEntrega,
   cambiarCotizacion: panelCambiarCotizacion,
   cambiarEntrega: panelCambiarEntrega,
   renglones: panelRenglones,
@@ -1421,7 +1513,7 @@ function armarUso(ss) {
     '1. Menú FÁRA Cotizaciones → Nueva cotización. Escribí las 3 letras del cliente.',
     '2. En Cotizaciones, completá la fila nueva. Empresa es la marca. Nombre para el mail es a quién le escribís.',
     '3. Parado en esa fila, tocá FÁRA Cotizaciones → Ver ítems y completá los renglones. Para sumar otro: Agregar ítem. En Precio va el total del renglón: la cantidad no multiplica.',
-    '4. Cambiá el Estado a Enviada y mandale el link de la última columna.',
+    '4. Cambiá el Estado a Enviada y mandale el link de la columna Link.',
     '',
     'Cambiar una cotización',
     'Editá la celda. El cliente ve el cambio al recargar la página. Para volver a la lista completa: FÁRA Cotizaciones → Ver todos los ítems.',

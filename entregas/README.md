@@ -10,7 +10,7 @@ Cuando ponés una cotización en `Aceptada`, o marcás un pago, se crea sola su 
 - Toma empresa, nombre, título y logo de la cotización.
 - Cada ítem de la cotización aparece en Archivos con Tipo `En proceso`. Podés agregar, cambiar u ocultar lo que quieras.
 - Queda en Estado `En proceso`. El cliente no ve nada hasta que le mandes el link, que está en la pestaña Entregas.
-- Falta solo el **Mail del cliente**, porque la cotización no lo tiene. Sin mail no salen los avisos.
+- El **Mail del cliente** viene de la cotización, si lo cargaste. Sin mail no salen los avisos.
 
 El botón Aceptar de la página solo te manda un WhatsApp: no crea nada.
 
@@ -20,7 +20,7 @@ Una vez creada es independiente: si cambiás la cotización, la entrega no cambi
 1. En la planilla: menú **FÁRA Entregas → Nueva entrega**. Escribí las 3 letras del cliente.
 2. En **Entregas**, completá la fila. **Empresa** es lo que sale en la página. **Nombre para el mail** es el saludo: con `Leandro` el mail dice "Hola Leandro,". También podés poner `equipo de Ceniza`. **Mensaje** es opcional: sale arriba, debajo del título, y si queda vacío no se ve nada. Con **Mail del cliente** le llegan los avisos de vencimiento.
 3. Parado en esa fila, tocá **FÁRA Entregas → Ver archivos** y cargá un renglón por cada cosa que entregás. Para sumar otro: **FÁRA Entregas → Agregar archivo**.
-4. Elegí el **Estado** y mandale al cliente el link de la última columna.
+4. Elegí el **Estado** y mandale al cliente el link de la columna **Link**.
 
 Un renglón con link muestra un botón. Sin link, se ve solo el texto. Podés pegar el link con o sin `https://`. Si la dirección no sirve, la celda se pone en rojo.
 
@@ -111,15 +111,21 @@ Por eso la fila `Vencida` queda en **rojo** en la planilla. Cuando la veas:
 - **Entregas** (petróleo): lista con estado y fecha límite. Tocá una para cambiar el Estado, ver sus renglones, pegar un link con **Guardar link**, cambiar Tipo y Cuándo se ve, o agregar un renglón.
 - Cada acción hace lo mismo que editar la planilla: actualiza la última modificación y la copia rápida, completa la fecha límite y crea la entrega al aceptar o pagar.
 - **Agregar foto**: en un renglón, para dejar asentado lo que entregaste, como un fotolibro o una impresión 3D. El panel la achica a WebP y el renglón pasa a Tipo `Entregado`, con su link. Respeta lo elegido en Cuándo se ve.
+- **Buscar, filtrar y ordenar**: el buscador mira empresa, nombre, título, mail y código. **Activas** esconde lo cerrado: en cotizaciones, Vencida y Anulada; en entregas, Archivos borrados y Anulada. Lo cerrado no se borra: aparece al buscarlo, con **Todas** o eligiendo su estado.
+- **Eliminar** borra de verdad: la fila y sus renglones se vacían y el link deja de funcionar. Una cotización eliminada no borra su entrega. Una entrega eliminada no borra su cotización ni las fotos: si después cambiás el pago de esa cotización, la entrega se vuelve a crear.
 - La planilla sigue siendo editable como siempre.
 
 **Las fotos** quedan en la carpeta **FÁRA · Fotos de entregas** de Google Drive, que se crea sola. La podés renombrar o mover. Cualquiera con el link de una foto puede verla. Si borrás una foto, su link deja de funcionar: acordate de limpiar ese renglón. Si borrás la carpeta entera, se crea otra con la próxima foto.
 
-**Entrar.** La primera vez pegás la clave y ese celular la recuerda. **Salir** la borra de ese celular. Para tener un ícono: en Chrome, tres puntos → **Agregar a la pantalla principal**.
+**Entrar.** La primera vez pegás la clave. Ese celular abre una sesión de un año y entra directo; la clave no queda guardada en el celular. **Salir** cierra la sesión de ese celular. Para tener un ícono: en Chrome, tres puntos → **Agregar a la pantalla principal**.
 
-**Crear o cambiar la clave.** Menú **FÁRA Cotizaciones → Crear clave del panel**. Se muestra una sola vez: guardala en tu gestor de contraseñas. Si perdés el celular o sospechás algo, creá otra: la anterior deja de servir en todos lados.
+**Crear o cambiar la clave.** Menú **FÁRA Cotizaciones → Crear clave del panel**. Se muestra una sola vez: guardala en tu gestor de contraseñas. Si perdés el celular o sospechás algo, creá otra: se cierra el panel en todos los celulares al instante.
 
-**Seguridad.** Quien tenga la clave entra, así que no la mandes por chats compartidos ni la escribas en el repo. El script guarda solo su huella, no la clave. Después de 10 intentos mal deja de atender 15 minutos. El servidor valida estados, tipos y links. El panel no toca la planilla por fuera de estas acciones.
+**Seguridad.**
+- Quien tenga la clave puede entrar, y quien tenga tu celular desbloqueado también: no la mandes por chats compartidos ni la escribas en el repo.
+- El script guarda solo huellas de la clave y de las sesiones. Hay hasta 5 sesiones a la vez.
+- Después de 10 claves mal no acepta más intentos por 15 minutos. Los celulares con sesión siguen funcionando.
+- El servidor valida estados, tipos, links y mails, y atiende de a un cambio por vez.
 
 **Si cambia el panel.** Lo que cambie en `Code.gs` necesita **Implementar → Gestionar implementaciones → lápiz → Nueva versión** en la implementación pública. La página se actualiza con el deploy.
 

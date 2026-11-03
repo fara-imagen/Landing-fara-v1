@@ -1,8 +1,8 @@
 /* ==========================================================
    FÁRA · assets/js/panel.js
    Panel privado: habla con el script de la planilla "FÁRA · Cotizaciones".
-   La clave se pide una vez y queda solo en este navegador. Sin ella el
-   script no entrega nada: esta página, sola, no tiene ningún dato.
+   La clave se usa una vez, para abrir una sesión en este navegador: lo que
+   queda guardado es la sesión. Sin ella el script no entrega nada.
    Todo el contenido se escribe como texto (nunca como HTML).
    ========================================================== */
 (function (w, d) {
@@ -10,7 +10,7 @@
 
   /* API: la misma dirección /exec de assets/js/cotizacion.js */
   const API = 'https://script.google.com/macros/s/AKfycbxkYwQ-kbpUrgIhF8RF58sCLI0ZEj-TtX3VcdI8tccmWyJNjqBTI6rKr6DZVTwiBxC47A/exec';
-  const GUARDADA = 'fara-panel-clave';
+  const GUARDADA = 'fara-panel-sesion';
   const ESPERA_MAX = 30000;
   const ESPERA_FOTO = 90000;
   const FOTO_LADO = 1600; /* píxeles del lado más largo */
@@ -26,11 +26,20 @@
   const aviso = d.getElementById('panAviso');
   const velo = d.getElementById('panVelo');
 
-  let clave = '';
+  let sesion = '';
   let D = null;
   let pestana = 'cot';
   let abierta = '';
   const renglones = {};
+  /* lo cerrado sale de la vista normal, sin borrarse: se ve con Todas o eligiendo su estado */
+  const VISTAS = {
+    cot: { cerradas: ['Anulada', 'Vencida'], ordenes: ['Más nuevas', 'Más viejas', 'Empresa A-Z', 'Mayor total'] },
+    ent: { cerradas: ['Archivos borrados', 'Anulada'], ordenes: ['Más nuevas', 'Más viejas', 'Empresa A-Z', 'Vence primero'] }
+  };
+  const vista = {
+    cot: { busqueda: '', filtro: 'Activas', orden: 'Más nuevas' },
+    ent: { busqueda: '', filtro: 'Activas', orden: 'Más nuevas' }
+  };
   const borradores = {}; // links escritos sin guardar: sobreviven a cada repintado
 
   /* ---------- utilidades ---------- */
@@ -54,18 +63,22 @@
   }
 
   const plata = function (n, moneda) { return (moneda === 'USD' ? 'US$ ' : '$ ') + Number(n || 0).toLocaleString('es-AR'); };
-  const decimal = function (v) { return String(v).replace(',', '.').trim(); };
+  /* acepta 350.000, 350000 y 1.000,50: el punto de miles no es un decimal */
+  const decimal = function (v) {
+    const t = String(v).replace(/[\s$]/g, '');
+    return (/^\d{1,3}(\.\d{3})+(,\d+)?$/.test(t) ? t.replace(/\./g, '') : t).replace(',', '.');
+  };
 
   function fechaCorta(iso) {
     const p = String(iso || '').split('-');
     return p.length === 3 ? p[2] + '/' + p[1] + '/' + p[0] : '';
   }
 
-  /* el almacenamiento puede estar bloqueado: sin él, la clave dura hasta cerrar la pestaña */
-  function leerClave() {
+  /* el almacenamiento puede estar bloqueado: sin él, la sesión dura hasta cerrar la pestaña */
+  function leerSesion() {
     try { return w.localStorage.getItem(GUARDADA) || ''; } catch (e) { return ''; }
   }
-  function guardarClave(v) {
+  function guardarSesion(v) {
     try {
       if (v) w.localStorage.setItem(GUARDADA, v);
       else w.localStorage.removeItem(GUARDADA);
@@ -82,16 +95,17 @@
     return fetch(API, {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify({ clave: clave, accion: accion, args: args }),
+      body: JSON.stringify({ sesion: sesion, accion: accion, args: args }),
       credentials: 'omit',
       signal: corte.signal
-    }).then(function (r) { return r.json(); }, function () {
+    }).then(function (r) { return r.json(); }).catch(function () {
       throw new Error('No pude conectar. Probá de nuevo.');
     }).then(function (r) {
       clearTimeout(reloj);
       if (r.ok) return r.datos;
-      if (r.clave || r.bloqueado) {
-        const motivo = new Error(r.bloqueado ? 'Demasiados intentos. Esperá 15 minutos.' : 'Esa clave no es correcta.');
+      if (r.clave || r.bloqueado || r.sesion) {
+        const motivo = new Error(r.bloqueado ? 'Demasiados intentos. Esperá 15 minutos.'
+          : r.clave ? 'Esa clave no es correcta.' : 'Tu sesión se cerró. Entrá de nuevo con la clave.');
         motivo.entrada = true;
         throw motivo;
       }
@@ -136,8 +150,8 @@
   /* ---------- entrada ---------- */
 
   function pedirClave(error) {
-    guardarClave('');
-    clave = '';
+    guardarSesion('');
+    sesion = '';
     D = null;
     capaHoja.textContent = '';
     pestanas.hidden = true;
@@ -153,16 +167,17 @@
       ev.preventDefault();
       const escrita = campo.value.trim().toLowerCase();
       if (!escrita) return;
-      clave = escrita;
       velo.hidden = false;
-      srv('datos').then(function (r) {
+      srv('entrar', escrita).then(function (r) {
+        sesion = r.sesion;
+        guardarSesion(sesion);
+        return srv('datos');
+      }).then(function (r) {
         velo.hidden = true;
-        guardarClave(clave);
         D = r;
         arrancar();
       }, function (e) {
         velo.hidden = true;
-        clave = '';
         mensaje.textContent = e.message;
         campo.select();
       });
@@ -214,6 +229,74 @@
 
   function cuantas(n, una, varias) { return n + ' ' + (n === 1 ? una : varias); }
 
+  const sinAcentos = function (t) { return String(t || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase(); };
+
+  /* aplica búsqueda, filtro y orden; el arreglo viene de la más nueva a la más vieja */
+  function elegirFilas(filas, tipo) {
+    const v = vista[tipo];
+    const buscado = sinAcentos(v.busqueda).trim();
+    const salen = filas.filter(function (f) {
+      /* al buscar aparece todo: lo anulado se encuentra sin tocar el filtro */
+      if (v.filtro === 'Activas' && !buscado && VISTAS[tipo].cerradas.indexOf(f.estado) >= 0) return false;
+      if (v.filtro !== 'Activas' && v.filtro !== 'Todas' && f.estado !== v.filtro) return false;
+      return !buscado || sinAcentos([f.empresa, f.contacto, f.titulo, f.mail, f.codigo].join(' ')).indexOf(buscado) >= 0;
+    });
+    const empresa = function (a, b) { return (a.empresa || '').localeCompare(b.empresa || '', 'es'); };
+    if (v.orden === 'Más viejas') salen.reverse();
+    if (v.orden === 'Empresa A-Z') salen.sort(empresa);
+    if (v.orden === 'Mayor total') salen.sort(function (a, b) { return b.total - a.total; });
+    if (v.orden === 'Vence primero') {
+      /* las que no tienen fecha van al final */
+      salen.sort(function (a, b) { return (a.limite || '9999').localeCompare(b.limite || '9999'); });
+    }
+    return salen;
+  }
+
+  /* buscador, filtro y orden quedan fijos: al escribir solo se repinta la lista */
+  function pintarListado(tipo, filas, estados, nombre, nombres, dibujar) {
+    const v = vista[tipo];
+    const lista = h('div', { class: 'pan-lista' });
+    const cuenta = h('p', { class: 'pan-cuenta', role: 'status' });
+    function llenar() {
+      const salen = elegirFilas(filas, tipo);
+      lista.textContent = '';
+      salen.forEach(function (f) { lista.append(dibujar(f)); });
+      if (!salen.length) lista.append(h('p', { class: 'pan-vacio' }, filas.length ? 'Nada coincide con lo que buscás.' : 'Todavía no hay ' + nombres + '.'));
+      cuenta.textContent = 'Mostrando ' + salen.length + ' de ' + cuantas(filas.length, nombre, nombres);
+    }
+    const elegir = function (valor, opciones, etiqueta, guardar) {
+      return h('select', {
+        'aria-label': etiqueta, value: valor,
+        onchange: function (ev) { guardar(ev.target.value); llenar(); }
+      }, opciones.map(function (o) { return h('option', { value: o, selected: o === valor }, o); }));
+    };
+    raiz.append(h('section', { class: 'pan-controles' },
+      h('input', {
+        type: 'search', placeholder: 'Buscar por empresa, nombre, título o mail', 'aria-label': 'Buscar', autocomplete: 'off',
+        value: v.busqueda, oninput: function (ev) { v.busqueda = ev.target.value; llenar(); }
+      }),
+      h('div', { class: 'pan-orden' },
+        elegir(v.filtro, ['Activas', 'Todas'].concat(estados), 'Filtrar', function (o) { v.filtro = o; }),
+        elegir(v.orden, VISTAS[tipo].ordenes, 'Ordenar', function (o) { v.orden = o; }))),
+      cuenta, lista);
+    llenar();
+  }
+
+  function botonEliminar(texto, aviso2, accion, codigo) {
+    return h('button', {
+      class: 'pan-quitar', type: 'button',
+      onclick: function () {
+        if (!w.confirm(aviso2)) return;
+        hacer(srv(accion, codigo), function (r) {
+          D = r;
+          abierta = '';
+          pintar();
+          avisar('Eliminada');
+        });
+      }
+    }, texto);
+  }
+
   function botonesLink(codigo, contacto, esEntrega) {
     if (!RE_CODIGO.test(codigo)) return null;
     const link = (esEntrega ? D.sitioEntrega : D.sitio) + codigo;
@@ -244,8 +327,7 @@
   function pintarCot() {
     raiz.append(cabecera('Cotizaciones', cuantas(D.cotizaciones.length, 'cotización', 'cotizaciones'),
       h('button', { class: 'btn btn-accent', type: 'button', onclick: function () { abrirFormulario(); } }, 'Nueva cotización')));
-    if (!D.cotizaciones.length) raiz.append(h('p', { class: 'pan-vacio' }, 'Todavía no hay cotizaciones.'));
-    raiz.append(h('div', { class: 'pan-lista' }, D.cotizaciones.map(function (c) {
+    pintarListado('cot', D.cotizaciones, D.opciones.estadosCot, 'cotización', 'cotizaciones', function (c) {
       return tarjeta(c.codigo, c.empresa, c.titulo, [
         marca(c.estado || 'Sin estado', c.estado === 'Enviada' || c.estado === 'Aceptada' ? 'ok' : ''),
         marca(c.pago || 'Pendiente'),
@@ -269,16 +351,23 @@
               pintar();
               avisar('Mail guardado');
             });
-          }));
+          }),
+          botonEliminar('Eliminar cotización', '¿Eliminar la cotización de ' + (c.empresa || c.codigo) + '? No se puede deshacer: el link deja de funcionar. Si tiene entrega, esa queda.', 'eliminarCotizacion', c.codigo));
       });
-    })));
+    });
+  }
+
+  /* lo que se cierra sale de Activas: el aviso dice dónde quedó */
+  function avisarCambio(tipo, valor) {
+    const seVa = vista[tipo].filtro === 'Activas' && VISTAS[tipo].cerradas.indexOf(valor) >= 0;
+    avisar(seVa ? 'Quedó en ' + valor + '. La encontrás buscándola o con el filtro Todas.' : 'Listo');
   }
 
   function cambiarCot(codigo, campo, valor) {
     hacer(srv('cambiarCotizacion', codigo, campo, valor), function (r) {
       D = r;
       pintar();
-      avisar('Listo');
+      avisarCambio('cot', valor);
     });
   }
 
@@ -314,7 +403,12 @@
     }
     function sumar() {
       const activos = elegidos.filter(function (e) { return e.activo(); });
-      let suma = activos.reduce(function (t, e) { return t + (Number(decimal(e.precio.value)) || 0); }, 0);
+      /* mismo cálculo que la planilla: descuento propio del ítem y sin los ocultos */
+      let suma = activos.reduce(function (t, e) {
+        if (e.oculto) return t;
+        const pct = Number(e.descuentoPct) || 0;
+        return t + (Number(decimal(e.precio.value)) || 0) * (1 - (pct < 1 ? pct : pct / 100));
+      }, 0);
       const descuento = Number(decimal(f.descuentoValor ? f.descuentoValor.value : '')) || 0;
       if (descuento && f.descuentoTipo.value === '%') suma = suma * (1 - descuento / 100);
       else if (descuento) suma = suma - descuento;
@@ -376,7 +470,7 @@
         detalle.campos.unidad.value = previo.unidad;
       }
       const item = {
-        previo: !!previo, precio: precio, campos: detalle.campos, activo: function () { return true; },
+        previo: !!previo, oculto: !!previo && previo.mostrar === false, descuentoPct: previo ? previo.descuentoPct : '', precio: precio, campos: detalle.campos, activo: function () { return true; },
         leer: function () {
           const leido = Object.assign(leerItem(item, nombre.value), { alCatalogo: alCatalogo.checked });
           if (previo) { leido.descuentoPct = previo.descuentoPct; leido.mostrar = previo.mostrar; }
@@ -476,13 +570,12 @@
   /* entregas */
   function pintarEnt() {
     raiz.append(cabecera('Entregas', cuantas(D.entregas.length, 'entrega', 'entregas')));
-    if (!D.entregas.length) raiz.append(h('p', { class: 'pan-vacio' }, 'Todavía no hay entregas.'));
-    raiz.append(h('div', { class: 'pan-lista' }, D.entregas.map(function (e) {
+    pintarListado('ent', D.entregas, D.opciones.estadosEnt, 'entrega', 'entregas', function (e) {
       return tarjeta(e.codigo, e.empresa, e.titulo, [
         marca(e.estado || 'Sin estado', e.estado === 'Disponible' ? 'ok' : e.estado === 'Vencida' ? 'mal' : ''),
         e.limite ? marca('Hasta ' + fechaCorta(e.limite)) : null
       ], function () { return cuerpoEntrega(e); }, function () { cargarRenglones(e.codigo); });
-    })));
+    });
   }
 
   function cargarRenglones(codigo) {
@@ -503,7 +596,7 @@
         hacer(srv('cambiarEntrega', e.codigo, 'estado', v), function (r) {
           D = r;
           pintar();
-          avisar('Listo');
+          avisarCambio('ent', v);
         });
       }),
       botonesLink(e.codigo, e.contacto, true),
@@ -523,6 +616,7 @@
     if (!filas.length) cuerpo.append(h('p', { class: 'pan-vacio' }, 'Sin renglones todavía.'));
     filas.forEach(function (r) { cuerpo.append(renglon(e.codigo, r)); });
     cuerpo.append(formRenglon(e.codigo));
+    cuerpo.append(botonEliminar('Eliminar entrega', '¿Eliminar la entrega de ' + (e.empresa || e.codigo) + '? No se puede deshacer: el link deja de funcionar. Las fotos quedan en tu carpeta de Drive.', 'eliminarEntrega', e.codigo));
     return cuerpo;
   }
 
@@ -667,11 +761,13 @@
   tabCot.addEventListener('click', function () { cambiarPestana('cot'); });
   tabEnt.addEventListener('click', function () { cambiarPestana('ent'); });
   salir.addEventListener('click', function () {
-    if (w.confirm('¿Salir? Para volver vas a necesitar la clave.')) pedirClave();
+    if (!w.confirm('¿Salir? Para volver vas a necesitar la clave.')) return;
+    srv('salir').catch(function () { /* igual se borra de este celular */ });
+    pedirClave();
   });
 
-  clave = leerClave();
-  if (!clave) {
+  sesion = leerSesion();
+  if (!sesion) {
     pedirClave();
     return;
   }
