@@ -1,4 +1,7 @@
 User-agent: *
 Allow: /
+Disallow: /cotizacion/
+Disallow: /entrega/
+Disallow: /panel-cotizaciones/
 
 Sitemap: https://faraimagen.com.ar/sitemap.xml

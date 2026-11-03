@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+
+<!-- Panel privado de FÁRA: sin Pixel ni medición. Los datos solo llegan con la clave. -->
+<title>Panel · FÁRA</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="referrer" content="no-referrer">
+<meta name="theme-color" content="#1A1410">
+
+<link rel="icon" type="image/png" href="https://res.cloudinary.com/eekglpse/image/upload/v1792547726/fara_favicon_48_positivo.png">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://res.cloudinary.com">
+<link rel="preconnect" href="https://script.google.com">
+<link rel="preconnect" href="https://script.googleusercontent.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@100..125,400..700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/style.css?v=3">
+<link rel="stylesheet" href="/assets/panel.css?v=2">
+<script src="/assets/js/panel.js?v=2" defer></script>
+</head>
+<body>
+
+<header class="header">
+  <div class="nav pan-nav">
+    <a class="nav-logo" href="/" aria-label="FÁRA, ir al inicio">
+      <img src="https://res.cloudinary.com/eekglpse/image/upload/f_png,h_160/c_crop,g_center,w_0.96,h_0.9/e_make_transparent:35/e_trim:10/e_colorize:100,co_rgb:1A1410/v1792547783/fara_marca_agua_logotipo_crema.svg" alt="FÁRA" height="21">
+    </a>
+    <button class="pan-salir" id="panSalir" type="button" hidden>Salir</button>
+  </div>
+</header>
+
+<main class="wrap pan-wrap" id="pan" aria-busy="true">
+  <div role="status" aria-label="Cargando el panel">
+    <div class="pan-sk pan-sk-hero"></div>
+    <div class="pan-sk"></div>
+    <div class="pan-sk"></div>
+  </div>
+  <noscript>
+    <div class="post-hero"><h1>El panel necesita JavaScript</h1></div>
+  </noscript>
+</main>
+
+<nav class="pan-pestanas" id="panPestanas" aria-label="Secciones" hidden>
+  <button type="button" id="panTabCot" aria-pressed="true">Cotizaciones</button>
+  <button type="button" id="panTabEnt" aria-pressed="false">Entregas</button>
+</nav>
+
+<div class="pan-aviso" id="panAviso" role="status" hidden></div>
+<div class="pan-velo" id="panVelo" hidden><span>Un momento…</span></div>
+<div id="panHoja"></div>
+
+</body>
+</html>

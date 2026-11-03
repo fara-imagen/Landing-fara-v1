@@ -5,6 +5,31 @@
 [functions]
   directory = "netlify/functions"
 
+# Cotizaciones: todas las direcciones /cotizacion/<codigo> muestran la misma plantilla
+[[redirects]]
+  from = "/cotizacion/*"
+  to = "/cotizacion/index.html"
+  status = 200
+
+# Entregas: todas las direcciones /entrega/<codigo> muestran la misma plantilla
+[[redirects]]
+  from = "/entrega/*"
+  to = "/entrega/index.html"
+  status = 200
+
+# Los manuales y el script de la planilla viven en el repo, no en la web
+[[redirects]]
+  from = "/cotizaciones/*"
+  to = "/404.html"
+  status = 404
+  force = true
+
+[[redirects]]
+  from = "/entregas/*"
+  to = "/404.html"
+  status = 404
+  force = true
+
 [[headers]]
   for = "/*"
   [headers.values]
@@ -24,3 +49,25 @@
   for = "/assets/*"
   [headers.values]
     Cache-Control = "public, max-age=3600"
+
+# Las cotizaciones no aparecen en buscadores
+[[headers]]
+  for = "/cotizacion/*"
+  [headers.values]
+    X-Robots-Tag = "noindex, nofollow"
+
+# Las entregas tampoco, y el código de cada cliente no viaja a otros sitios
+[[headers]]
+  for = "/entrega/*"
+  [headers.values]
+    X-Robots-Tag = "noindex, nofollow"
+    Referrer-Policy = "no-referrer"
+
+# El panel es privado: no se indexa y solo puede hablar con el script de la planilla
+[[headers]]
+  for = "/panel-cotizaciones/*"
+  [headers.values]
+    X-Robots-Tag = "noindex, nofollow"
+    Referrer-Policy = "no-referrer"
+    Cache-Control = "no-cache"
+    Content-Security-Policy = "default-src 'none'; script-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https://res.cloudinary.com; connect-src https://script.google.com https://script.googleusercontent.com; base-uri 'none'; form-action 'none'; frame-ancestors 'none'"
