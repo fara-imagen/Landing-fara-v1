@@ -82,7 +82,8 @@ Eventos del sitio:
 5) QUÉ HAY EN CADA CARPETA
 ==========================================================
 
-  index.html ...................... la landing (lee textos y fotos de tu planilla de Google)
+  apple-touch-icon.png ............ ícono de 180 px para iPhone (también en Cloudinary, Landing Page/02 Favicon)
+  index.html ...................... la landing (todo escrito en el HTML; de la planilla solo lee la galería y la casilla de mantenimiento)
   404.html ........................ página de error
   gracias/ ........................ confirmación de formulario (noindex, dispara Lead una vez)
   privacidad/ ..................... política de privacidad
@@ -100,13 +101,13 @@ Eventos del sitio:
 ==========================================================
 
 Si cambian, hay que actualizarlos en estos archivos:
-  - WhatsApp 5493885735415 ........ index.html (respaldo; manda el de la planilla),
+  - WhatsApp 5493885735415 ........ index.html (en cada botón de WhatsApp),
                                     gracias/, blog/por-que-te-piden-descuento/, llms.txt, ai.txt
   - Mail hola@faraimagen.com.ar ... privacidad/, llms.txt, ai.txt
   - Dominio faraimagen.com.ar ..... canonical de cada página, sitemap.xml, robots.txt,
                                     llms.txt, ai.txt, capi.js (lista de dominios permitidos)
-  - Instagram ..................... llms.txt, ai.txt y la planilla (general.instagram)
-  - Precio "desde ARS 90.000" .... llms.txt, ai.txt
+  - Instagram ..................... llms.txt, ai.txt y el pie de index.html
+  - Precio "desde ARS 90.000" .... llms.txt, ai.txt y las preguntas frecuentes de index.html (texto y JSON-LD)
 
 ==========================================================
 7) LO QUE NO SE INCLUYÓ
