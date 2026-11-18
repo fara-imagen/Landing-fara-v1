@@ -79,6 +79,80 @@ if(window.MK_PIXEL_ID.indexOf('TU_')!==0){
 }
 </script>
 
+<!-- Preguntas frecuentes: el mismo texto que la sección #preguntas. Si cambiás una respuesta, cambiala en los dos lugares -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "¿Cuánto cuesta una sesión de fotos de producto en CABA?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Desde ARS 90.000. El precio final depende de cuántos productos son y dónde vas a usar las fotos. Después de una reunión gratis de 15 minutos te mando una propuesta con precio cerrado, así sabés el total antes de empezar."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Cómo se paga?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "50 % de seña para reservar la fecha de la sesión y el otro 50 % antes de recibir las fotos."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Cuántas fotos incluye y en qué formatos las recibo?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "La cantidad se define en la propuesta según tus productos, desde 6 fotos. Las recibís en alta resolución para imprimir, en versión liviana para la web, recortadas en 4:5 y 9:16 para redes y con fondo recortado en PNG para tu tienda online."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿En cuánto tiempo recibo las fotos?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "En unos 7 días hábiles desde la sesión. En los proyectos más grandes, el plazo exacto queda escrito en la propuesta."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Dónde se hace la sesión?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "En mi estudio o en tu local, según qué le convenga a tu producto. Trabajo en la Ciudad Autónoma de Buenos Aires."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Puedo usar las fotos en anuncios, en mi tienda y en redes?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Sí, para lo que quieras: redes, tienda online, catálogo, impresos y publicidad. Si además querés que yo arme y maneje tus anuncios, lo cotizamos aparte."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Por qué no usar fotos hechas con IA?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Una imagen hecha con IA dibuja un producto parecido al tuyo. Quien te compra espera recibir lo que vio, y una foto real le muestra exactamente eso: tu color, tu textura, tu etiqueta."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Cómo te contacto para empezar a trabajar?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Escribime por WhatsApp y coordinamos la reunión de 15 minutos. Es gratis y sin compromiso."
+      }
+    }
+  ]
+}
+</script>
+
 <style>
 /* ============ TOKENS (paleta oficial FÁRA) ============ */
 :root{
@@ -95,7 +169,7 @@ if(window.MK_PIXEL_ID.indexOf('TU_')!==0){
   --on-dark-muted:rgba(242,235,221,.74);
   --line-dark:rgba(242,235,221,.18);
   --line:rgba(26,20,16,.12);
-  --radius:22px;
+  --radius:16px;
   --max:1160px;
   --ease:cubic-bezier(.23,1,.32,1);        /* ease-out firme: entradas y respuestas */
   --ease-io:cubic-bezier(.77,0,.175,1);   /* movimiento en pantalla */
@@ -135,7 +209,6 @@ h3{font-size:clamp(20px,2.1vw,24px);letter-spacing:-.015em;}
   display:inline-flex;align-items:center;gap:10px;
   font-size:13px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);
 }
-.eyebrow::before{content:"";width:22px;height:1px;background:var(--ambar);}
 .on-dark .eyebrow{color:var(--on-dark-muted);}
 .lead{font-size:clamp(17px,1.6vw,19px);}
 .section-head{max-width:680px;margin-bottom:40px;}
@@ -144,7 +217,7 @@ h3{font-size:clamp(20px,2.1vw,24px);letter-spacing:-.015em;}
 /* ============ BOTONES ============ */
 .btn{
   display:inline-flex;align-items:center;justify-content:center;gap:10px;
-  padding:16px 26px;border-radius:12px;border:none;cursor:pointer;
+  padding:16px 26px;border-radius:16px;border:none;cursor:pointer;
   font-family:var(--font);font-weight:700;font-size:16px;line-height:1.3;text-decoration:none;text-align:left;
   transition:transform 160ms var(--ease), box-shadow .2s ease, background .2s ease;
 }
@@ -183,16 +256,14 @@ h3{font-size:clamp(20px,2.1vw,24px);letter-spacing:-.015em;}
 .nav{
   max-width:var(--max);margin:0 auto;
   display:flex;align-items:center;justify-content:space-between;gap:16px;
-  padding:10px 10px 10px 20px;border-radius:18px;
+  padding:10px 10px 10px 20px;border-radius:var(--radius);
   background:var(--glass-light);
   backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);
   border:1px solid rgba(255,255,255,.45);
   box-shadow:0 12px 34px rgba(26,20,16,.12), inset 0 1px 0 rgba(255,255,255,.7);
 }
 .nav-logo img{height:21px;width:auto;}
-.nav-links{display:none;position:relative;gap:2px;padding:4px;border-radius:999px;
-  background:rgba(255,255,255,.32);border:1px solid rgba(255,255,255,.6);
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.7), 0 4px 14px rgba(26,20,16,.06);}
+.nav-links{display:none;position:relative;gap:2px;padding:4px;}
 .nav-links a{position:relative;z-index:1;padding:8px 16px;border-radius:999px;text-decoration:none;
   font-size:14px;font-weight:500;color:var(--muted);transition:color .25s ease;}
 .nav-links a:hover,.nav-links a.is-on{color:var(--espresso);}
@@ -204,119 +275,169 @@ h3{font-size:clamp(20px,2.1vw,24px);letter-spacing:-.015em;}
 @media (min-width:900px){ .nav-links{display:flex;} }
 
 /* ============ HERO ============ */
-.hero{padding:20px 0 56px;}
-.hero-grid{position:relative;display:grid;}
-.hero-photo{position:relative;border-radius:var(--radius);overflow:hidden;aspect-ratio:16/9;background:var(--espresso-2);}
-.hero-photo picture{display:contents;}
-.hero-photo img{width:100%;height:100%;object-fit:cover;} /* ninguna foto se espeja: se muestra tal cual se subió */
+.hero{padding:28px 0 56px;}
+.hero-grid{display:flex;flex-direction:column;align-items:center;gap:56px;}
+.hero-txt{width:100%;min-width:0;}
+.hero-txt h1{margin-top:14px;font-size:clamp(32px,3.6vw,48px);font-weight:600;font-stretch:112%;line-height:1.05;letter-spacing:-.025em;}
+.hero-txt h1 mark{
+  color:inherit;padding:0 6px;border-radius:5px;background-color:transparent;
+  background-image:linear-gradient(100deg,var(--ambar),var(--ambar));background-repeat:no-repeat;background-size:0% 100%;
+  box-decoration-break:clone;-webkit-box-decoration-break:clone;
+  animation:hero-marca .8s var(--ease) .6s forwards;
+}
+@keyframes hero-marca{to{background-size:100% 100%;color:var(--crema);}}
+.hero-bajada{margin-top:18px;max-width:38ch;font-size:clamp(17px,1.5vw,19px);line-height:1.55;color:var(--muted);}
+.hero-cta{margin-top:22px;}
+.hero-act{display:flex;flex-direction:column;width:100%;}
+.hero-txt .creds{margin-top:28px;padding-top:20px;border-top:1px solid var(--line);display:flex;justify-content:center;gap:28px;text-align:center;}
+.hero-txt .creds div{padding:0;border:0;}
+.hero-txt .creds b{font-size:14px;font-weight:600;font-stretch:100%;color:var(--espresso);}
+.hero-txt .creds b::before{display:none;}
+.hero-txt .creds span{padding:0;font-size:12px;color:var(--muted);}
+
+/* post de Instagram en vidrio oscuro: solo él flota */
+.post-wrap{position:relative;z-index:2;}
+.post-fl{position:relative;animation:post-flotar 7s ease-in-out infinite;}
+.post-wrap.is-held .post-fl,.post-wrap.is-held .post-bub.in{animation-play-state:paused;}
+@keyframes post-flotar{0%,100%{transform:translateY(0);}50%{transform:translateY(-6px);}}
+.post{
+  width:min(345px,78vw);padding:17px;border-radius:var(--radius);
+  background:var(--glass-dark);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);
+  border:1px solid var(--line-dark);
+  box-shadow:0 30px 60px -20px rgba(26,20,16,.5), inset 0 1px 0 rgba(255,255,255,.12);
+  color:var(--on-dark);user-select:none;-webkit-user-select:none;touch-action:pan-y;-webkit-touch-callout:none;
+}
+.post-who{display:flex;align-items:center;gap:10px;line-height:1.2;padding:2px 2px 15px;}
+.post-ini{width:32px;height:32px;border-radius:50%;background:var(--crema);color:var(--espresso);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;flex:none;}
+.post-who b{display:block;font-size:15px;font-weight:600;}
+.post-who small{font-size:12.5px;color:var(--on-dark-muted);}
+.post-vp{position:relative;aspect-ratio:4/5;border-radius:calc(var(--radius) - 3px);overflow:hidden;background:var(--espresso-2);}
+.post-s{position:absolute;inset:0;transform:translateX(100%);}
+.post-s.on{transform:none;}
+.post-s.va{transition:transform 440ms cubic-bezier(.22,.9,.3,1);}
+.post-s img{width:100%;height:100%;object-fit:cover;object-position:center 30%;pointer-events:none;-webkit-user-drag:none;}
+.post-cnt{position:absolute;right:9px;top:9px;z-index:4;padding:3px 9px;border-radius:5px;font-size:12.5px;font-weight:600;color:var(--crema);background:rgba(26,20,16,.45);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);}
+.post-big{position:absolute;left:50%;top:50%;width:92px;height:92px;margin:-46px 0 0 -46px;z-index:5;opacity:0;pointer-events:none;color:var(--crema);filter:drop-shadow(0 6px 14px rgba(0,0,0,.35));}
+.post-big.go{animation:post-corazon 900ms var(--ease) forwards;}
+@keyframes post-corazon{0%{opacity:0;transform:scale(.6);}30%{opacity:1;transform:scale(1.08);}45%{transform:scale(1);}80%{opacity:1;}100%{opacity:0;transform:scale(1);}}
+.post-bar{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding:15px 2px 5px;}
+.post-ic{display:flex;gap:14px;}
+.post-ic svg{width:24px;height:24px;}
+.post-ic .hf path{transition:fill .2s ease,stroke .2s ease;}
+.post-ic.liked .hf path{fill:var(--ambar);stroke:var(--ambar);}
+.post-ic.liked .hf{animation:post-pop .35s ease;}
+@keyframes post-pop{50%{transform:scale(1.25);}}
+.post-dots{display:flex;gap:4px;}
+.post-dots i{width:7px;height:7px;border-radius:50%;background:var(--crema);opacity:.22;transition:opacity .3s ease,background .3s ease;}
+.post-dots i.on{background:var(--ambar);opacity:1;}
+.post-cap{padding:4px 2px 2px;font-size:14px;line-height:1.4;}
+.post-cap b{font-weight:600;margin-right:4px;}
+
+/* globos de comentario y likes: vidrio claro chico sobre el post oscuro */
+.post-bub{
+  position:absolute;z-index:6;display:flex;align-items:center;gap:9px;padding:8px 14px 8px 8px;border-radius:var(--radius);
+  font-size:13px;font-weight:500;white-space:nowrap;pointer-events:none;color:var(--espresso);
+  background:var(--glass-light);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);
+  border:1px solid rgba(255,255,255,.6);box-shadow:0 10px 24px -8px rgba(26,20,16,.35), inset 0 1px 0 rgba(255,255,255,.7);
+  opacity:0;transform:translateY(8px) scale(.9);transition:opacity .4s ease,transform .5s cubic-bezier(.34,1.56,.64,1);
+}
+.post-bub.in{opacity:1;transform:none;}
+.post-bub.in.flota{animation:post-globo 6s ease-in-out infinite;}
+@keyframes post-globo{0%,100%{transform:translateY(0);}50%{transform:translateY(-4px);}}
+.post-bub i{width:27px;height:27px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12.5px;font-weight:700;font-style:normal;color:var(--crema);flex:none;}
+.post-likes{padding:8px 14px;gap:7px;font-weight:600;}
+.post-likes svg{width:17px;height:17px;color:var(--ambar);}
+.post-likes b.pp{animation:post-pop .35s ease;}
+.post-likes{right:-9vw;top:1%;}
+.post-bub:nth-of-type(2){left:-10vw;top:12%;rotate:-2deg;}
+.post-bub:nth-of-type(3){right:-10vw;top:33%;rotate:1.5deg;}
+.post-bub:nth-of-type(4){left:-10vw;top:56%;rotate:1deg;}
+.post-bub:nth-of-type(5){right:-10vw;top:76%;rotate:-1.5deg;}
+.post-bub:nth-of-type(6){left:-10vw;top:90%;rotate:1.5deg;}
+@media (max-width:899px){ .post-bub{font-size:11.5px;padding:5px 10px 5px 5px;gap:6px;} .post-bub i{width:21px;height:21px;font-size:10px;} .post-likes{padding:5px 10px;} }
+
+@media (min-width:900px){
+  .hero{padding:64px 0 104px;}
+  .hero-grid{display:grid;grid-template-columns:1fr 1fr;align-items:center;justify-items:center;max-width:var(--max);margin:0 auto;gap:0;}
+  .hero-txt{width:470px;max-width:100%;}
+  .hero-act{display:inline-flex;width:auto;}
+  .hero-cta,.hero-txt .creds{margin-top:28px;}
+  .hero-txt .creds{gap:32px;}
+  .post-bub{font-size:15px;}
+  .post-likes{right:-86px;top:3%;}
+  .post-bub:nth-of-type(2){left:-120px;top:11%;}
+  .post-bub:nth-of-type(3){right:-153px;top:27%;}
+  .post-bub:nth-of-type(4){left:-106px;top:46%;}
+  .post-bub:nth-of-type(5){right:-114px;top:63%;}
+  .post-bub:nth-of-type(6){left:-134px;top:79%;}
+  .hero .btn-cta{padding:14px 26px 14px 14px;gap:16px;}
+  .hero .btn-cta .btn-ico{width:50px;height:50px;}
+  .hero .btn-cta .btn-txt strong{font-size:19px;}
+  .hero .btn-cta .btn-txt small{font-size:15px;}
+  .hero .eyebrow{font-size:14px;}
+}
+/* cómo trabajo: lo que hace el cliente y lo que hago yo */
+.step .vy{margin-top:12px;display:grid;grid-template-columns:40px 1fr;gap:8px;align-items:baseline;}
+.step .vy b{font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);}
+.step .vy p{margin:0;color:var(--muted);font-size:15px;line-height:1.5;}
+.step .vy-yo b{color:#8A5A22;}
 /* sección de mensajes */
-.talk{position:relative;overflow:hidden;}
-.talk::before{content:"";position:absolute;width:560px;height:560px;border-radius:50%;left:-160px;top:50%;transform:translateY(-50%);
+.talk{position:relative;overflow:hidden;background:var(--espresso) var(--trama-clara) 0 0/160px auto;color:var(--on-dark);}
+.talk::before{content:"";position:absolute;width:620px;height:620px;border-radius:50%;left:-120px;top:50%;transform:translateY(-50%);
   background:radial-gradient(circle,rgba(200,135,58,.22),transparent 65%);pointer-events:none;}
 .talk-grid{position:relative;display:grid;gap:40px;align-items:center;}
 .talk-copy h2{margin-top:14px;}
 .talk-punch{margin-top:18px;font-size:clamp(22px,2.6vw,30px);font-weight:600;font-stretch:112%;line-height:1.3;letter-spacing:-.015em;}
 .talk-punch mark{background:var(--ambar);color:var(--crema);padding:1px 7px;border-radius:5px;box-decoration-break:clone;-webkit-box-decoration-break:clone;}
-.talk-why{margin-top:28px;padding-top:24px;border-top:1px solid var(--line);max-width:48ch;}
+.talk-why{margin-top:28px;padding-top:24px;border-top:1px solid var(--line-dark);max-width:48ch;}
 .talk-why-lead{font-size:clamp(18px,1.8vw,21px);font-weight:600;line-height:1.35;}
-.talk-why p + p{margin-top:12px;color:var(--muted);}
-.talk-why strong{color:var(--espresso);font-weight:600;}
+.talk-why p + p{margin-top:12px;color:var(--on-dark-muted);}
+.talk-why strong{color:var(--on-dark);font-weight:600;}
 .phone{
-  width:min(100%,340px);margin:0 auto;border-radius:34px;padding:14px;
-  background:rgba(26,20,16,.86);color:var(--on-dark);
+  width:min(100%,340px);margin:0 auto;border-radius:var(--radius);padding:14px;
+  background:rgba(242,235,221,.12);color:var(--on-dark);
   backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);
-  border:1px solid rgba(242,235,221,.18);
-  box-shadow:0 40px 80px -30px rgba(0,0,0,.7), inset 0 1px 0 rgba(255,255,255,.12);
+  border:1px solid rgba(242,235,221,.26);
+  box-shadow:0 40px 80px -30px rgba(0,0,0,.7), inset 0 1px 0 rgba(242,235,221,.3);
 }
 .phone-top{display:flex;align-items:center;gap:10px;padding:6px 8px 12px;border-bottom:1px solid var(--line-dark);}
-.phone-top .avatar{width:34px;height:34px;border-radius:50%;background:var(--crema-2);color:var(--espresso);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;}
+.phone-top .avatar{width:34px;height:34px;border-radius:50%;background:var(--crema);color:var(--espresso);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;}
 .phone-top b{display:block;font-size:15px;line-height:1.2;}
-.phone-top small{font-size:12px;color:var(--ambar-2);}
+.phone-top small{font-size:12px;color:var(--ambar);}
 .chat{position:relative;height:300px;overflow:hidden;margin:6px 0 10px;
   -webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 28%);mask-image:linear-gradient(to bottom,transparent 0,#000 28%);}
 .chat-track{position:absolute;left:0;right:0;bottom:0;display:flex;flex-direction:column;align-items:flex-start;gap:8px;padding:0 4px;will-change:transform;}
 .chat-bubble{
   position:relative;flex:none;margin:0;max-width:92%;padding:9px 46px 9px 14px;border-radius:4px 16px 16px 16px;
-  background:rgba(242,235,221,.9);color:var(--espresso);
+  background:rgba(242,235,221,.94);color:var(--espresso);
   box-shadow:0 6px 16px rgba(0,0,0,.25);
   font-size:15px;font-weight:600;line-height:1.25;
 }
 .chat-bubble time{position:absolute;right:10px;bottom:5px;font-size:10px;font-weight:500;color:var(--muted);}
 .phone-input{border-radius:999px;padding:10px 16px;background:rgba(242,235,221,.08);border:1px solid var(--line-dark);font-size:13px;color:var(--on-dark-muted);}
 @media (min-width:900px){ .talk-grid{grid-template-columns:1fr 1.1fr;gap:72px;} .chat{height:340px;} }
-.hero-photo::after{content:"";position:absolute;inset:16px;border:1px solid rgba(242,235,221,.6);border-radius:6px;pointer-events:none;}
-.hero-card{
-  position:relative;z-index:2;margin:-28px 10px 0;padding:22px 20px 24px;border-radius:var(--radius);
-  background:var(--glass-dark);
-  backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);
-  border:1px solid var(--line-dark);
-  box-shadow:0 30px 60px -20px rgba(26,20,16,.5), inset 0 1px 0 rgba(255,255,255,.12);
-  color:var(--on-dark);
-}
-.hero-card > .eyebrow{display:none;}
-.hero-card h1{margin:0 0 14px;}
-.hero-card .lead{color:var(--on-dark-muted);}
-.hero-card,.asks-box,.asks{min-width:0;}
-.asks-box{margin:4px 0 0;padding:14px 16px 16px;border-radius:16px;
-  background:rgba(242,235,221,.07);border:1px solid rgba(242,235,221,.16);
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.06);animation:fade-up .6s var(--ease) .22s both;}
-.asks{overflow:hidden;margin:0 -16px 12px;padding:2px 0;
-  -webkit-mask-image:linear-gradient(90deg,transparent,#000 10%,#000 90%,transparent);mask-image:linear-gradient(90deg,transparent,#000 10%,#000 90%,transparent);}
-.asks-track{display:flex;width:max-content;animation:asks-slide 52s linear infinite;}
-.asks-track,.asks-dup{gap:8px;}
-.asks-dup{display:flex;padding-left:8px;}
-.asks-track > .ask:first-child{margin-left:16px;}
-.asks.is-off .asks-track{animation-play-state:paused;}
-@media (hover:hover) and (pointer:fine){ .asks:hover .asks-track{animation-play-state:paused;} }
-@keyframes asks-slide{to{transform:translateX(-50%);}}
-.ask{flex:none;white-space:nowrap;padding:7px 14px;border-radius:14px 14px 14px 4px;
-  background:rgba(242,235,221,.12);border:1px solid rgba(242,235,221,.22);
-  font-size:14px;font-weight:500;font-stretch:125%;letter-spacing:.01em;color:var(--crema);}
-.asks-box .lead{font-size:clamp(15px,1.35vw,17px);}
-@media (min-width:900px){ .ask{font-size:15px;padding:8px 16px;} .asks-box{padding:16px 20px 18px;} .asks{margin:0 -20px 14px;} .asks-track > .ask:first-child{margin-left:20px;} }
-@media (max-width:899px){ .ask{font-size:13px;padding:6px 12px;} }
-.hero-card mark{
-  background-color:transparent;color:var(--crema);
-  background-image:linear-gradient(100deg,var(--ambar),var(--ambar));
-  background-repeat:no-repeat;background-size:0% 100%;
-  padding:1px 5px;border-radius:4px;
-  box-decoration-break:clone;-webkit-box-decoration-break:clone;
-  animation:highlight-sweep .7s var(--ease) .75s forwards;
-}
-@keyframes highlight-sweep{to{background-size:100% 100%;}}
-.hero-cta{margin-top:20px;}
-.hero-card .creds{margin-top:22px;padding-top:18px;border-top:1px solid var(--line-dark);}
-
-@media (min-width:900px){
-  .hero{padding:44px 0 96px;}
-  .hero-grid{grid-template-columns:repeat(12,1fr);align-items:center;}
-  .hero-photo{grid-column:1 / span 8;grid-row:1;aspect-ratio:auto;height:min(80vh,660px);}
-  .hero-photo::after{inset:28px;}
-  .hero-card{grid-column:7 / span 6;grid-row:1;margin:0 0 0 -36px;padding:44px 44px 34px;background:rgba(26,20,16,.64);}
-  .hero-card > .eyebrow{display:inline-flex;}
-  .hero-card h1{margin:14px 0 16px;}
-}
-
 @keyframes fade-up{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:none;}}
-.hero-photo{animation:fade-up .8s var(--ease) both;}
-.hero-card .eyebrow{animation:fade-up .6s var(--ease) .1s both;}
-.hero-card h1{animation:fade-up .6s var(--ease) .16s both;}
-.hero-card .hero-cta{animation:fade-up .6s var(--ease) .28s both;}
-.hero-card .creds{animation:fade-up .6s var(--ease) .34s both;}
+.hero-txt .eyebrow{animation:fade-up .6s var(--ease) .1s both;}
+.hero-txt h1{animation:fade-up .6s var(--ease) .16s both;}
+.hero-bajada{animation:fade-up .6s var(--ease) .22s both;}
+.hero-txt .hero-cta{animation:fade-up .6s var(--ease) .28s both;}
+.hero-txt .creds{animation:fade-up .6s var(--ease) .34s both;}
+.post-wrap{animation:fade-up .8s var(--ease) .1s backwards;}
 
 /* ============ COMPARADOR ============ */
-.compare{background:var(--espresso) var(--trama-clara) 0 0/160px auto;color:var(--on-dark);}
+.compare{color:var(--espresso);}
+.compare .accent-text{color:#8A5A22;}
 .compare-grid{display:grid;gap:36px;align-items:center;}
 .compare-copy h2{margin-top:14px;}
-.compare-copy p{margin-top:16px;color:var(--on-dark-muted);max-width:48ch;}
-.compare-copy .ai-q{font-size:clamp(19px,1.9vw,23px);line-height:1.35;font-weight:600;color:var(--on-dark);padding-left:16px;border-left:3px solid var(--ambar);}
+.compare-copy p{margin-top:16px;color:var(--muted);max-width:48ch;}
+.compare-copy .ai-q{font-size:clamp(19px,1.9vw,23px);line-height:1.35;font-weight:600;color:var(--espresso);padding-left:16px;border-left:3px solid var(--ambar);}
 .compare-points{list-style:none;margin-top:24px;display:grid;gap:12px;}
-.compare-points li{display:grid;grid-template-columns:22px 1fr;gap:10px;color:var(--on-dark-muted);font-size:16px;}
+.compare-points li{display:grid;grid-template-columns:22px 1fr;gap:10px;color:var(--muted);font-size:16px;}
 .compare-points li::before{content:"";width:8px;height:8px;margin-top:9px;border-radius:50%;background:var(--ambar);}
-.compare-points b{color:var(--on-dark);font-weight:600;}
+.compare-points b{color:var(--espresso);font-weight:600;}
 .cmp{position:relative;border-radius:var(--radius);overflow:hidden;aspect-ratio:4/5;
   max-width:480px;width:100%;margin:0 auto;cursor:ew-resize;user-select:none;touch-action:pan-y;
-  box-shadow:0 30px 80px rgba(0,0,0,.45);background:var(--espresso-2);}
+  box-shadow:0 30px 70px -20px rgba(26,20,16,.45);background:var(--espresso-2);}
 .cmp-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
 .cmp-before{position:absolute;inset:0;overflow:hidden;z-index:2;clip-path:inset(0 50% 0 0);}
 .cmp-frost{position:absolute;inset:0;pointer-events:none;opacity:0;
@@ -335,7 +456,7 @@ h3{font-size:clamp(20px,2.1vw,24px);letter-spacing:-.015em;}
 /* al agarrarlo, el control crece apenas: el comparador "escuchó" el toque */
 .cmp-handle{transition:transform 160ms var(--ease);}
 .cmp.is-drag .cmp-handle{transform:translate(-50%,-50%) scale(1.1);}
-.cmp-hint{text-align:center;margin-top:12px;font-size:13px;color:var(--on-dark-muted);}
+.cmp-hint{text-align:center;margin-top:12px;font-size:13px;color:var(--muted);}
 @media (min-width:900px){ .compare-grid{grid-template-columns:1fr 1fr;gap:72px;} }
 
 /* ============ PROMESA (foto de fondo + vidrio) ============ */
@@ -344,7 +465,7 @@ h3{font-size:clamp(20px,2.1vw,24px);letter-spacing:-.015em;}
 .promise-bg img{width:100%;height:100%;object-fit:cover;}
 .promise-bg::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(26,20,16,.15),rgba(26,20,16,.35));}
 .promise-card{
-  max-width:860px;margin:0 auto;padding:32px 22px;border-radius:28px;text-align:center;
+  max-width:860px;margin:0 auto;padding:32px 22px;border-radius:var(--radius);text-align:center;
   background:rgba(242,235,221,.62);
   backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);
   border:1px solid rgba(255,255,255,.55);
@@ -368,21 +489,23 @@ h3{font-size:clamp(20px,2.1vw,24px);letter-spacing:-.015em;}
 }
 
 /* ============ PROCESO ============ */
-.steps{display:grid;gap:16px;}
-.step{
-  position:relative;padding:28px 24px;border-radius:var(--radius);
-  background:rgba(255,255,255,.38);
-  backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);
-  border:1px solid rgba(255,255,255,.6);
-  box-shadow:0 16px 34px rgba(26,20,16,.06), inset 0 1px 0 rgba(255,255,255,.7);
-}
+.steps{display:grid;gap:0;}
+/* línea de tiempo: el número ancla cada paso y una línea fina los une */
+.step{position:relative;padding:0 0 44px 76px;}
+.step:last-child{padding-bottom:0;}
+.step::before{content:"";position:absolute;left:24px;top:60px;bottom:10px;width:1px;background:rgba(26,20,16,.2);}
+.step:last-child::before{display:none;}
 .step-icon{width:48px;height:48px;border-radius:50%;border:1.5px solid var(--espresso);
   display:flex;align-items:center;justify-content:center;margin-bottom:18px;}
 .step-icon svg{width:22px;height:22px;}
-.step-num{position:absolute;top:22px;right:24px;font-size:15px;font-weight:600;color:var(--muted);}
-.step h3{margin-bottom:8px;}
+.step-num{position:absolute;left:0;top:-4px;font-size:46px;font-weight:600;font-stretch:112%;letter-spacing:-.03em;line-height:1;color:var(--ambar);}
+.step h3{margin-bottom:4px;font-size:clamp(23px,2.2vw,27px);}
 .step p{color:var(--muted);font-size:16px;}
-@media (min-width:768px){ .steps{grid-template-columns:repeat(3,1fr);gap:20px;} .step{padding:36px 30px;} }
+@media (min-width:768px){
+  .steps{grid-template-columns:repeat(3,1fr);gap:48px;}
+  .step,.step:last-child{padding:76px 0 0;}
+  .step::before{left:76px;right:-36px;top:23px;bottom:auto;width:auto;height:1px;}
+}
 
 /* ============ PORTAFOLIO ============ */
 .bento{display:grid;grid-template-columns:repeat(2,1fr);grid-auto-rows:160px;gap:10px;grid-auto-flow:dense;}
@@ -413,31 +536,35 @@ h3{font-size:clamp(20px,2.1vw,24px);letter-spacing:-.015em;}
 
 /* ============ SOBRE MÍ ============ */
 .about{background:var(--espresso) var(--trama-clara) 0 0/160px auto;color:var(--on-dark);}
-.about-grid{display:grid;position:relative;}
-.about-photo{border-radius:var(--radius);overflow:hidden;aspect-ratio:4/5;background:var(--espresso-2);}
-.about-photo img{width:100%;height:100%;object-fit:cover;transform:scale(1.08);}
-.about-card{
-  position:relative;z-index:2;margin:-44px 12px 0;padding:28px 24px;border-radius:var(--radius);
-  background:rgba(42,33,27,.54);
-  backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);
-  border:1px solid var(--line-dark);box-shadow:0 30px 60px -20px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,255,255,.1);
+/* halo cálido detrás del texto, la misma luz tenue del cierre */
+.about{position:relative;overflow:hidden;}
+.about::before{content:"";position:absolute;width:760px;height:760px;right:-160px;top:50%;transform:translateY(-50%);border-radius:50%;
+  background:radial-gradient(circle,rgba(200,135,58,.22),rgba(200,135,58,0) 65%);pointer-events:none;}
+@media (max-width:899px){ .about::before{width:520px;height:520px;right:-180px;top:72%;} }
+.about-grid{display:grid;position:relative;gap:48px;align-items:center;}
+.about-pan{
+  margin:0 auto;width:min(380px,82vw);padding:17px;border-radius:var(--radius);
+  background:rgba(242,235,221,.12);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);
+  border:1px solid rgba(242,235,221,.26);box-shadow:0 30px 60px -24px rgba(0,0,0,.6), inset 0 1px 0 rgba(242,235,221,.3);
 }
-.about-card h2{margin:14px 0 18px;}
-.about-card p{color:var(--on-dark-muted);margin-top:14px;}
-.about-card p strong{color:var(--on-dark);font-weight:600;}
-.about-card .creds{margin-top:24px;padding-top:18px;border-top:1px solid var(--line-dark);}
-.photo-credit{position:absolute;left:16px;bottom:16px;z-index:2;display:flex;align-items:center;gap:9px;white-space:nowrap;
-  padding:10px 16px;border-radius:999px;font-size:15px;font-weight:600;font-stretch:112%;letter-spacing:-.01em;color:var(--crema);
-  background:rgba(26,20,16,.45);backdrop-filter:blur(14px) saturate(130%);-webkit-backdrop-filter:blur(14px) saturate(130%);
-  border:1px solid rgba(242,235,221,.22);box-shadow:inset 0 1px 0 rgba(255,255,255,.1);}
+.about-photo{position:relative;border-radius:calc(var(--radius) - 3px);overflow:hidden;aspect-ratio:4/5;background:var(--espresso-2);}
+.about-photo img{width:100%;height:100%;object-fit:cover;transform:scale(1.08);}
+.photo-credit{display:flex;align-items:center;gap:8px;padding:14px 2px 2px;font-size:15px;font-weight:600;font-stretch:112%;letter-spacing:-.01em;color:var(--on-dark);}
 .photo-credit img{height:14px;width:auto;flex:none;}
-.about-photo{position:relative;}
-@media (max-width:899px){ .photo-credit{bottom:60px;} } /* en celular la tarjeta sube 44px sobre la foto: el crédito queda por encima */
-@media (min-width:900px){ .photo-credit{left:22px;bottom:22px;} }
+.about-card{position:relative;}
+.about-card h2{margin:14px 0 18px;text-wrap:balance;}
+.nw{white-space:nowrap;}
+.about-card p{color:var(--on-dark-muted);margin-top:14px;max-width:52ch;}
+.about-card p strong{color:var(--on-dark);font-weight:600;}
+.about-card .creds{margin-top:28px;padding-top:20px;border-top:1px solid var(--line-dark);display:flex;gap:32px;}
+.about-card .creds div{padding:0;border:0;}
+.about-card .creds b{font-size:16px;font-weight:600;font-stretch:100%;}
+.about-card .creds b::before{display:none;}
+.about-card .creds span{padding:0;font-size:14px;}
 @media (min-width:900px){
-  .about-grid{grid-template-columns:repeat(12,1fr);align-items:center;}
-  .about-photo{grid-column:1 / span 6;grid-row:1;}
-  .about-card{grid-column:6 / span 7;grid-row:1;margin:0 0 0 -32px;padding:48px;}
+  .about-grid{grid-template-columns:1fr 1fr;justify-items:center;gap:0;}
+  .about-pan{width:480px;}
+  .about-card{width:510px;max-width:100%;}
 }
 
 /* ============ TESTIMONIOS ============ */
@@ -455,9 +582,39 @@ h3{font-size:clamp(20px,2.1vw,24px);letter-spacing:-.015em;}
 .testi figcaption b{display:block;color:var(--espresso);font-weight:600;}
 @media (min-width:768px){ .testis{grid-template-columns:repeat(2,1fr);gap:20px;} .testi{padding:36px;} }
 
+/* ============ PREGUNTAS FRECUENTES ============ */
+/* texto fijo en el HTML (lo leen Google y las IAs) y repetido en el JSON-LD FAQPage del <head> */
+.faq-grid{display:grid;gap:8px;}
+.faq-list{display:grid;gap:10px;}
+.faq-item{border-radius:var(--radius);background:rgba(255,255,255,.38);
+  backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);
+  border:1px solid rgba(255,255,255,.6);box-shadow:0 16px 34px rgba(26,20,16,.06), inset 0 1px 0 rgba(255,255,255,.7);
+  interpolate-size:allow-keywords;}
+.faq-item summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:20px 20px 20px 24px;
+  font-size:clamp(17px,1.6vw,19px);font-weight:600;line-height:1.35;border-radius:var(--radius);}
+.faq-item summary::-webkit-details-marker{display:none;}
+.faq-item summary:focus-visible{outline:3px solid #8A5A22;outline-offset:3px;}
+.faq-ico{position:relative;width:32px;height:32px;border-radius:50%;background:var(--espresso);flex:none;transition:transform .3s var(--ease),background .2s ease;}
+.faq-ico::before,.faq-ico::after{content:"";position:absolute;left:50%;top:50%;width:12px;height:2px;margin:-1px 0 0 -6px;border-radius:2px;background:var(--crema);}
+.faq-ico::after{transform:rotate(90deg);}
+.faq-item[open] .faq-ico{transform:rotate(45deg);background:var(--ambar);}
+.faq-item p{padding:0 24px 22px;color:var(--muted);font-size:17px;line-height:1.6;max-width:60ch;}
+.faq-item::details-content{block-size:0;overflow:hidden;transition:block-size .35s var(--ease),content-visibility .35s allow-discrete;}
+.faq-item[open]::details-content{block-size:auto;}
+@media (hover:hover) and (pointer:fine){ .faq-item summary:hover .faq-ico{transform:scale(1.08);} .faq-item[open] summary:hover .faq-ico{transform:rotate(45deg) scale(1.08);} }
+@media (min-width:900px){
+  .faq-grid{grid-template-columns:1fr 1.45fr;gap:56px;align-items:start;}
+  .faq-grid .section-head{position:sticky;top:110px;margin-bottom:0;}
+  .faq-item summary{padding:22px 24px 22px 28px;}
+  .faq-item p{padding:0 28px 24px;}
+}
+@media (prefers-reduced-motion:reduce){ .faq-ico,.faq-item::details-content{transition:none;} }
+@media (prefers-reduced-transparency:reduce){ .faq-item{background:var(--crema-2);backdrop-filter:none;-webkit-backdrop-filter:none;} }
+@media (prefers-contrast:more){ .faq-item{border-color:rgba(26,20,16,.45);} }
+
 /* ============ CTA FINAL ============ */
 .final{padding-bottom:72px;}
-.final-card{border-radius:28px;padding:36px 24px;background:var(--espresso);color:var(--on-dark);
+.final-card{border-radius:var(--radius);padding:36px 24px;background:var(--espresso);color:var(--on-dark);
   display:grid;gap:28px;position:relative;overflow:hidden;}
 .final-card::before{content:"";position:absolute;width:420px;height:420px;border-radius:50%;
   right:-140px;top:-180px;background:radial-gradient(circle,rgba(200,135,58,.3),transparent 65%);pointer-events:none;}
@@ -496,7 +653,7 @@ h3{font-size:clamp(20px,2.1vw,24px);letter-spacing:-.015em;}
 @keyframes mant-in{from{opacity:0;}to{opacity:1;}}
 
 /* ============ ME GUSTA CON DOBLE TOQUE (detalle escondido en las fotos) ============ */
-.hero-photo,.about-photo,.bento button{touch-action:manipulation;} /* el doble toque no hace zoom */
+.post-vp,.about-photo,.bento button{touch-action:manipulation;} /* el doble toque no hace zoom */
 .fara-like{position:absolute;z-index:6;width:clamp(84px,14vw,120px);aspect-ratio:1;pointer-events:none;will-change:transform,opacity;}
 .fara-like-i{width:100%;height:100%;display:block;will-change:transform;}
 
@@ -512,9 +669,9 @@ h3{font-size:clamp(20px,2.1vw,24px);letter-spacing:-.015em;}
 @media (prefers-reduced-motion: reduce){
   html{scroll-behavior:auto;}
   .reveal,.stagger-item{transform:none;transition:opacity .3s ease;}
-  .hero-photo,.hero-card .eyebrow,.hero-card h1,.hero-card .hero-cta,.hero-card .creds,.asks-box,.mant{animation:none;}
-  .asks-track{animation:none;flex-wrap:wrap;width:auto;} .asks-dup{display:none;} .asks{-webkit-mask-image:none;mask-image:none;margin-left:0;margin-right:0;} .asks-track > .ask:first-child{margin-left:0;}
-  .hero-card mark{animation:none;background-size:100% 100%;}
+  .hero-txt .eyebrow,.hero-txt h1,.hero-bajada,.hero-txt .hero-cta,.hero-txt .creds,.post-wrap,.mant{animation:none;}
+  .hero-txt h1 mark{animation:none;background-size:100% 100%;color:var(--crema);}
+  .post-fl,.post-bub.in{animation:none;} .post-bub{transition:opacity .3s ease;transform:none;}
   .promise-card .price-mark{transition:none;background-size:100% 100%;color:var(--crema);}
   .bento img{transition:none;}
 }
@@ -522,12 +679,14 @@ h3{font-size:clamp(20px,2.1vw,24px);letter-spacing:-.015em;}
 /* vidrio accesible: si el sistema pide menos transparencia o más contraste, el vidrio pasa a sólido */
 @media (prefers-reduced-transparency: reduce){
   .nav,.promise-card{background:var(--crema);backdrop-filter:none;-webkit-backdrop-filter:none;}
-  .hero-card,.about-card,.phone,.photo-credit{background:var(--espresso);backdrop-filter:none;-webkit-backdrop-filter:none;}
-  .step,.testi{background:var(--crema-2);backdrop-filter:none;-webkit-backdrop-filter:none;}
+  .post{background:var(--espresso);backdrop-filter:none;-webkit-backdrop-filter:none;}
+  .phone{background:var(--espresso-2);backdrop-filter:none;-webkit-backdrop-filter:none;}
+  .testi,.post-bub{background:var(--crema-2);backdrop-filter:none;-webkit-backdrop-filter:none;}
 }
 @media (prefers-contrast: more){
   .nav,.promise-card,.step,.testi{border-color:rgba(26,20,16,.45);}
-  .hero-card,.about-card,.phone{border-color:rgba(242,235,221,.5);}
+  .post,.about-card,.phone{border-color:rgba(242,235,221,.5);}
+  .about-pan{background:var(--espresso-2);backdrop-filter:none;-webkit-backdrop-filter:none;}
 }
 </style>
 </head>
@@ -559,48 +718,60 @@ h3{font-size:clamp(20px,2.1vw,24px);letter-spacing:-.015em;}
   <!-- 1 · HERO -->
   <section class="hero">
     <div class="wrap hero-grid">
-      <div class="hero-photo">
-        <picture>
-        <!-- vertical: cuando el texto pasa abajo de la foto -->
-        <source id="srcHeroV" media="(max-width:899px)"
-          srcset="https://res.cloudinary.com/eekglpse/image/upload/f_auto,q_auto,w_800/v1792715092/TRA-GIRLS_25-26-2.webp 800w, https://res.cloudinary.com/eekglpse/image/upload/f_auto,q_auto,w_1200/v1792715092/TRA-GIRLS_25-26-2.webp 1200w" sizes="100vw">
-        <img id="imgHero"
-          src="https://res.cloudinary.com/eekglpse/image/upload/f_auto,q_auto,w_1600/v1792715102/TOM_moto_05-26-7.webp"
-          srcset="https://res.cloudinary.com/eekglpse/image/upload/f_auto,q_auto,w_800/v1792715102/TOM_moto_05-26-7.webp 800w,
-                  https://res.cloudinary.com/eekglpse/image/upload/f_auto,q_auto,w_1600/v1792715102/TOM_moto_05-26-7.webp 1600w"
-          sizes="60vw"
-          alt="Moto fotografiada por FÁRA para una marca de Buenos Aires"
-          fetchpriority="high" width="1600" height="1200">
-        </picture>
-      </div>
-
-      <div class="hero-card on-dark">
+      <div class="hero-txt">
         <span class="eyebrow" data-k="hero.etiqueta">Buenos Aires · CABA</span>
-        <h1 data-k="hero.titulo">Fotografía de producto y marca para PyMEs</h1>
-        <div class="asks-box">
-          <div class="asks" id="asks" aria-label="Preguntas que te hacen tus clientes: ¿Por qué tan caro?, ¿Tenés código de descuento?, ¿Me hacés un precio?, En otro lado lo vi más barato, ¿Si llevo dos me hacés descuento?, Lo pienso y te aviso">
-            <div class="asks-track"><span class="ask">¿Por qué tan caro?</span><span class="ask">¿Tenés código de descuento?</span><span class="ask">¿Me hacés un precio?</span><span class="ask">En otro lado lo vi más barato</span><span class="ask">¿Si llevo dos me hacés descuento?</span><span class="ask">Lo pienso y te aviso</span><span aria-hidden="true" class="asks-dup"><span class="ask">¿Por qué tan caro?</span><span class="ask">¿Tenés código de descuento?</span><span class="ask">¿Me hacés un precio?</span><span class="ask">En otro lado lo vi más barato</span><span class="ask">¿Si llevo dos me hacés descuento?</span><span class="ask">Lo pienso y te aviso</span></span></div>
-          </div>
-          <p class="lead"><span data-k="hero.frase">¿Te suenan estas preguntas?</span> <mark data-k="hero.frase" data-f="2">Tu marca puede estar mostrando menos de lo que vale tu producto.</mark></p>
-        </div>
+        <h1><span data-k="hero.titular">Fotos para que quieran tu producto</span> <mark data-k="hero.titular" data-f="2">antes de ver el precio</mark></h1>
+        <p class="hero-bajada" data-k="hero.bajada">Fotografía de producto y marca para PyMEs en Buenos Aires. Tu producto ya es bueno: mi trabajo es que la foto lo demuestre en el primer segundo.</p>
+        <div class="hero-act">
         <div class="hero-cta">
           <a class="btn btn-accent btn-cta" href="https://wa.me/5493885735415?text=Hola%20Mat%C3%ADas%2C%20vi%20la%20web%20de%20F%C3%81RA%20y%20quiero%20agendar%20la%20reuni%C3%B3n%20de%2015%20minutos." target="_blank" rel="noopener">
             <span class="btn-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#ico-wa"/></svg></span>
             <span class="btn-txt"><strong data-k="hero.boton">Escribime por WhatsApp</strong><small data-k="hero.boton" data-f="2">Reunión gratis de 15 minutos</small></span>
             <svg class="btn-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
           </a>
-          <span class="micro" data-k="hero.micro">↳ Me escribís directo a mí. Sin costo y sin compromiso.</span>
         </div>
         <div class="creds" data-list="hero.credencial">
           <div><b>Fotógrafo</b><span>10 años de experiencia</span></div>
-          <div><b>Diseñador industrial</b><span>UBA · Sello Buen Diseño e Innovar</span></div>
+          <div><b>Diseñador industrial</b><span>UBA, Sello Buen Diseño e Innovar</span></div>
+        </div>
+        </div>
+      </div>
+
+      <!-- Post del hero: fotos en la planilla (Links → POST DEL HERO); rubro, barrio, caption, comentarios y likes en Landing → post.* -->
+      <div class="post-wrap" id="post">
+        <div class="post-fl">
+          <article class="post" aria-label="Trabajos de FÁRA">
+            <div class="post-who"><span class="post-ini" aria-hidden="true">R</span><span><b class="post-rubro">Rubro</b><small class="post-barrio">Barrio</small></span></div>
+            <div class="post-vp">
+              <div class="post-s on"><img src="https://res.cloudinary.com/eekglpse/image/upload/f_auto,q_auto,w_900/v1792715092/TRA-GIRLS_25-26-2.webp" alt="Fotografía para la obra GIRLS de Transmutare Producciones" width="900" height="1125" fetchpriority="high"></div>
+              <div class="post-s"><img src="https://res.cloudinary.com/eekglpse/image/upload/f_auto,q_auto,w_900/v1792715102/TOM_moto_05-26-7.webp" alt="Moto fotografiada por FÁRA para una marca de Buenos Aires" width="900" height="1125" loading="lazy"></div>
+              <div class="post-s"><img src="https://res.cloudinary.com/eekglpse/image/upload/f_auto,q_auto,w_900/v1792715096/MATE-5b.webp" alt="Mate en detalle, fotografía de producto" width="900" height="1125" loading="lazy"></div>
+              <div class="post-s"><img src="https://res.cloudinary.com/eekglpse/image/upload/f_auto,q_auto,w_900/v1792715085/000_Oktoberfest_-_2025-6189.webp" alt="Fotografía de marca en Oktoberfest 2025" width="900" height="1125" loading="lazy"></div>
+              <span class="post-cnt" aria-hidden="true">1/4</span>
+              <svg class="post-big" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21.2l-1.4-1.3C5.4 15.1 2 12 2 8.2 2 5.1 4.4 2.8 7.4 2.8c1.7 0 3.4.8 4.6 2.1 1.2-1.3 2.9-2.1 4.6-2.1 3 0 5.4 2.3 5.4 5.4 0 3.8-3.4 6.9-8.6 11.7L12 21.2z" fill="currentColor"/></svg>
+            </div>
+            <div class="post-bar" aria-hidden="true">
+              <span class="post-ic">
+                <svg class="hf" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="M12 21.2l-1.4-1.3C5.4 15.1 2 12 2 8.2 2 5.1 4.4 2.8 7.4 2.8c1.7 0 3.4.8 4.6 2.1 1.2-1.3 2.9-2.1 4.6-2.1 3 0 5.4 2.3 5.4 5.4 0 3.8-3.4 6.9-8.6 11.7L12 21.2z"/></svg>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="M20.5 12a8.5 8.5 0 0 1-12.3 7.6L3.5 20.5l1-4.4A8.5 8.5 0 1 1 20.5 12z"/></svg>
+              </span>
+              <span class="post-dots"><i class="on"></i><i></i><i></i><i></i></span><span></span>
+            </div>
+            <p class="post-cap"><b class="post-rubro">Rubro</b><span class="post-txt">Caption de la foto 1.</span></p>
+          </article>
+          <div class="post-bub post-likes" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 21.2l-1.4-1.3C5.4 15.1 2 12 2 8.2 2 5.1 4.4 2.8 7.4 2.8c1.7 0 3.4.8 4.6 2.1 1.2-1.3 2.9-2.1 4.6-2.1 3 0 5.4 2.3 5.4 5.4 0 3.8-3.4 6.9-8.6 11.7L12 21.2z" fill="currentColor"/></svg><b>1.248</b></div>
+          <div class="post-bub" aria-hidden="true"><i style="background:#C8873A">L</i><span>uff, me encanta</span></div>
+          <div class="post-bub" aria-hidden="true"><i style="background:#2F5D62">M</i><span>@caro este para tu cumple</span></div>
+          <div class="post-bub" aria-hidden="true"><i style="background:#7A8B6F">S</i><span>decime que queda stock</span></div>
+          <div class="post-bub" aria-hidden="true"><i style="background:#8C5A3C">J</i><span>lo quiero ya!!</span></div>
+          <div class="post-bub" aria-hidden="true"><i style="background:#C8873A">V</i><span>@juli acá se va mi aguinaldo</span></div>
         </div>
       </div>
     </div>
   </section>
 
   <!-- 1b · MENSAJES QUE TE LLEGAN -->
-  <section class="talk" id="problema">
+  <section class="talk on-dark" id="problema">
     <div class="wrap talk-grid">
       <div class="phone reveal" aria-label="Mensajes que recibís de clientes">
         <div class="phone-top">
@@ -615,7 +786,7 @@ h3{font-size:clamp(20px,2.1vw,24px);letter-spacing:-.015em;}
         <h2 data-k="problema.titulo">¿Te suenan estos mensajes?</h2>
         <p class="talk-punch"><mark data-k="problema.resaltado">Tu marca no está mostrando lo que vale tu producto.</mark></p>
         <div class="talk-why">
-          <p class="talk-why-lead" data-k="problema.destacado">Tenés un producto excelente y la competencia, con uno de peor calidad, vende más.</p>
+          <p class="talk-why-lead" data-k="problema.heroe">El que prueba tu producto, vuelve. En Instagram nadie lo puede probar: solo lo ve.</p>
           <p data-k="problema.texto" data-md>Le pusiste años de trabajo a tu producto. <strong>Tu comunicación merece el mismo cuidado</strong>, porque el cliente decide cuánto vale por lo que ve en tus fotos, tu catálogo y tus redes.</p>
         </div>
       </div>
@@ -623,7 +794,7 @@ h3{font-size:clamp(20px,2.1vw,24px);letter-spacing:-.015em;}
   </section>
 
   <!-- 3 · PRONÓSTICO: comparador -->
-  <section class="compare on-dark">
+  <section class="compare">
     <div class="wrap compare-grid">
       <div class="compare-copy reveal">
         <span class="eyebrow" data-k="comparador.etiqueta">Arrastrá y comparalo</span>
@@ -673,31 +844,30 @@ h3{font-size:clamp(20px,2.1vw,24px);letter-spacing:-.015em;}
     <div class="wrap">
       <div class="section-head reveal">
         <span class="eyebrow" data-k="proceso.etiqueta">Cómo trabajo</span>
-        <h2 data-k="proceso.titulo">Tres pasos, precio cerrado</h2>
+        <h2 data-k="proceso.titular">Vos ponés el producto. Del resto me encargo yo.</h2>
       </div>
       <div class="steps reveal-stagger">
         <article class="step stagger-item">
           <span class="step-num">01</span>
-          <div class="step-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg></div>
-          <h3 data-k="proceso.paso" data-i="0">Reunión de 15 minutos</h3>
-          <p data-k="proceso.paso" data-i="0" data-f="2">Me contás qué vendés y a quién. Miramos juntos cómo se ve hoy tu marca.</p>
+          <h3 data-k="proceso.vosyo" data-i="0">Reunión de 15 minutos</h3>
+          <div class="vy"><b>Vos</b><p data-k="proceso.vosyo" data-i="0" data-f="2">Me contás qué vendés y a quién.</p></div>
+          <div class="vy vy-yo"><b>Yo</b><p data-k="proceso.vosyo" data-i="0" data-f="3">Miro cómo se ve hoy tu marca y te digo qué cambiaría primero.</p></div>
         </article>
         <article class="step stagger-item">
           <span class="step-num">02</span>
-          <div class="step-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></svg></div>
-          <h3 data-k="proceso.paso" data-i="1">Propuesta con precio cerrado</h3>
-          <p data-k="proceso.paso" data-i="1" data-f="2">Te digo qué cambiaría primero y cuánto cuesta. Sabés el número antes de empezar.</p>
+          <h3 data-k="proceso.vosyo" data-i="1">Propuesta con precio cerrado</h3>
+          <div class="vy"><b>Vos</b><p data-k="proceso.vosyo" data-i="1" data-f="2">Leés la propuesta y decidís.</p></div>
+          <div class="vy vy-yo"><b>Yo</b><p data-k="proceso.vosyo" data-i="1" data-f="3">Te paso qué fotos hacer, dónde las vas a usar y el precio final, antes de empezar.</p></div>
         </article>
         <article class="step stagger-item">
           <span class="step-num">03</span>
-          <div class="step-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg></div>
-          <h3 data-k="proceso.paso" data-i="2">Sesión y entrega</h3>
-          <p data-k="proceso.paso" data-i="2" data-f="2">Fotografío tu producto y te entrego las fotos listas para catálogo, tienda y redes.</p>
+          <h3 data-k="proceso.vosyo" data-i="2">Sesión y entrega</h3>
+          <div class="vy"><b>Vos</b><p data-k="proceso.vosyo" data-i="2" data-f="2">[Cómo llega el producto a la sesión]</p></div>
+          <div class="vy vy-yo"><b>Yo</b><p data-k="proceso.vosyo" data-i="2" data-f="3">Fotografío, edito y te entrego las fotos listas para catálogo, tienda y redes.</p></div>
         </article>
       </div>
     </div>
   </section>
-
   <!-- 6 · PORTAFOLIO -->
   <section id="trabajos" style="padding-top:0">
     <div class="wrap">
@@ -726,13 +896,15 @@ h3{font-size:clamp(20px,2.1vw,24px);letter-spacing:-.015em;}
   <!-- 7 · SOBRE MÍ -->
   <section id="sobre-mi" class="about on-dark">
     <div class="wrap about-grid">
-      <div class="about-photo reveal">
+      <figure class="about-pan reveal">
+        <div class="about-photo">
         <img id="imgRetrato" src="https://res.cloudinary.com/eekglpse/image/upload/f_auto,q_auto,w_900/v1792715339/Retrato_mr_-_09_29_optimized.webp" alt="Matías, fotógrafo y diseñador industrial, creador de FÁRA" loading="lazy">
-        <p class="photo-credit"><span data-k="sobremi.credito">Matías, creador de</span> <img src="https://res.cloudinary.com/eekglpse/image/upload/f_png,h_160/c_crop,g_center,w_0.96,h_0.9/e_make_transparent:35/e_trim:10/e_colorize:100,co_rgb:F2EBDD/v1792547783/fara_marca_agua_logotipo_crema.svg" alt="FÁRA" height="14" loading="lazy"></p>
-      </div>
+        </div>
+        <figcaption class="photo-credit"><span data-k="sobremi.credito">Matías, creador de</span> <img src="https://res.cloudinary.com/eekglpse/image/upload/f_png,h_160/c_crop,g_center,w_0.96,h_0.9/e_make_transparent:35/e_trim:10/e_colorize:100,co_rgb:F2EBDD/v1792547783/fara_marca_agua_logotipo_crema.svg" alt="FÁRA" height="14" loading="lazy"></figcaption>
+      </figure>
       <div class="about-card reveal">
         <span class="eyebrow" data-k="sobremi.etiqueta">Sobre mí</span>
-        <h2 data-k="sobremi.titulo">Antes de fotografiar productos, los diseñaba.</h2>
+        <h2 data-k="sobremi.titulo">Antes de fotografiar productos, <span class="nw">los diseñaba.</span></h2>
         <div data-list="sobremi.parrafo"><p>Soy Matías, fotógrafo desde 2016 y diseñador industrial (UBA). Antes de fotografiar productos me dediqué a diseñarlos: los creé, los mejoré, los hice más fáciles de fabricar, hasta obtuve el Sello Buen Diseño y el Innovar. <strong>Por eso, cuando miro tu producto, sé qué lo hace bueno y cómo mostrarlo.</strong> Y si tiene algo para mejorar, también puedo ayudarte.</p>
         <p>Trabajé dentro de varias PyMEs argentinas y vi lo que se repite: un producto muy bien resuelto, un dueño sin tiempo y fotos que no le hacen justicia. Conozco la foto completa porque la vi desde adentro.</p></div>
         <div class="creds" data-list="sobremi.credencial">
@@ -771,6 +943,50 @@ h3{font-size:clamp(20px,2.1vw,24px);letter-spacing:-.015em;}
     </div>
   </section>
 
+  <!-- 8.5 · PREGUNTAS FRECUENTES (texto fijo: tiene que coincidir con el JSON-LD FAQPage del <head>) -->
+  <section id="preguntas" data-track-view="Preguntas frecuentes">
+    <div class="wrap faq-grid">
+      <div class="section-head reveal">
+        <span class="eyebrow">Preguntas frecuentes</span>
+        <h2>Lo que me preguntan antes de la primera sesión</h2>
+      </div>
+      <div class="faq-list reveal">
+          <details class="faq-item" name="faq">
+            <summary>¿Cuánto cuesta una sesión de fotos de producto en CABA?<span class="faq-ico" aria-hidden="true"></span></summary>
+            <p>Desde ARS 90.000. El precio final depende de cuántos productos son y dónde vas a usar las fotos. Después de una reunión gratis de 15 minutos te mando una propuesta con precio cerrado, así sabés el total antes de empezar.</p>
+          </details>
+          <details class="faq-item" name="faq">
+            <summary>¿Cómo se paga?<span class="faq-ico" aria-hidden="true"></span></summary>
+            <p>50 % de seña para reservar la fecha de la sesión y el otro 50 % antes de recibir las fotos.</p>
+          </details>
+          <details class="faq-item" name="faq">
+            <summary>¿Cuántas fotos incluye y en qué formatos las recibo?<span class="faq-ico" aria-hidden="true"></span></summary>
+            <p>La cantidad se define en la propuesta según tus productos, desde 6 fotos. Las recibís en alta resolución para imprimir, en versión liviana para la web, recortadas en 4:5 y 9:16 para redes y con fondo recortado en PNG para tu tienda online.</p>
+          </details>
+          <details class="faq-item" name="faq">
+            <summary>¿En cuánto tiempo recibo las fotos?<span class="faq-ico" aria-hidden="true"></span></summary>
+            <p>En unos 7 días hábiles desde la sesión. En los proyectos más grandes, el plazo exacto queda escrito en la propuesta.</p>
+          </details>
+          <details class="faq-item" name="faq">
+            <summary>¿Dónde se hace la sesión?<span class="faq-ico" aria-hidden="true"></span></summary>
+            <p>En mi estudio o en tu local, según qué le convenga a tu producto. Trabajo en la Ciudad Autónoma de Buenos Aires.</p>
+          </details>
+          <details class="faq-item" name="faq">
+            <summary>¿Puedo usar las fotos en anuncios, en mi tienda y en redes?<span class="faq-ico" aria-hidden="true"></span></summary>
+            <p>Sí, para lo que quieras: redes, tienda online, catálogo, impresos y publicidad. Si además querés que yo arme y maneje tus anuncios, lo cotizamos aparte.</p>
+          </details>
+          <details class="faq-item" name="faq">
+            <summary>¿Por qué no usar fotos hechas con IA?<span class="faq-ico" aria-hidden="true"></span></summary>
+            <p>Una imagen hecha con IA dibuja un producto parecido al tuyo. Quien te compra espera recibir lo que vio, y una foto real le muestra exactamente eso: tu color, tu textura, tu etiqueta.</p>
+          </details>
+          <details class="faq-item" name="faq">
+            <summary>¿Cómo te contacto para empezar a trabajar?<span class="faq-ico" aria-hidden="true"></span></summary>
+            <p>Escribime por WhatsApp y coordinamos la reunión de 15 minutos. Es gratis y sin compromiso.</p>
+          </details>
+      </div>
+    </div>
+  </section>
+
   <!-- 9 · PRÓXIMOS PASOS + CTA FINAL -->
   <section class="final" id="contacto" style="padding-top:0">
     <div class="wrap">
@@ -785,7 +1001,7 @@ h3{font-size:clamp(20px,2.1vw,24px);letter-spacing:-.015em;}
             <span class="btn-txt"><strong data-k="final.boton">Escribime por WhatsApp</strong><small data-k="final.boton" data-f="2">Coordinamos el día de la reunión</small></span>
             <svg class="btn-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
           </a>
-            <span class="micro" data-k="final.micro">↳ Me escribís directo a mí y coordinamos el día. No pagás nada.</span>
+            <span class="micro" data-k="final.micro">Me escribís directo a mí y coordinamos el día. No pagás nada.</span>
           </div>
         </div>
         <ol class="next" data-list="final.paso">
@@ -852,6 +1068,7 @@ const PESTANAS={landing:201, links:202};
   const LOGO='f_png,h_160/c_crop,g_center,w_0.96,h_0.9/e_make_transparent:35/e_trim:10/e_colorize:100,co_rgb:';
   let mant=null; /* datos de "Web en mantenimiento" si la casilla está tildada */
 
+  const postDatos=o=>{ if(window.FARA_setPost) FARA_setPost(o); else (window.__postQ=window.__postQ||[]).push(o); };
   function aplicarTextos(rows){
     const D={};
     rows.slice(2).forEach(r=>{
@@ -863,7 +1080,7 @@ const PESTANAS={landing:201, links:202};
     /* textos simples */
     document.querySelectorAll('[data-k]').forEach(el=>{
       const v=get(el.dataset.k,+(el.dataset.f||1),+(el.dataset.i||0)); if(!v) return;
-      if('md' in el.dataset) el.innerHTML=md(v); else el.textContent=v;
+      if('md' in el.dataset) el.innerHTML=md(v); else el.textContent=v.replace(/^↳\s*/,'');
     });
     /* listas */
     const L=(k,fn)=>{ const box=document.querySelector(`[data-list="${k}"]`), it=list(k); if(box&&it.length) box.innerHTML=it.map(fn).join(''); };
@@ -876,13 +1093,18 @@ const PESTANAS={landing:201, links:202};
     L('pie.frase',x=>`<span>${esc(x[0])}</span>`);
     /* preguntas del hero (la cinta va duplicada para que el loop no corte) */
     const pq=list('hero.pregunta').map(x=>x[0]);
-    if(pq.length){
+    if(pq.length&&document.getElementById('asks')){
       const asks=document.getElementById('asks'), sp=pq.map(q=>`<span class="ask">${esc(q)}</span>`).join('');
       asks.querySelector('.asks-track').innerHTML=sp+`<span aria-hidden="true" class="asks-dup">${sp}</span>`;
       asks.setAttribute('aria-label','Preguntas que te hacen tus clientes: '+pq.join(', '));
     }
     /* mensajes del teléfono */
     if(window.FARA_setMsgs) FARA_setMsgs(list('problema.mensaje').map(x=>x[0]));
+    /* post del hero */
+    postDatos({trabajos:list('post.trabajo'), comentarios:list('post.comentario'), likes:get('post.likes')});
+    /* título de Sobre mí: lo que va después de la coma no se corta (así no queda una palabra sola en un renglón) */
+    const sm=document.querySelector('[data-k="sobremi.titulo"]'), smt=sm?sm.textContent:'', smi=smt.lastIndexOf(',');
+    if(smi>0&&!sm.querySelector('.nw')){ const nw=document.createElement('span'); nw.className='nw'; nw.textContent=smt.slice(smi+1).trim(); sm.textContent=smt.slice(0,smi+1)+' '; sm.append(nw); }
     /* espacio antes del cierre de la promesa si no arranca con puntuación */
     const p3=document.querySelector('[data-k="promesa.frase"][data-f="3"]');
     if(p3&&p3.textContent&&/^[A-Za-zÁÉÍÓÚáéíóúÑñ¿¡0-9]/.test(p3.textContent)) p3.textContent=' '+p3.textContent;
@@ -940,6 +1162,8 @@ const PESTANAS={landing:201, links:202};
       const id=x.fmt==='izquierda'?'imgIzq':x.fmt==='derecha'?'imgDer':null;
       if(id) set(document.getElementById(id),cl(x.link,'f_auto,q_auto,w_960'),x.alt);
     });
+    const pp=(B['POST DEL HERO']||[]).map(x=>({src:cl(x.link,'f_auto,q_auto,w_900'),alt:x.alt}));
+    if(pp.length) postDatos({fotos:pp});
     const pr=first('PROMESA'); if(pr) set(document.getElementById('imgPromesa'),cl(pr.link,'f_auto,q_auto,w_1600'));
     const rt=first('SOBRE MÍ'); if(rt) set(document.getElementById('imgRetrato'),cl(rt.link,'f_auto,q_auto,w_900'),rt.alt);
     /* portafolio: se rearma solo si cambió algo */
@@ -1033,6 +1257,121 @@ const PESTANAS={landing:201, links:202};
   document.addEventListener('visibilitychange',()=>document.hidden?stop():start());
 })();
 
+/* Post del hero: cada foto queda quieta unos 3 s, recibe un doble tap y pasa con un swipe de una.
+   Solo el post flota. Se pausa mientras se mantiene apretado (clic o dedo), fuera de pantalla o con la pestaña oculta. */
+(function(){
+  const root=document.getElementById('post'); if(!root) return;
+  const vp=root.querySelector('.post-vp'), big=root.querySelector('.post-big'), ic=root.querySelector('.post-ic'),
+        cnt=root.querySelector('.post-cnt'), dotsBox=root.querySelector('.post-dots'), likesEl=root.querySelector('.post-likes b');
+  const rm=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const COLORES=['#C8873A','#2F5D62','#7A8B6F','#8C5A3C','#C8873A'];
+  const D=5400, T_TAP=3000, T_SWIPE=3700;
+  let fotos=[...vp.querySelectorAll('.post-s img')].map(im=>({src:im.getAttribute('src'),alt:im.alt}));
+  let trabajos=fotos.map((_,k)=>['Rubro','Barrio','Caption de la foto '+(k+1)+'.']);
+  let likes=parseInt((likesEl.textContent||'').replace(/\D/g,''),10)||0;
+  let i=0, el=0, last=performance.now(), fired={}, held=false, visible=true, oculto=document.hidden, moviendo=false;
+  const slides=()=>[...vp.querySelectorAll('.post-s')];
+
+  function info(){
+    const t=trabajos[i]||trabajos[0]||['','',''];
+    root.querySelectorAll('.post-rubro').forEach(e=>e.textContent=t[0]);
+    root.querySelector('.post-barrio').textContent=t[1];
+    root.querySelector('.post-ini').textContent=(t[0]||' ').trim().charAt(0).toUpperCase();
+    root.querySelector('.post-txt').textContent=t[2];
+    cnt.textContent=(i+1)+'/'+fotos.length;
+    [...dotsBox.children].forEach((d,k)=>d.classList.toggle('on',k===i));
+    ic.classList.remove('liked');
+  }
+  function armarFotos(){
+    vp.querySelectorAll('.post-s').forEach(s=>s.remove());
+    fotos.forEach((f,k)=>{
+      const s=document.createElement('div'); s.className='post-s'+(k?'':' on');
+      s.innerHTML=`<img src="${f.src}" alt="" width="900" height="1125"${k?' loading="lazy"':''}>`;
+      s.querySelector('img').alt=f.alt||'Fotografía de FÁRA';
+      vp.insertBefore(s,cnt);
+    });
+    dotsBox.innerHTML=fotos.map((_,k)=>`<i${k?'':' class="on"'}></i>`).join('');
+    i=0; el=0; fired={}; info();
+  }
+  function like(){
+    likes+=1; likesEl.textContent=likes.toLocaleString('es-AR');
+    likesEl.classList.remove('pp'); void likesEl.offsetWidth; likesEl.classList.add('pp');
+  }
+  function dobleTap(){
+    big.classList.remove('go'); void big.getBoundingClientRect(); big.classList.add('go');
+    ic.classList.add('liked'); like();
+  }
+  function swipe(){
+    const ss=slides(); if(ss.length<2||moviendo) return;
+    const n=(i+1)%ss.length, cur=ss[i], nx=ss[n];
+    if(rm){ cur.classList.remove('on'); nx.classList.add('on'); i=n; info(); return; }
+    moviendo=true;
+    nx.className='post-s'; nx.style.transform='translateX(100%)'; void nx.offsetWidth;
+    cur.classList.add('va'); nx.classList.add('va');
+    cur.style.transform='translateX(-100%)'; nx.style.transform='translateX(0)';
+    setTimeout(()=>{ cur.className='post-s'; cur.style.transform=''; nx.className='post-s on'; nx.style.transform=''; i=n; info(); moviendo=false; },460);
+  }
+
+  /* datos de la planilla (pueden llegar antes o después de que cargue esto) */
+  function setPost(o){
+    if(o.fotos&&o.fotos.length){ fotos=o.fotos.slice(0,6); while(trabajos.length<fotos.length) trabajos.push(['','','']); armarFotos(); }
+    if(o.trabajos&&o.trabajos.length){ trabajos=o.trabajos.map(x=>[x[0]||'',x[1]||'',x[2]||'']); info(); }
+    if(o.comentarios&&o.comentarios.length){
+      const bubs=[...root.querySelectorAll('.post-bub:not(.post-likes)')];
+      bubs.forEach((b,k)=>{ const c=o.comentarios[k];
+        if(!c){ b.hidden=true; return; }
+        b.hidden=false; const ini=(c[1]||c[0]||' ').trim().charAt(0).toUpperCase();
+        b.querySelector('i').textContent=ini; b.querySelector('i').style.background=COLORES[k%COLORES.length];
+        b.querySelector('span').textContent=c[0];
+      });
+    }
+    if(o.likes){ const n=parseInt(String(o.likes).replace(/\D/g,''),10); if(n){ likes=n; likesEl.textContent=n.toLocaleString('es-AR'); } }
+  }
+  window.FARA_setPost=setPost;
+  (window.__postQ||[]).forEach(setPost); window.__postQ=[];
+
+  /* globos: entran de a uno la primera vez que el post se ve */
+  let globos=false;
+  function entrarGlobos(){
+    if(globos) return; globos=true;
+    const likesB=root.querySelector('.post-likes'); setTimeout(()=>likesB.classList.add('in'),300);
+    root.querySelectorAll('.post-bub:not(.post-likes)').forEach((b,k)=>setTimeout(()=>{
+      b.classList.add('in');
+      if(!rm) setTimeout(()=>{ b.style.animationDelay=(k*-1.1)+'s'; b.classList.add('flota'); },600);
+    },600+k*520));
+  }
+
+  /* pausa: solo mientras se mantiene apretado */
+  const post=root.querySelector('.post');
+  const sostener=e=>{ held=true; root.classList.add('is-held'); try{ post.setPointerCapture(e.pointerId); }catch(_){} };
+  const soltar=()=>{ held=false; root.classList.remove('is-held'); };
+  post.addEventListener('pointerdown',sostener);
+  ['pointerup','pointercancel','lostpointercapture'].forEach(ev=>post.addEventListener(ev,soltar));
+  post.addEventListener('contextmenu',e=>e.preventDefault());
+
+  if('IntersectionObserver' in window){
+    new IntersectionObserver(es=>es.forEach(e=>{ visible=e.isIntersecting; if(visible) entrarGlobos(); }),{threshold:.25}).observe(root);
+  } else entrarGlobos();
+  document.addEventListener('visibilitychange',()=>{ oculto=document.hidden; });
+
+  info();
+  (function loop(t){
+    const dt=t-last; last=t;
+    if(!held&&visible&&!oculto) el+=Math.min(dt,100);
+    if(el>=T_TAP&&!fired.tap){ fired.tap=1; if(!rm) dobleTap(); }
+    if(el>=T_SWIPE&&!fired.sw){ fired.sw=1; swipe(); }
+    if(el>=D){ el=0; fired={}; }
+    requestAnimationFrame(loop);
+  })(performance.now());
+
+  /* en compu, con mouse: el post se corre unos píxeles siguiendo el puntero */
+  if(!rm&&matchMedia('(min-width:900px) and (pointer:fine)').matches){
+    let tx=0,ty=0,cx=0,cy=0;
+    addEventListener('pointermove',e=>{ tx=e.clientX/innerWidth-.5; ty=e.clientY/innerHeight-.5; },{passive:true});
+    (function mover(){ cx+=(tx-cx)*.05; cy+=(ty-cy)*.05; if(visible) root.style.transform=`translate(${(cx*8).toFixed(2)}px,${(cy*6).toFixed(2)}px)`; requestAnimationFrame(mover); })();
+  }
+})();
+
 /* Preguntas del hero: se pausan fuera de pantalla */
 (function(){
   const a=document.querySelector('.asks'); if(!a||!('IntersectionObserver' in window)) return;
@@ -1054,7 +1393,7 @@ const PESTANAS={landing:201, links:202};
     a.addEventListener('mouseenter',()=>moveTo(a));
     a.addEventListener('focus',()=>moveTo(a));
   });
-  nav.addEventListener('mouseleave',()=>moveTo(active));
+  nav.addEventListener('mouseleave',()=>moveTo(null));
   if('IntersectionObserver' in window){
     const map=new Map(links.map(a=>[document.querySelector(a.getAttribute('href')),a]));
     const io=new IntersectionObserver(es=>{
@@ -1062,7 +1401,7 @@ const PESTANAS={landing:201, links:202};
         if(e.isIntersecting){ active=a; } else if(active===a){ active=null; }
       });
       links.forEach(l=>l.classList.toggle('is-on',l===active));
-      if(!nav.matches(':hover')) moveTo(active);
+      /* la pastilla solo aparece con el mouse encima */
     },{rootMargin:'-45% 0px -50% 0px'});
     map.forEach((a,sec)=>sec&&io.observe(sec));
   }
@@ -1248,7 +1587,7 @@ const PESTANAS={landing:201, links:202};
   function anfitrion(el){
     if(!el||!el.closest) return null;
     if(el.closest('#lbImg')) return document.getElementById('lightbox');
-    return el.closest('.hero-photo,.about-photo');
+    return el.closest('.post-vp,.about-photo');
   }
 
   function corazon(host,x,y){

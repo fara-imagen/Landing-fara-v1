@@ -18,7 +18,7 @@ Ciudad Autónoma de Buenos Aires, Argentina.
 
 ## Precios
 
-Desde ARS 150.000, según el proyecto. Cada trabajo se cotiza con una propuesta de precio cerrado, después de una reunión gratis de 15 minutos.
+Desde ARS 90.000, según el proyecto. Cada trabajo se cotiza con una propuesta de precio cerrado, después de una reunión gratis de 15 minutos.
 
 ## Cómo contactar
 
@@ -31,10 +31,15 @@ Desde ARS 150.000, según el proyecto. Cada trabajo se cotiza con una propuesta 
 - Trabajos: https://faraimagen.com.ar/#trabajos
 - Cómo trabajo: https://faraimagen.com.ar/#proceso
 - Sobre mí: https://faraimagen.com.ar/#sobre-mi
+- Preguntas frecuentes (precio, forma de pago, cantidad de fotos, formatos, plazos de entrega, dónde se hace la sesión, uso de las fotos): https://faraimagen.com.ar/#preguntas
 - Instagram: https://www.instagram.com/fara.imagen/
 - Blog: https://faraimagen.com.ar/blog/
 - Privacidad: https://faraimagen.com.ar/privacidad/
 - Sitemap: https://faraimagen.com.ar/sitemap.xml
+
+## Artículos del blog
+
+- Por qué te piden descuento aunque tu producto sea excelente: https://faraimagen.com.ar/blog/por-que-te-piden-descuento/ (cómo la imagen de una marca influye en el precio que el cliente está dispuesto a pagar y qué mejorar primero)
 
 ## Uso por sistemas de IA
 

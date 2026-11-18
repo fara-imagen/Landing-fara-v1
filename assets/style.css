@@ -245,3 +245,43 @@ mark{
 @media (prefers-contrast: more){
   .nav{border-color:rgba(26,20,16,.45);}
 }
+
+/* ==========================================================
+   PÁGINAS PÚBLICAS CON EL SISTEMA (body class="sitio")
+   Blog, posts, privacidad, gracias y 404. Mismas reglas que la landing:
+   radio 16 px, etiqueta sin rayita, menú cápsula con enlaces sueltos,
+   enlaces ámbar-700 sin subrayado, foco ámbar-700, sin cajas dentro de cajas.
+   Cotización, entrega y panel no llevan la clase y quedan como estaban.
+   ========================================================== */
+.sitio{--radius:16px;--foco:#8A5A22;--enlace:#8A5A22;}
+.sitio .eyebrow::before{display:none;}
+.sitio .btn{border-radius:16px;}
+.sitio .btn:focus-visible,.sitio a:focus-visible{outline-color:var(--foco);}
+
+/* menú: el mismo de la landing (logo, enlaces sueltos y botón) */
+.sitio .nav{border-radius:var(--radius);}
+.sitio .nav-links{background:none;border:0;box-shadow:none;}
+.sitio .nav-links a{transition:color .25s ease, background .25s ease, box-shadow .25s ease;}
+.sitio .nav-links a:hover{color:var(--espresso);background:var(--crema);box-shadow:0 2px 8px rgba(26,20,16,.12), inset 0 1px 0 rgba(255,255,255,.8);}
+
+/* textos del pie como en la landing: el punto se oculta cuando la frase empieza un renglón */
+.sitio .footer-txt{display:flex;flex-wrap:wrap;margin-left:-1.4em;clip-path:inset(0 0 0 1.4em);}
+.sitio .footer-txt span{white-space:nowrap;}
+.sitio .footer-txt span::before{content:"·";display:inline-block;width:1.4em;text-align:center;}
+
+/* enlaces dentro de un texto: ámbar-700, peso 600, sin subrayado */
+.sitio .prose a:not(.btn):not(.post-card){color:var(--enlace);font-weight:600;text-decoration:none;}
+.sitio .prose a:not(.btn):not(.post-card):hover{color:var(--espresso);}
+
+/* 404: los tres números en espresso (el ámbar nunca va como texto sobre crema) */
+.sitio .nf .nf-code span{color:inherit;}
+
+/* post: cabecera oscura, cuerpo de vidrio y, afuera del cuerpo, la llamada y los relacionados */
+.sitio .post-after{margin-top:16px;}
+.sitio .post-after .post-cta{margin-top:0;}
+.sitio .post-after .related{margin-top:48px;padding-top:0;border-top:0;}
+@media (min-width:768px){ .sitio .post-cta{padding:40px 48px;} }
+
+/* listado del blog: el primer pintado ya trae las tarjetas en el HTML */
+.sitio .page-head{padding-top:40px;}
+@media (min-width:768px){ .sitio .page-head{padding-top:64px;} }
