@@ -106,7 +106,7 @@ Si cambian, hay que actualizarlos en estos archivos:
   - Dominio faraimagen.com.ar ..... canonical de cada página, sitemap.xml, robots.txt,
                                     llms.txt, ai.txt, capi.js (lista de dominios permitidos)
   - Instagram ..................... llms.txt, ai.txt y la planilla (general.instagram)
-  - Precio "desde ARS 150.000" .... llms.txt, ai.txt
+  - Precio "desde ARS 90.000" .... llms.txt, ai.txt
 
 ==========================================================
 7) LO QUE NO SE INCLUYÓ

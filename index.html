@@ -79,6 +79,80 @@ if(window.MK_PIXEL_ID.indexOf('TU_')!==0){
 }
 </script>
 
+<!-- Preguntas frecuentes: el mismo texto que la sección #preguntas. Si cambiás una respuesta, cambiala en los dos lugares -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "¿Cuánto cuesta una sesión de fotos de producto en CABA?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Desde ARS 90.000. El precio final depende de cuántos productos son y dónde vas a usar las fotos. Después de una reunión gratis de 15 minutos te mando una propuesta con precio cerrado, así sabés el total antes de empezar."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Cómo se paga?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "50 % de seña para reservar la fecha de la sesión y el otro 50 % antes de recibir las fotos."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Cuántas fotos incluye y en qué formatos las recibo?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "La cantidad se define en la propuesta según tus productos, desde 6 fotos. Las recibís en alta resolución para imprimir, en versión liviana para la web, recortadas en 4:5 y 9:16 para redes y con fondo recortado en PNG para tu tienda online."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿En cuánto tiempo recibo las fotos?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "En unos 7 días hábiles desde la sesión. En los proyectos más grandes, el plazo exacto queda escrito en la propuesta."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Dónde se hace la sesión?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "En mi estudio o en tu local, según qué le convenga a tu producto. Trabajo en la Ciudad Autónoma de Buenos Aires."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Puedo usar las fotos en anuncios, en mi tienda y en redes?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Sí, para lo que quieras: redes, tienda online, catálogo, impresos y publicidad. Si además querés que yo arme y maneje tus anuncios, lo cotizamos aparte."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Por qué no usar fotos hechas con IA?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Una imagen hecha con IA dibuja un producto parecido al tuyo. Quien te compra espera recibir lo que vio, y una foto real le muestra exactamente eso: tu color, tu textura, tu etiqueta."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Cómo te contacto para empezar a trabajar?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Escribime por WhatsApp y coordinamos la reunión de 15 minutos. Es gratis y sin compromiso."
+      }
+    }
+  ]
+}
+</script>
+
 <style>
 /* ============ TOKENS (paleta oficial FÁRA) ============ */
 :root{
@@ -478,7 +552,8 @@ h3{font-size:clamp(20px,2.1vw,24px);letter-spacing:-.015em;}
 .photo-credit{display:flex;align-items:center;gap:8px;padding:14px 2px 2px;font-size:15px;font-weight:600;font-stretch:112%;letter-spacing:-.01em;color:var(--on-dark);}
 .photo-credit img{height:14px;width:auto;flex:none;}
 .about-card{position:relative;}
-.about-card h2{margin:14px 0 18px;}
+.about-card h2{margin:14px 0 18px;text-wrap:balance;}
+.nw{white-space:nowrap;}
 .about-card p{color:var(--on-dark-muted);margin-top:14px;max-width:52ch;}
 .about-card p strong{color:var(--on-dark);font-weight:600;}
 .about-card .creds{margin-top:28px;padding-top:20px;border-top:1px solid var(--line-dark);display:flex;gap:32px;}
@@ -488,8 +563,8 @@ h3{font-size:clamp(20px,2.1vw,24px);letter-spacing:-.015em;}
 .about-card .creds span{padding:0;font-size:14px;}
 @media (min-width:900px){
   .about-grid{grid-template-columns:1fr 1fr;justify-items:center;gap:0;}
-  .about-pan{width:380px;}
-  .about-card{width:480px;max-width:100%;}
+  .about-pan{width:480px;}
+  .about-card{width:510px;max-width:100%;}
 }
 
 /* ============ TESTIMONIOS ============ */
@@ -506,6 +581,36 @@ h3{font-size:clamp(20px,2.1vw,24px);letter-spacing:-.015em;}
 .testi figcaption{font-size:15px;color:var(--muted);}
 .testi figcaption b{display:block;color:var(--espresso);font-weight:600;}
 @media (min-width:768px){ .testis{grid-template-columns:repeat(2,1fr);gap:20px;} .testi{padding:36px;} }
+
+/* ============ PREGUNTAS FRECUENTES ============ */
+/* texto fijo en el HTML (lo leen Google y las IAs) y repetido en el JSON-LD FAQPage del <head> */
+.faq-grid{display:grid;gap:8px;}
+.faq-list{display:grid;gap:10px;}
+.faq-item{border-radius:var(--radius);background:rgba(255,255,255,.38);
+  backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);
+  border:1px solid rgba(255,255,255,.6);box-shadow:0 16px 34px rgba(26,20,16,.06), inset 0 1px 0 rgba(255,255,255,.7);
+  interpolate-size:allow-keywords;}
+.faq-item summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:20px 20px 20px 24px;
+  font-size:clamp(17px,1.6vw,19px);font-weight:600;line-height:1.35;border-radius:var(--radius);}
+.faq-item summary::-webkit-details-marker{display:none;}
+.faq-item summary:focus-visible{outline:3px solid #8A5A22;outline-offset:3px;}
+.faq-ico{position:relative;width:32px;height:32px;border-radius:50%;background:var(--espresso);flex:none;transition:transform .3s var(--ease),background .2s ease;}
+.faq-ico::before,.faq-ico::after{content:"";position:absolute;left:50%;top:50%;width:12px;height:2px;margin:-1px 0 0 -6px;border-radius:2px;background:var(--crema);}
+.faq-ico::after{transform:rotate(90deg);}
+.faq-item[open] .faq-ico{transform:rotate(45deg);background:var(--ambar);}
+.faq-item p{padding:0 24px 22px;color:var(--muted);font-size:17px;line-height:1.6;max-width:60ch;}
+.faq-item::details-content{block-size:0;overflow:hidden;transition:block-size .35s var(--ease),content-visibility .35s allow-discrete;}
+.faq-item[open]::details-content{block-size:auto;}
+@media (hover:hover) and (pointer:fine){ .faq-item summary:hover .faq-ico{transform:scale(1.08);} .faq-item[open] summary:hover .faq-ico{transform:rotate(45deg) scale(1.08);} }
+@media (min-width:900px){
+  .faq-grid{grid-template-columns:1fr 1.45fr;gap:56px;align-items:start;}
+  .faq-grid .section-head{position:sticky;top:110px;margin-bottom:0;}
+  .faq-item summary{padding:22px 24px 22px 28px;}
+  .faq-item p{padding:0 28px 24px;}
+}
+@media (prefers-reduced-motion:reduce){ .faq-ico,.faq-item::details-content{transition:none;} }
+@media (prefers-reduced-transparency:reduce){ .faq-item{background:var(--crema-2);backdrop-filter:none;-webkit-backdrop-filter:none;} }
+@media (prefers-contrast:more){ .faq-item{border-color:rgba(26,20,16,.45);} }
 
 /* ============ CTA FINAL ============ */
 .final{padding-bottom:72px;}
@@ -799,7 +904,7 @@ h3{font-size:clamp(20px,2.1vw,24px);letter-spacing:-.015em;}
       </figure>
       <div class="about-card reveal">
         <span class="eyebrow" data-k="sobremi.etiqueta">Sobre mí</span>
-        <h2 data-k="sobremi.titulo">Antes de fotografiar productos, los diseñaba.</h2>
+        <h2 data-k="sobremi.titulo">Antes de fotografiar productos, <span class="nw">los diseñaba.</span></h2>
         <div data-list="sobremi.parrafo"><p>Soy Matías, fotógrafo desde 2016 y diseñador industrial (UBA). Antes de fotografiar productos me dediqué a diseñarlos: los creé, los mejoré, los hice más fáciles de fabricar, hasta obtuve el Sello Buen Diseño y el Innovar. <strong>Por eso, cuando miro tu producto, sé qué lo hace bueno y cómo mostrarlo.</strong> Y si tiene algo para mejorar, también puedo ayudarte.</p>
         <p>Trabajé dentro de varias PyMEs argentinas y vi lo que se repite: un producto muy bien resuelto, un dueño sin tiempo y fotos que no le hacen justicia. Conozco la foto completa porque la vi desde adentro.</p></div>
         <div class="creds" data-list="sobremi.credencial">
@@ -834,6 +939,50 @@ h3{font-size:clamp(20px,2.1vw,24px);letter-spacing:-.015em;}
           <blockquote>Sus tomas fueron increíbles y su presencia muy agradable, casi imperceptible. El material que le quedó a Urdhva es maravilloso.</blockquote>
           <figcaption><b>Laura</b>Dueña de Urdhva Yoga</figcaption>
         </figure>
+      </div>
+    </div>
+  </section>
+
+  <!-- 8.5 · PREGUNTAS FRECUENTES (texto fijo: tiene que coincidir con el JSON-LD FAQPage del <head>) -->
+  <section id="preguntas" data-track-view="Preguntas frecuentes">
+    <div class="wrap faq-grid">
+      <div class="section-head reveal">
+        <span class="eyebrow">Preguntas frecuentes</span>
+        <h2>Lo que me preguntan antes de la primera sesión</h2>
+      </div>
+      <div class="faq-list reveal">
+          <details class="faq-item" name="faq">
+            <summary>¿Cuánto cuesta una sesión de fotos de producto en CABA?<span class="faq-ico" aria-hidden="true"></span></summary>
+            <p>Desde ARS 90.000. El precio final depende de cuántos productos son y dónde vas a usar las fotos. Después de una reunión gratis de 15 minutos te mando una propuesta con precio cerrado, así sabés el total antes de empezar.</p>
+          </details>
+          <details class="faq-item" name="faq">
+            <summary>¿Cómo se paga?<span class="faq-ico" aria-hidden="true"></span></summary>
+            <p>50 % de seña para reservar la fecha de la sesión y el otro 50 % antes de recibir las fotos.</p>
+          </details>
+          <details class="faq-item" name="faq">
+            <summary>¿Cuántas fotos incluye y en qué formatos las recibo?<span class="faq-ico" aria-hidden="true"></span></summary>
+            <p>La cantidad se define en la propuesta según tus productos, desde 6 fotos. Las recibís en alta resolución para imprimir, en versión liviana para la web, recortadas en 4:5 y 9:16 para redes y con fondo recortado en PNG para tu tienda online.</p>
+          </details>
+          <details class="faq-item" name="faq">
+            <summary>¿En cuánto tiempo recibo las fotos?<span class="faq-ico" aria-hidden="true"></span></summary>
+            <p>En unos 7 días hábiles desde la sesión. En los proyectos más grandes, el plazo exacto queda escrito en la propuesta.</p>
+          </details>
+          <details class="faq-item" name="faq">
+            <summary>¿Dónde se hace la sesión?<span class="faq-ico" aria-hidden="true"></span></summary>
+            <p>En mi estudio o en tu local, según qué le convenga a tu producto. Trabajo en la Ciudad Autónoma de Buenos Aires.</p>
+          </details>
+          <details class="faq-item" name="faq">
+            <summary>¿Puedo usar las fotos en anuncios, en mi tienda y en redes?<span class="faq-ico" aria-hidden="true"></span></summary>
+            <p>Sí, para lo que quieras: redes, tienda online, catálogo, impresos y publicidad. Si además querés que yo arme y maneje tus anuncios, lo cotizamos aparte.</p>
+          </details>
+          <details class="faq-item" name="faq">
+            <summary>¿Por qué no usar fotos hechas con IA?<span class="faq-ico" aria-hidden="true"></span></summary>
+            <p>Una imagen hecha con IA dibuja un producto parecido al tuyo. Quien te compra espera recibir lo que vio, y una foto real le muestra exactamente eso: tu color, tu textura, tu etiqueta.</p>
+          </details>
+          <details class="faq-item" name="faq">
+            <summary>¿Cómo te contacto para empezar a trabajar?<span class="faq-ico" aria-hidden="true"></span></summary>
+            <p>Escribime por WhatsApp y coordinamos la reunión de 15 minutos. Es gratis y sin compromiso.</p>
+          </details>
       </div>
     </div>
   </section>
@@ -953,6 +1102,9 @@ const PESTANAS={landing:201, links:202};
     if(window.FARA_setMsgs) FARA_setMsgs(list('problema.mensaje').map(x=>x[0]));
     /* post del hero */
     postDatos({trabajos:list('post.trabajo'), comentarios:list('post.comentario'), likes:get('post.likes')});
+    /* título de Sobre mí: lo que va después de la coma no se corta (así no queda una palabra sola en un renglón) */
+    const sm=document.querySelector('[data-k="sobremi.titulo"]'), smt=sm?sm.textContent:'', smi=smt.lastIndexOf(',');
+    if(smi>0&&!sm.querySelector('.nw')){ const nw=document.createElement('span'); nw.className='nw'; nw.textContent=smt.slice(smi+1).trim(); sm.textContent=smt.slice(0,smi+1)+' '; sm.append(nw); }
     /* espacio antes del cierre de la promesa si no arranca con puntuación */
     const p3=document.querySelector('[data-k="promesa.frase"][data-f="3"]');
     if(p3&&p3.textContent&&/^[A-Za-zÁÉÍÓÚáéíóúÑñ¿¡0-9]/.test(p3.textContent)) p3.textContent=' '+p3.textContent;
